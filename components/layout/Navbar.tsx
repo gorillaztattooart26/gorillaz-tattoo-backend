@@ -35,13 +35,13 @@ export function Navbar() {
         ))}
       </div>
 
-      <button
-        type="button"
+      <Link
+        href={`${ROUTES.home}${HOME_SECTIONS.booking}`}
         className="bg-[#fabb42] text-black text-sm font-semibold rounded-full px-6 py-3 transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)]"
-        aria-label="Book a tattoo session"
+        aria-label="Jump to the tattoo inquiry form"
       >
         book session
-      </button>
+      </Link>
     </nav>
   )
 }

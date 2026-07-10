@@ -6,7 +6,8 @@ export interface BookingFormValues {
   style: string
   placement: string
   size: string
-  date: string
+  height: string
+  weight: string
   idea: string
 }
 

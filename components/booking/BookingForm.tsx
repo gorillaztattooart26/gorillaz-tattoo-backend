@@ -17,7 +17,8 @@ const INITIAL_VALUES: BookingFormValues = {
   style: STYLE_OPTIONS[0],
   placement: '',
   size: SIZE_OPTIONS[0],
-  date: '',
+  height: '',
+  weight: '',
   idea: '',
 }
 
@@ -122,11 +123,23 @@ export function BookingForm() {
       <Select value={form.size} onChange={update('size')} options={SIZE_OPTIONS} srLabel="estimated size" />
 
       <label className="block">
-        <span className="sr-only">preferred appointment date</span>
+        <span className="sr-only">height</span>
         <input
-          type="date"
-          value={form.date}
-          onChange={update('date')}
+          type="text"
+          value={form.height}
+          onChange={update('height')}
+          placeholder="Height (e.g. 5 ft 8 in / 173 cm)"
+          className={fieldClasses}
+        />
+      </label>
+
+      <label className="block">
+        <span className="sr-only">weight</span>
+        <input
+          type="text"
+          value={form.weight}
+          onChange={update('weight')}
+          placeholder="Weight (e.g. 150 lbs / 68kg)"
           className={fieldClasses}
         />
       </label>

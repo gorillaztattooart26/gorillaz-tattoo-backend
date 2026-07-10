@@ -15,12 +15,12 @@ export function AccordionItem({ question, answer, isOpen, onToggle }: AccordionI
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
-        className="w-full flex items-center justify-between gap-6 py-6 text-left"
+        className="group w-full flex items-center justify-between gap-6 py-6 text-left"
       >
         <span className="text-white text-lg md:text-xl">{question}</span>
         <span
           className={cn(
-            'shrink-0 text-white text-2xl leading-none transition-transform duration-300',
+            'shrink-0 text-white text-2xl leading-none transition-all duration-300 group-hover:text-[#fabb42]',
             isOpen && 'rotate-45',
           )}
           aria-hidden="true"

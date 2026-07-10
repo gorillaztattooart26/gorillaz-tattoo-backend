@@ -24,7 +24,8 @@ export function submitBookingInquiry(payload: BookingInquiryPayload): void {
       `tattoo style: ${payload.style}\n` +
       `placement: ${payload.placement}\n` +
       `estimated size: ${payload.size}\n` +
-      `preferred appointment date: ${payload.date}\n` +
+      `height: ${payload.height}\n` +
+      `weight: ${payload.weight}\n` +
       `reference images: ${fileNames}\n\n` +
       `tattoo idea:\n${payload.idea}`,
   )
