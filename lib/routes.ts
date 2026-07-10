@@ -7,6 +7,7 @@ export const ROUTES = {
   about: '/about',
   artists: '/artists',
   portfolio: '/portfolio',
+  gallery: '/gallery',
   booking: '/booking',
   contact: '/contact',
 } as const
