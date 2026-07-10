@@ -1,5 +1,7 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { SectionHeading } from '@/components/common/SectionHeading'
+import { ROUTES } from '@/lib/routes'
 import type { PortfolioWork } from '@/types/portfolio'
 
 const WORKS: PortfolioWork[] = [
@@ -90,6 +92,15 @@ export function PortfolioPreview() {
             </figcaption>
           </figure>
         ))}
+      </div>
+
+      <div className="reveal mt-10 flex justify-center md:mt-14">
+        <Link
+          href={ROUTES.gallery}
+          className="rounded-full bg-[#fabb42] px-8 py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)]"
+        >
+          view gallery
+        </Link>
       </div>
     </section>
   )

@@ -34,12 +34,11 @@ export const siteConfig = {
  * Homepage section links use `/#section` (not bare `#section`) so they
  * resolve correctly from the shared layout regardless of which route the
  * visitor is currently on — Next.js scrolls to the anchor after navigating
- * home. `gallery` points at its own dedicated route instead of an anchor.
+ * home.
  */
 export const NAV_LINKS: NavLink[] = [
   { label: 'portfolio', href: `${ROUTES.home}${HOME_SECTIONS.portfolio}` },
   { label: 'artists', href: `${ROUTES.home}${HOME_SECTIONS.artists}` },
   { label: 'studio', href: `${ROUTES.home}${HOME_SECTIONS.studio}` },
   { label: 'booking', href: `${ROUTES.home}${HOME_SECTIONS.booking}` },
-  { label: 'gallery', href: ROUTES.gallery },
 ]
