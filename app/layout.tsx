@@ -1,8 +1,5 @@
 import type { Metadata } from 'next'
 import { Readex_Pro } from 'next/font/google'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
-import { ScrollRevealProvider } from '@/components/providers/ScrollRevealProvider'
 import { siteConfig } from '@/lib/site-config'
 import { buildLocalBusinessJsonLd } from '@/lib/seo'
 import '@/styles/globals.css'
@@ -36,6 +33,11 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
 }
 
+/**
+ * True app root — fonts, global CSS, and site-wide JSON-LD only. Public
+ * chrome (Navbar/Footer) lives in app/(marketing)/layout.tsx so the
+ * private booking portal (app/booking/[token]) can opt out of it.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const jsonLd = buildLocalBusinessJsonLd()
 
@@ -46,10 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-        <ScrollRevealProvider />
+        {children}
       </body>
     </html>
   )
