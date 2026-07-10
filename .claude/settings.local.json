@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mdfind -name \"node\" -onlyin /usr/local)",
+      "Bash(curl -sI https://nodejs.org/dist/v22.17.0/node-v22.17.0-darwin-arm64.tar.gz)",
+      "Bash(mkdir -p ~/.local/node)",
+      "Bash(curl -sL https://nodejs.org/dist/v22.17.0/node-v22.17.0-darwin-arm64.tar.gz)",
+      "Bash(tar xz *)",
+      "Bash(~/.local/node/bin/node --version)",
+      "Bash(~/.local/node/bin/npm --version)"
+    ]
+  }
+}
