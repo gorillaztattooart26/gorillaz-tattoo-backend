@@ -4,7 +4,12 @@ import { useState } from 'react'
 import { Select } from '@/components/ui/Select'
 import { fieldClasses } from '@/components/ui/fieldStyles'
 import { ArrowIcon } from '@/components/common/icons'
-import { ARTIST_OPTIONS, SIZE_OPTIONS, STYLE_OPTIONS } from '@/components/booking/options'
+import {
+  ARTIST_OPTIONS,
+  CONTACT_METHOD_OPTIONS,
+  SIZE_OPTIONS,
+  STYLE_OPTIONS,
+} from '@/components/booking/options'
 import { submitBookingInquiry } from '@/services/booking'
 import type { BookingFormValues } from '@/types/booking'
 import { cn } from '@/utils/cn'
@@ -13,6 +18,7 @@ const INITIAL_VALUES: BookingFormValues = {
   fullName: '',
   email: '',
   phone: '',
+  preferredContactMethod: CONTACT_METHOD_OPTIONS[0],
   artist: ARTIST_OPTIONS[0],
   style: STYLE_OPTIONS[0],
   placement: '',
@@ -93,6 +99,14 @@ export function BookingForm() {
       </label>
 
       <Select
+        value={form.preferredContactMethod}
+        onChange={update('preferredContactMethod')}
+        options={CONTACT_METHOD_OPTIONS}
+        srLabel="preferred contact method"
+        capitalize
+      />
+
+      <Select
         value={form.artist}
         onChange={update('artist')}
         options={ARTIST_OPTIONS}
@@ -120,27 +134,34 @@ export function BookingForm() {
         />
       </label>
 
-      <div className="sm:col-span-2 grid grid-cols-3 gap-4">
-        <Select value={form.size} onChange={update('size')} options={SIZE_OPTIONS} srLabel="estimated size" />
+      <div className="sm:col-span-2 grid grid-cols-4 gap-4">
+        <div className="col-span-2">
+          <Select
+            value={form.size}
+            onChange={update('size')}
+            options={SIZE_OPTIONS}
+            srLabel="estimated size"
+          />
+        </div>
 
-        <label className="block">
+        <label className="block col-span-1">
           <span className="sr-only">height</span>
           <input
             type="text"
             value={form.height}
             onChange={update('height')}
-            placeholder="Height (e.g. 5 ft 8 in / 173 cm)"
+            placeholder="Height"
             className={fieldClasses}
           />
         </label>
 
-        <label className="block">
+        <label className="block col-span-1">
           <span className="sr-only">weight</span>
           <input
             type="text"
             value={form.weight}
             onChange={update('weight')}
-            placeholder="Weight (e.g. 150 lbs / 68kg)"
+            placeholder="Weight"
             className={fieldClasses}
           />
         </label>

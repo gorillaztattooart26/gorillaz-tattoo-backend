@@ -20,6 +20,7 @@ export function submitBookingInquiry(payload: BookingInquiryPayload): void {
     `full name: ${payload.fullName}\n` +
       `email: ${payload.email}\n` +
       `phone: ${payload.phone}\n` +
+      `preferred contact method: ${payload.preferredContactMethod}\n` +
       `preferred artist: ${payload.artist}\n` +
       `tattoo style: ${payload.style}\n` +
       `placement: ${payload.placement}\n` +

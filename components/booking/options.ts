@@ -1,9 +1,11 @@
 export const ARTIST_OPTIONS = [
-  'no preference',
+  'preferred tattoo artist',
   'andrea santos',
   'miko reyes',
   'joaquin dela cruz',
 ]
+
+export const CONTACT_METHOD_OPTIONS = ['email', 'call', 'sms', 'messenger']
 
 export const STYLE_OPTIONS = [
   'blackwork',
