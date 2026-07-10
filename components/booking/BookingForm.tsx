@@ -122,27 +122,29 @@ export function BookingForm() {
 
       <Select value={form.size} onChange={update('size')} options={SIZE_OPTIONS} srLabel="estimated size" />
 
-      <label className="block">
-        <span className="sr-only">height</span>
-        <input
-          type="text"
-          value={form.height}
-          onChange={update('height')}
-          placeholder="Height (e.g. 5 ft 8 in / 173 cm)"
-          className={fieldClasses}
-        />
-      </label>
+      <div className="sm:col-span-2 grid grid-cols-2 gap-4">
+        <label className="block">
+          <span className="sr-only">height</span>
+          <input
+            type="text"
+            value={form.height}
+            onChange={update('height')}
+            placeholder="Height (e.g. 5 ft 8 in / 173 cm)"
+            className={fieldClasses}
+          />
+        </label>
 
-      <label className="block">
-        <span className="sr-only">weight</span>
-        <input
-          type="text"
-          value={form.weight}
-          onChange={update('weight')}
-          placeholder="Weight (e.g. 150 lbs / 68kg)"
-          className={fieldClasses}
-        />
-      </label>
+        <label className="block">
+          <span className="sr-only">weight</span>
+          <input
+            type="text"
+            value={form.weight}
+            onChange={update('weight')}
+            placeholder="Weight (e.g. 150 lbs / 68kg)"
+            className={fieldClasses}
+          />
+        </label>
+      </div>
 
       <label className="block sm:col-span-2 cursor-pointer">
         <span className="sr-only">reference images upload</span>

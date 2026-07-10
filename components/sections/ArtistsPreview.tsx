@@ -114,9 +114,6 @@ export function ArtistsPreview() {
           aria-label="Show next artist"
           className="group flex flex-col items-center justify-center gap-4 rounded-2xl border border-white/15 bg-neutral-900/30 py-10 md:py-0 hover:border-white/30 hover:bg-neutral-900/60 transition-colors"
         >
-          <span className="text-white/40 text-xs uppercase tracking-widest">
-            {String(index + 1).padStart(2, '0')} / {String(ARTISTS.length).padStart(2, '0')}
-          </span>
           <span className="flex items-center gap-2 text-white text-sm font-semibold uppercase tracking-wide">
             next artist
             <NextArrowIcon className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />

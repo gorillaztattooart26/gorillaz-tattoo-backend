@@ -20,7 +20,7 @@ export function Booking() {
           <br />
           get tattooed?
         </h2>
-        <ArrowIcon className="mb-1 md:mb-2 h-[13vw] w-[13vw] md:h-[4.2vw] md:w-[4.2vw] shrink-0 text-white" />
+        <ArrowIcon className="mb-1 md:mb-2 h-[16vw] w-[16vw] md:h-[5.2vw] md:w-[5.2vw] shrink-0 text-white" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 items-start">
