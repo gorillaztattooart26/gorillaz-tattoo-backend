@@ -120,9 +120,9 @@ export function BookingForm() {
         />
       </label>
 
-      <Select value={form.size} onChange={update('size')} options={SIZE_OPTIONS} srLabel="estimated size" />
+      <div className="sm:col-span-2 grid grid-cols-3 gap-4">
+        <Select value={form.size} onChange={update('size')} options={SIZE_OPTIONS} srLabel="estimated size" />
 
-      <div className="sm:col-span-2 grid grid-cols-2 gap-4">
         <label className="block">
           <span className="sr-only">height</span>
           <input
