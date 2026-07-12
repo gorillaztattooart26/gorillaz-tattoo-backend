@@ -1,70 +1,145 @@
-import type { Booking, PaymentStatus } from '@/types/booking-portal'
+import crypto from 'node:crypto'
 
 /**
- * PayMongo integration seam. No API requests are made yet — these are
- * typed stubs describing the future architecture so PaymentCard and the
- * booking portal can be wired up now and swapped to real calls later
- * without changing any calling code.
+ * PayMongo integration — server-only. `PAYMONGO_SECRET_KEY` must never be
+ * sent to the client, so every export here is only ever called from Server
+ * Actions or route handlers (components/booking/payment-actions.ts,
+ * app/api/paymongo/webhook/route.ts).
  */
 
+const PAYMONGO_API_BASE = 'https://api.paymongo.com/v1'
+
+function paymongoAuthHeader(): string {
+  const secretKey = process.env.PAYMONGO_SECRET_KEY
+  if (!secretKey) {
+    throw new Error('Missing PAYMONGO_SECRET_KEY environment variable.')
+  }
+  return `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`
+}
+
 export interface CreateCheckoutSessionParams {
-  booking: Pick<Booking, 'token' | 'bookingId'>
+  bookingToken: string
+  bookingId: string
+  /** Whole currency units (e.g. PHP), not centavos — converted internally. */
   amount: number
   currency: string
   description: string
+  customer: { name: string; email: string; mobile: string }
+  successUrl: string
+  cancelUrl: string
 }
 
 export interface CheckoutSession {
   id: string
   checkoutUrl: string
-  status: 'pending' | 'expired' | 'paid'
 }
 
 /**
- * TODO: POST to PayMongo's Checkout Sessions API (via a server action or
- * /api/paymongo/checkout route, never directly from the client — the
- * secret key must stay server-side) and return the resulting checkout URL
- * to redirect the customer to.
+ * Creates a PayMongo Checkout Session and returns the hosted page URL to
+ * redirect the customer to. `metadata.booking_token` is what the webhook
+ * uses to reconcile an incoming `payment.paid`/`payment.failed` event back
+ * to the booking that triggered it.
  */
 export async function createCheckoutSession(
   params: CreateCheckoutSessionParams,
 ): Promise<CheckoutSession> {
-  console.info('[paymongo] createCheckoutSession() called with', params)
-  throw new Error('createCheckoutSession() is not implemented yet — PayMongo integration pending.')
-}
+  const response = await fetch(`${PAYMONGO_API_BASE}/checkout_sessions`, {
+    method: 'POST',
+    headers: {
+      Authorization: paymongoAuthHeader(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      data: {
+        attributes: {
+          line_items: [
+            {
+              name: params.description,
+              amount: Math.round(params.amount * 100),
+              currency: params.currency,
+              quantity: 1,
+            },
+          ],
+          payment_method_types: ['card', 'gcash', 'paymaya'],
+          success_url: params.successUrl,
+          cancel_url: params.cancelUrl,
+          description: params.description,
+          reference_number: params.bookingId,
+          send_email_receipt: false,
+          billing: {
+            name: params.customer.name,
+            email: params.customer.email,
+            phone: params.customer.mobile,
+          },
+          metadata: {
+            booking_token: params.bookingToken,
+          },
+        },
+      },
+    }),
+  })
 
-export interface VerifyPaymentParams {
-  checkoutSessionId: string
-}
+  const body = await response.json()
 
-export interface VerifyPaymentResult {
-  status: PaymentStatus
-  paidAt: string | null
+  if (!response.ok) {
+    console.error('[paymongo] createCheckoutSession failed:', body)
+    throw new Error('Failed to create PayMongo checkout session.')
+  }
+
+  return {
+    id: body.data.id,
+    checkoutUrl: body.data.attributes.checkout_url,
+  }
 }
 
 /**
- * TODO: query PayMongo for the checkout session / payment intent status
- * (server-side) and reconcile it against the booking record in Supabase.
+ * Verifies a `Paymongo-Signature` header against the raw request body.
+ * Algorithm confirmed against the official `paymongo-node` SDK's
+ * `Webhook.js#constructEvent` (PayMongo's own docs pages for this were
+ * incomplete/404ing): the header is 3 comma-separated `key=value` parts —
+ * timestamp, test-mode signature, live-mode signature, in that fixed
+ * order. The expected signature is `HMAC-SHA256(webhookSecret,
+ * "${timestamp}.${rawBody}")`, compared against whichever of the
+ * test/live parts is non-empty (live takes precedence, matching the SDK).
+ *
+ * Uses a timing-safe comparison rather than the SDK's plain `!=` — the
+ * algorithm is otherwise identical, this just closes a timing side-channel
+ * the reference implementation doesn't bother with.
  */
-export async function verifyPayment(
-  params: VerifyPaymentParams,
-): Promise<VerifyPaymentResult> {
-  console.info('[paymongo] verifyPayment() called with', params)
-  throw new Error('verifyPayment() is not implemented yet — PayMongo integration pending.')
-}
+export function verifyWebhookSignature(
+  rawBody: string,
+  signatureHeader: string,
+  webhookSecret: string,
+): boolean {
+  const parts = signatureHeader.split(',')
+  if (parts.length < 3) {
+    return false
+  }
 
-export interface PaymongoWebhookEvent {
-  type: string
-  data: unknown
-}
+  const timestamp = parts[0]?.split('=')[1]
+  const testModeSignature = parts[1]?.split('=')[1]
+  const liveModeSignature = parts[2]?.split('=')[1]
 
-/**
- * TODO: this is the shape of the future POST /api/paymongo/webhook route
- * handler — verify the PayMongo signature header, then update the
- * booking's payment status in Supabase based on the event type
- * (e.g. `payment.paid`, `payment.failed`).
- */
-export async function handleWebhook(event: PaymongoWebhookEvent): Promise<void> {
-  console.info('[paymongo] handleWebhook() called with', event)
-  throw new Error('handleWebhook() is not implemented yet — PayMongo integration pending.')
+  if (!timestamp) {
+    return false
+  }
+
+  const comparisonSignature = liveModeSignature || testModeSignature
+  if (!comparisonSignature) {
+    return false
+  }
+
+  const expectedHex = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest('hex')
+
+  const expected = Buffer.from(expectedHex, 'hex')
+  const provided = Buffer.from(comparisonSignature, 'hex')
+
+  if (expected.length !== provided.length) {
+    return false
+  }
+
+  return crypto.timingSafeEqual(expected, provided)
 }

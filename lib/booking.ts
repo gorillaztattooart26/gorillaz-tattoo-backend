@@ -47,6 +47,7 @@ function buildTimeline(status: BookingStatus, appointmentDate: string): Timeline
 }
 
 interface BookingRpcRow {
+  id: string
   token: string
   booking_id: string
   status: BookingStatus
@@ -171,5 +172,47 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
     payment: null,
     timeline: buildTimeline(b.status, b.appointment_date),
     createdAt: b.created_at,
+  }
+}
+
+export interface BookingRecord {
+  /** Raw `bookings.id` UUID — the FK target for `payments.booking_id`. */
+  id: string
+  bookingId: string
+  status: BookingStatus
+  downPaymentAmount: number
+  currency: string
+  customer: { name: string; email: string; mobile: string }
+}
+
+/**
+ * Thin counterpart to `getBookingByToken()` for internal (non-display)
+ * callers, like the checkout Server Action, that need the raw `bookings.id`
+ * primary key and the authoritative down payment amount — re-derived from
+ * the DB rather than trusted from client input. Deliberately not merged
+ * into `Booking` (the shape every display component consumes) to avoid
+ * threading an internal DB id through unrelated UI code.
+ */
+export async function getBookingRecordByToken(token: string): Promise<BookingRecord | null> {
+  const { data, error } = await supabase.rpc('get_booking_by_token', { p_token: token })
+
+  if (error || !data) {
+    if (error) console.error('[bookings] get_booking_by_token failed:', error)
+    return null
+  }
+
+  const { booking: b } = data as unknown as BookingRpcResult
+
+  return {
+    id: b.id,
+    bookingId: b.booking_id,
+    status: b.status,
+    downPaymentAmount: b.down_payment_amount,
+    currency: b.currency,
+    customer: {
+      name: b.customer_name,
+      email: b.customer_email,
+      mobile: b.customer_mobile,
+    },
   }
 }

@@ -263,6 +263,56 @@ export interface Database {
           },
         ]
       }
+      payments: {
+        Row: {
+          id: string
+          booking_id: string
+          checkout_session_id: string
+          provider: string
+          method: string | null
+          status: string
+          amount: number
+          currency: string
+          paid_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          checkout_session_id: string
+          provider?: string
+          method?: string | null
+          status?: string
+          amount: number
+          currency?: string
+          paid_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          booking_id?: string
+          checkout_session_id?: string
+          provider?: string
+          method?: string | null
+          status?: string
+          amount?: number
+          currency?: string
+          paid_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'payments_booking_id_fkey'
+            columns: ['booking_id']
+            isOneToOne: false
+            referencedRelation: 'bookings'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -281,3 +331,5 @@ export type InquiryImageInsert = Database['public']['Tables']['inquiry_images'][
 export type ArtistRow = Database['public']['Tables']['artists']['Row']
 export type BookingRow = Database['public']['Tables']['bookings']['Row']
 export type BookingReferenceImageRow = Database['public']['Tables']['booking_reference_images']['Row']
+export type PaymentRow = Database['public']['Tables']['payments']['Row']
+export type PaymentInsert = Database['public']['Tables']['payments']['Insert']
