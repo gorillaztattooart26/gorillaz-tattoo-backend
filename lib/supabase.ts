@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -18,9 +19,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
  * handling is wired up yet (per-request cookie sync via @supabase/ssr
  * is the next step once sign-in is actually built).
  *
- * Once a schema exists, run `supabase gen types typescript` and pass the
- * generated `Database` type in here (`createClient<Database>(...)`) for
- * fully typed `.from()` queries — left untyped for now since no tables
- * exist yet.
+ * Typed against `Database` (types/supabase.ts) so `.from('inquiries')`
+ * etc. are checked at compile time — see that file for how to regenerate
+ * it once the Supabase CLI is available.
  */
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)

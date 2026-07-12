@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getBookingByToken } from '@/lib/mock/bookings'
+import { getBookingByToken } from '@/lib/booking'
 import { BookingPortal } from '@/components/booking/BookingPortal'
 import { BookingHeader } from '@/components/booking/BookingHeader'
 import { CustomerCard } from '@/components/booking/CustomerCard'
@@ -37,11 +37,7 @@ interface PageProps {
 export default async function PrivateBookingPage({ params }: PageProps) {
   const { token } = await params
 
-  // TODO: replace with a Supabase query — validate the token, check
-  // expiry/revocation, and fetch the booking row server-side. Any
-  // invalid/expired/unknown token must fall through to notFound() so no
-  // information about real bookings leaks via response differences.
-  const booking = getBookingByToken(token)
+  const booking = await getBookingByToken(token)
 
   if (!booking) {
     notFound()

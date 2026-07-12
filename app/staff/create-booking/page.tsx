@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { CreateBookingForm } from '@/components/staff/CreateBookingForm'
+import { getArtists } from '@/lib/artists'
 
 export const metadata: Metadata = {
   title: 'Create Booking | Staff',
@@ -11,7 +12,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function CreateBookingPage() {
+export default async function CreateBookingPage() {
+  const artists = await getArtists()
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16 md:py-24">
       <div className="text-center">
@@ -27,7 +30,7 @@ export default function CreateBookingPage() {
         </p>
       </div>
 
-      <CreateBookingForm />
+      <CreateBookingForm artists={artists} />
     </div>
   )
 }

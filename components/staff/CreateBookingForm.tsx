@@ -11,19 +11,18 @@ import { Button } from '@/components/ui/button'
 import { ChevronIcon } from '@/components/common/icons'
 import { fieldClasses } from '@/components/ui/fieldStyles'
 import { cn } from '@/lib/utils'
-import { ARTISTS } from '@/lib/mock/artists'
 import { createBookingAction } from '@/app/staff/create-booking/actions'
 import {
   createBookingSchema,
   type CreateBookingFormInput,
   type CreateBookingValues,
 } from '@/app/staff/create-booking/schema'
+import type { Artist } from '@/types/artist'
 
 const CONTACT_METHODS = ['email', 'sms', 'call', 'messenger'] as const
 
 const DEFAULT_VALUES: Partial<CreateBookingFormInput> = {
   preferredContactMethod: 'email',
-  artistSlug: ARTISTS[0]?.slug,
   studioAddress: 'Unit 4B, Poblacion Arts District, Makati City, Metro Manila, Philippines',
   consultationMethod: 'In-person consultation completed at the studio',
   estimatedSessionHours: 3,
@@ -40,7 +39,7 @@ function formatPHP(amount: number): string {
   }).format(amount)
 }
 
-export function CreateBookingForm() {
+export function CreateBookingForm({ artists }: { artists: Artist[] }) {
   const router = useRouter()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -51,7 +50,7 @@ export function CreateBookingForm() {
     formState: { errors, isSubmitting },
   } = useForm<CreateBookingFormInput, unknown, CreateBookingValues>({
     resolver: zodResolver(createBookingSchema),
-    defaultValues: DEFAULT_VALUES,
+    defaultValues: { ...DEFAULT_VALUES, artistSlug: artists[0]?.slug },
   })
 
   const estimatedPrice = Number(watch('estimatedPrice')) || 0
@@ -117,7 +116,7 @@ export function CreateBookingForm() {
         <CardContent className="grid grid-cols-1 gap-4 px-0 sm:grid-cols-2">
           <FormField label="Assigned Artist" error={errors.artistSlug?.message}>
             <NativeSelect {...register('artistSlug')}>
-              {ARTISTS.map((artist) => (
+              {artists.map((artist) => (
                 <option key={artist.slug} value={artist.slug} className="bg-neutral-900 capitalize">
                   {artist.name}
                 </option>

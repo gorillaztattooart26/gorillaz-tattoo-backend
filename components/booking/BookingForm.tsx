@@ -10,7 +10,7 @@ import {
   SIZE_OPTIONS,
   STYLE_OPTIONS,
 } from '@/components/booking/options'
-import { submitBookingInquiry } from '@/services/booking'
+import { submitInquiryAction } from '@/components/booking/actions'
 import type { BookingFormValues } from '@/types/booking'
 import { cn } from '@/utils/cn'
 
@@ -34,12 +34,15 @@ const primaryButtonClasses =
 /**
  * The tattoo inquiry form. Isolated as its own Client Component so the rest
  * of the Booking section (heading, notice panel) stays server-rendered.
- * `submitBookingInquiry` is the seam a future Supabase/PayMongo/Resend
- * integration will replace — this component only depends on its signature.
+ * Submission is a Server Action (components/booking/actions.ts) that saves
+ * the inquiry + reference images to Supabase and redirects to /thank-you
+ * on success — this component only builds the FormData and reports errors.
  */
 export function BookingForm() {
   const [form, setForm] = useState<BookingFormValues>(INITIAL_VALUES)
   const [referenceFiles, setReferenceFiles] = useState<FileList | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const update =
     (key: keyof BookingFormValues) =>
@@ -48,12 +51,26 @@ export function BookingForm() {
     ) =>
       setForm((prev) => ({ ...prev, [key]: event.target.value }))
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    submitBookingInquiry({
-      ...form,
-      referenceFileNames: referenceFiles ? Array.from(referenceFiles).map((file) => file.name) : [],
-    })
+    setSubmitError(null)
+    setIsSubmitting(true)
+
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(form)) {
+      formData.append(key, value)
+    }
+    if (referenceFiles) {
+      Array.from(referenceFiles).forEach((file) => formData.append('referenceImages', file))
+    }
+
+    const result = await submitInquiryAction(formData)
+    // On success the action redirects and this component unmounts, so
+    // reaching here means something needs the visitor's attention.
+    if (result?.error) {
+      setSubmitError(result.error)
+    }
+    setIsSubmitting(false)
   }
 
   return (
@@ -198,8 +215,19 @@ export function BookingForm() {
         />
       </label>
 
-      <button type="submit" className={cn(primaryButtonClasses, 'sm:col-span-2 mt-2')}>
-        send inquiry
+      {submitError && (
+        <p className="sm:col-span-2 text-sm text-red-400">{submitError}</p>
+      )}
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className={cn(
+          primaryButtonClasses,
+          'sm:col-span-2 mt-2 disabled:pointer-events-none disabled:opacity-60 disabled:shadow-none',
+        )}
+      >
+        {isSubmitting ? 'sending…' : 'send inquiry'}
         <ArrowIcon />
       </button>
     </form>

@@ -11,7 +11,3 @@ export interface BookingFormValues {
   weight: string
   idea: string
 }
-
-export interface BookingInquiryPayload extends BookingFormValues {
-  referenceFileNames: string[]
-}
