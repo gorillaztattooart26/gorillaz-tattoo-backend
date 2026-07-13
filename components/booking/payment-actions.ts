@@ -1,20 +1,13 @@
 'use server'
 
-import { headers } from 'next/headers'
 import { supabase } from '@/lib/supabase'
 import { getBookingRecordByToken } from '@/lib/booking'
+import { getBaseUrl } from '@/lib/url'
 import { createCheckoutSession } from '@/services/paymongo'
 
 export interface CreateCheckoutSessionActionResult {
   checkoutUrl?: string
   error?: string
-}
-
-async function getBaseUrl(): Promise<string> {
-  const headersList = await headers()
-  const host = headersList.get('host') ?? 'localhost:3000'
-  const protocol = host.startsWith('localhost') ? 'http' : 'https'
-  return `${protocol}://${host}`
 }
 
 /**

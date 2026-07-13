@@ -1,18 +1,11 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { getBaseUrl } from '@/lib/url'
 
 export interface AuthActionResult {
   error: string
-}
-
-async function getBaseUrl(): Promise<string> {
-  const headersList = await headers()
-  const host = headersList.get('host') ?? 'localhost:3000'
-  const protocol = host.startsWith('localhost') ? 'http' : 'https'
-  return `${protocol}://${host}`
 }
 
 /**

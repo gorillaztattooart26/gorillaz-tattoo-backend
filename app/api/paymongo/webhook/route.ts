@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { verifyWebhookSignature } from '@/services/paymongo'
+import { getBaseUrl } from '@/lib/url'
+import { sendPaymentReceiptEmail } from '@/lib/emails'
 
 /**
  * PayMongo webhook — the source of truth for whether a booking's down
@@ -57,7 +59,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from('bookings')
-    .select('id')
+    .select('id, token, booking_id, customer_name, customer_email')
     .eq('token', bookingToken)
     .maybeSingle()
 
@@ -68,7 +70,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { data: pendingPayment, error: paymentLookupError } = await supabaseAdmin
     .from('payments')
-    .select('id')
+    .select('id, amount, currency')
     .eq('booking_id', booking.id)
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
@@ -103,6 +105,16 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
       return NextResponse.json({ error: 'Failed to record payment.' }, { status: 500 })
     }
+
+    const baseUrl = await getBaseUrl()
+    await sendPaymentReceiptEmail({
+      to: booking.customer_email,
+      customerName: booking.customer_name,
+      bookingId: booking.booking_id,
+      amount: pendingPayment.amount,
+      currency: pendingPayment.currency,
+      bookingUrl: `${baseUrl}/booking/${booking.token}`,
+    })
   } else {
     const { error: updatePaymentError } = await supabaseAdmin
       .from('payments')

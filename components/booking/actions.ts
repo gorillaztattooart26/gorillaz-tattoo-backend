@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { inquirySchema } from '@/components/booking/schema'
+import { sendInquiryConfirmationEmail, sendStaffNewInquiryNotification } from '@/lib/emails'
 
 const REFERENCES_BUCKET = 'references'
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024 // 10MB
@@ -81,6 +82,19 @@ export async function submitInquiryAction(
     console.error('[inquiries] insert failed:', insertError)
     return { error: 'Something went wrong submitting your inquiry. Please try again.' }
   }
+
+  await Promise.all([
+    sendInquiryConfirmationEmail({ to: parsed.data.email, fullName: parsed.data.fullName }),
+    sendStaffNewInquiryNotification({
+      fullName: parsed.data.fullName,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      preferredArtist: parsed.data.artist,
+      style: parsed.data.style,
+      placement: parsed.data.placement,
+      message: parsed.data.idea,
+    }),
+  ])
 
   for (const file of files) {
     const path = `${inquiryId}/${crypto.randomUUID()}-${file.name}`

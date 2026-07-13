@@ -2,6 +2,8 @@
 
 import { supabase } from '@/lib/supabase'
 import { createBookingSchema, type CreateBookingValues } from '@/app/staff/create-booking/schema'
+import { getBaseUrl } from '@/lib/url'
+import { sendBookingConfirmationEmail } from '@/lib/emails'
 
 const DEFAULT_REFERENCE_IMAGES = [
   { path: '/images/portfolio/portfolio-1.jpg', alt: 'Reference image on file for this booking' },
@@ -49,7 +51,7 @@ export async function createBookingAction(
 
   const { data: artist, error: artistError } = await supabase
     .from('artists')
-    .select('id')
+    .select('id, name')
     .eq('slug', parsed.artistSlug)
     .maybeSingle()
 
@@ -105,6 +107,17 @@ export async function createBookingAction(
       console.error('[bookings] booking_reference_images insert failed:', imageInsertError)
     }
   }
+
+  const baseUrl = await getBaseUrl()
+  await sendBookingConfirmationEmail({
+    to: parsed.customerEmail,
+    customerName: parsed.customerName,
+    bookingId,
+    bookingUrl: `${baseUrl}/booking/${token}`,
+    artistName: artist.name,
+    appointmentDate: parsed.appointmentDate,
+    appointmentTime: parsed.appointmentTime,
+  })
 
   return { token, bookingId }
 }
