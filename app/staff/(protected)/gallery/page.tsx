@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Image as ImageIcon } from 'lucide-react'
 import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function StaffGalleryPage() {
     <PlaceholderSection
       title="Gallery"
       description="Managing the public portfolio/gallery images from here is coming soon."
+      icon={ImageIcon}
     />
   )
 }

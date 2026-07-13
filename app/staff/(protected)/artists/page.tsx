@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Users } from 'lucide-react'
 import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function StaffArtistsPage() {
     <PlaceholderSection
       title="Artists"
       description="Managing the artist roster from this dashboard is coming soon."
+      icon={Users}
     />
   )
 }

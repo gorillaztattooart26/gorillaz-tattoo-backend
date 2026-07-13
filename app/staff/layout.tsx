@@ -1,25 +1,12 @@
-import Link from 'next/link'
-import { Logo } from '@/components/common/Logo'
-import { ROUTES } from '@/lib/routes'
-
 /**
  * Internal staff tooling — no public nav, not linked from anywhere in
- * the site. No authentication yet (MVP); this is the natural place to
- * add an auth check once the admin dashboard exists, without touching
- * any page underneath.
+ * the site. Just supplies the shared black background here: the login/
+ * forgot-password/reset-password pages already render their own centered
+ * logo inside their card (see components/staff/LoginForm.tsx etc.), and
+ * the protected dashboard shell has its own logo in the sidebar
+ * (components/staff/StaffSidebar.tsx) — a header here on top of either
+ * would just be a redundant, stacked second logo bar.
  */
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen w-full bg-black">
-      <header className="flex items-center justify-center gap-3 px-6 pt-8">
-        <Link href={ROUTES.home} aria-label="Gorillaz Tattoo Art home">
-          <Logo className="h-10 w-auto" width={160} height={51} />
-        </Link>
-        <span className="rounded-full border border-white/15 px-3 py-1 text-xs uppercase tracking-wide text-white/50">
-          staff
-        </span>
-      </header>
-      <main>{children}</main>
-    </div>
-  )
+  return <div className="min-h-screen w-full bg-black">{children}</div>
 }

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { StaffNav } from '@/components/staff/StaffNav'
+import { StaffSidebar } from '@/components/staff/StaffSidebar'
 
 /**
  * Shell for every authenticated staff page (Dashboard, Inquiries, Bookings,
@@ -25,9 +25,9 @@ export default async function ProtectedStaffLayout({
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      <StaffNav userEmail={user.email ?? ''} />
-      <main className="flex-1">{children}</main>
+    <div className="flex min-h-screen w-full">
+      <StaffSidebar userEmail={user.email ?? ''} />
+      <main className="min-w-0 flex-1">{children}</main>
     </div>
   )
 }

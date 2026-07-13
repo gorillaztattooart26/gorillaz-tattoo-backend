@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Settings as SettingsIcon } from 'lucide-react'
 import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
 
 export const metadata: Metadata = {
@@ -12,5 +13,11 @@ export const metadata: Metadata = {
 }
 
 export default function StaffSettingsPage() {
-  return <PlaceholderSection title="Settings" description="Studio settings are coming soon." />
+  return (
+    <PlaceholderSection
+      title="Settings"
+      description="Studio settings are coming soon."
+      icon={SettingsIcon}
+    />
+  )
 }
