@@ -10,6 +10,7 @@ export const ROUTES = {
   gallery: '/gallery',
   booking: '/booking',
   contact: '/contact',
+  aftercare: '/aftercare',
 } as const
 
 export type RouteKey = keyof typeof ROUTES
