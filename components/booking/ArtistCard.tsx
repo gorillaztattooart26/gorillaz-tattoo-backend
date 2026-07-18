@@ -16,7 +16,7 @@ export function ArtistCard({ artist }: { artist: Artist }) {
             alt={artist.alt}
             fill
             sizes="160px"
-            className="object-cover grayscale"
+            className="object-cover"
           />
         </div>
         <div className="flex-1 text-center sm:text-left">

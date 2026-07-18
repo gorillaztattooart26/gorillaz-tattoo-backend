@@ -29,7 +29,7 @@ export function ReferenceImageGallery({ images }: ReferenceImageGalleryProps) {
               alt={image.alt}
               fill
               sizes="200px"
-              className="object-cover grayscale opacity-80 transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </DialogTrigger>
           <DialogContent className="max-w-3xl bg-black p-2 sm:max-w-3xl">

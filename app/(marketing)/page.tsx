@@ -18,7 +18,15 @@ export const metadata: Metadata = buildMetadata({
 
 export default function HomePage() {
   return (
-    <>
+    <div className="relative bg-black">
+      {/* Ambient glow behind the page — sits in the black space between
+          sections, since the sections above it stay transparent (Marquee excepted). */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-32 top-[105vh] h-[40rem] w-[40rem] rounded-full bg-[#fabb42] opacity-[0.08] blur-[130px]" />
+        <div className="absolute -right-32 top-[230vh] h-[36rem] w-[36rem] rounded-full bg-[#fabb42] opacity-[0.07] blur-[130px]" />
+        <div className="absolute -left-20 top-[340vh] h-[38rem] w-[38rem] rounded-full bg-[#fabb42] opacity-[0.08] blur-[130px]" />
+      </div>
+
       <Hero />
       <Marquee />
       <PortfolioPreview />
@@ -26,6 +34,6 @@ export default function HomePage() {
       <Studio />
       <Booking />
       <FAQ />
-    </>
+    </div>
   )
 }

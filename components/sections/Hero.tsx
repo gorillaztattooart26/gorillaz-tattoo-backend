@@ -15,21 +15,17 @@ export function Hero() {
       aria-label="Gorillaz Tattoo Art Hero"
       className="relative min-h-screen w-full overflow-hidden bg-neutral-900"
     >
-      {/* Portrait — bleeds off the right edge, grayscale */}
-      <div className="animate-settle absolute inset-y-0 right-0 w-full md:w-[60%] lg:w-[56%]">
+      {/* Full-bleed background photo, grayscale */}
+      <div className="animate-settle absolute inset-0">
         <Image
-          src="/images/artists/artist-3.jpg"
-          alt="Gorillaz tattoo artist at work, portrait in black and white"
-          title="gorillaz tattoo art — resident artist"
+          src="/images/studio/studio-session.jpg"
+          alt="Tattoo artists at work inside the Gorillaz Tattoo Art studio, black and white"
+          title="gorillaz tattoo art — studio session"
           fill
           priority
-          sizes="(min-width: 1024px) 56vw, (min-width: 768px) 60vw, 100vw"
-          className="object-cover object-[70%_15%] grayscale"
+          sizes="100vw"
+          className="object-cover object-center grayscale"
         />
-        {/* blend into background on the left */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-neutral-900 to-transparent" />
-        {/* blend into background at the bottom */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-neutral-900 to-transparent" />
       </div>
 
       {/* Tagline + links — upper right, beside the portrait */}

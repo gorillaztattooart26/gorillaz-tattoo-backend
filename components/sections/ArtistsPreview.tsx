@@ -8,26 +8,26 @@ import type { Artist } from '@/types/artist'
 
 const ARTISTS: Artist[] = [
   {
-    slug: 'andrea-santos',
+    slug: 'park-lladoc',
     src: '/images/artists/artist-1.jpg',
-    name: 'andrea santos',
-    specialty: 'fine line & script',
-    years: '8 yrs',
-    bio: 'andrea found tattooing through hand-poke work before moving to machine fine line. every piece favors negative space over noise — delicate linework built to age well.',
-    instagram: 'https://instagram.com',
-    facebook: 'https://facebook.com',
-    alt: 'andrea santos — fine line and script tattoo artist at gorillaz tattoo art studio philippines',
+    name: 'park nichole lladoc',
+    specialty: 'black & grey realism',
+    years: '13 yrs',
+    bio: 'park is a tattoo artist based in the philippines with over 13 years of professional experience. he specializes in realism, black & grey, and hyper-realism, creating detailed, lifelike tattoos that combine technical precision with artistic expression. his work is known for its depth, realism, and commitment to delivering custom pieces that are both visually striking and deeply personal.',
+    instagram: 'https://www.instagram.com/parklladoc/',
+    facebook: 'https://www.facebook.com/park.lladoc',
+    alt: 'park nichole lladoc — black and grey realism tattoo artist at gorillaz tattoo art studio philippines',
   },
   {
-    slug: 'miko-reyes',
+    slug: 'isaiah-recongco',
     src: '/images/artists/artist-2.jpg',
-    name: 'miko reyes',
-    specialty: 'blackwork & tribal',
-    years: '12 yrs',
-    bio: 'miko apprenticed under traditional filipino tattooists and has spent over a decade pushing heavy blackwork and tribal patterns into bold, modern silhouettes.',
-    instagram: 'https://instagram.com',
-    facebook: 'https://facebook.com',
-    alt: 'miko reyes — blackwork and tribal tattoo artist at gorillaz tattoo art studio philippines',
+    name: 'isaiah recongco',
+    specialty: 'black and grey realism & line art',
+    years: '1 yr',
+    bio: 'isaiah specializes in black & grey realism, fine-line, and minimalist tattoo art, with a focus on technical shading — whip shading, pointillism, and pendulum work. every piece is about transforming stories into skin art.',
+    instagram: 'https://www.instagram.com/justsaiinked/',
+    facebook: 'https://www.facebook.com/profile.php?id=61590748843029',
+    alt: 'isaiah recongco — black and grey realism and line art tattoo artist at gorillaz tattoo art studio philippines',
   },
 ]
 
@@ -46,7 +46,7 @@ export function ArtistsPreview() {
       id="artists"
       role="region"
       aria-label="Tattoo artists at Gorillaz Tattoo Art studio"
-      className="relative w-full bg-black px-6 md:px-10 py-24 md:py-32"
+      className="relative w-full px-6 md:px-10 py-24 md:py-32"
     >
       <SectionHeading
         eyebrow="the crew"
@@ -67,7 +67,7 @@ export function ArtistsPreview() {
             title={`${artist.name} — ${artist.specialty} — gorillaz tattoo art studio`}
             fill
             sizes="(min-width: 768px) 33vw, 100vw"
-            className="object-cover grayscale opacity-80"
+            className="object-cover"
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
           <span className="absolute top-5 right-5 text-white/80 text-xs border border-white/30 rounded-full px-3 py-1 whitespace-nowrap backdrop-blur">

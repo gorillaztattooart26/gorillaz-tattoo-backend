@@ -27,7 +27,7 @@ export function Studio() {
       id="studio"
       role="region"
       aria-label="Gorillaz Tattoo Art studio — based in the Philippines"
-      className="relative w-full bg-black px-6 md:px-10 py-24 md:py-32"
+      className="relative w-full px-6 md:px-10 py-24 md:py-32"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-start">
         <div className="reveal">
@@ -56,13 +56,13 @@ export function Studio() {
           style={{ transitionDelay: '150ms' }}
         >
           <Image
-            src="/images/studio/studio-interior.jpg"
+            src="/images/studio/studio-tattooing.jpg"
             alt="inside gorillaz tattoo art — custom tattoo session at our private studio in the philippines"
             title="Gorillaz Tattoo Art studio — Philippines"
             fill
             loading="lazy"
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="object-cover grayscale opacity-80"
+            className="object-cover"
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
           <figcaption className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between gap-3">

@@ -6,41 +6,41 @@ import type { PortfolioWork } from '@/types/portfolio'
 
 const WORKS: PortfolioWork[] = [
   {
-    src: '/images/portfolio/portfolio-1.jpg',
-    style: 'blackwork',
-    piece: 'full backpiece',
-    alt: 'bold blackwork full backpiece tattoo — custom ink design by gorillaz tattoo art studio philippines',
+    src: '/images/portfolio/portfolio-50.jpg',
+    style: 'hyper-realism',
+    piece: 'hannya mask flame leg sleeve',
+    alt: 'hyper-realistic hannya mask and flames leg sleeve tattoo — custom ink design by gorillaz tattoo art studio philippines',
     span: 'md:col-span-2',
   },
   {
-    src: '/images/portfolio/portfolio-2.jpg',
-    style: 'bodysuit',
-    piece: 'traditional bodysuit',
-    alt: 'full body traditional tattoo bodysuit — custom tattoo portfolio, gorillaz tattoo art studio',
+    src: '/images/portfolio/portfolio-20.jpg',
+    style: 'blackwork',
+    piece: 'guardian angel leg sleeve',
+    alt: 'black and grey guardian angel leg sleeve tattoo — custom tattoo portfolio, gorillaz tattoo art studio',
   },
   {
-    src: '/images/portfolio/portfolio-3.jpg',
-    style: 'fine line',
-    piece: 'grayswash sleeve',
-    alt: 'fine line grayswash arm sleeve tattoo — custom ink design, gorillaz tattoo art studio philippines',
+    src: '/images/portfolio/portfolio-59.jpg',
+    style: 'realism',
+    piece: 'wasteland portrait sleeve',
+    alt: 'realism portrait tattoo with burning cityscape reflection — custom ink design, gorillaz tattoo art studio philippines',
   },
   {
-    src: '/images/portfolio/portfolio-4.jpg',
-    style: 'script',
-    piece: 'music bicep script',
-    alt: 'custom script music tattoo on bicep — tattoo portfolio, gorillaz tattoo art studio',
+    src: '/images/portfolio/portfolio-79.jpg',
+    style: 'japanese',
+    piece: 'blue dragon leg sleeve',
+    alt: 'traditional japanese blue dragon leg sleeve tattoo — tattoo portfolio, gorillaz tattoo art studio',
   },
   {
-    src: '/images/portfolio/portfolio-5.jpg',
-    style: 'portrait',
-    piece: 'monochrome study',
-    alt: 'monochrome portrait tattoo study — custom ink design by gorillaz tattoo art studio',
-  },
-  {
-    src: '/images/portfolio/portfolio-6.jpg',
+    src: '/images/portfolio/portfolio-105.jpg',
     style: 'neo traditional',
-    piece: 'chest & sleeve set',
-    alt: 'neo traditional chest and sleeve tattoo set — tattoo portfolio, gorillaz tattoo art studio philippines',
+    piece: 'tiger & serpent forearm',
+    alt: 'neo traditional tiger and serpent forearm tattoo — custom ink design by gorillaz tattoo art studio',
+  },
+  {
+    src: '/images/portfolio/portfolio-13.jpg',
+    style: 'anime',
+    piece: 'nine-tailed fox side piece',
+    alt: 'anime nine-tailed fox side piece tattoo — tattoo portfolio, gorillaz tattoo art studio philippines',
     span: 'md:col-span-2',
   },
 ]
@@ -55,7 +55,7 @@ export function PortfolioPreview() {
       id="portfolio"
       role="region"
       aria-label="Tattoo portfolio — selected custom ink work"
-      className="relative w-full bg-black px-6 md:px-10 py-24 md:py-32"
+      className="relative w-full px-6 md:px-10 py-24 md:py-32"
     >
       <div className="reveal flex items-end justify-between gap-6 mb-12 md:mb-16">
         <SectionHeading eyebrow="tattoo portfolio" headingClassName="first-letter:uppercase text-[12vw] md:text-[6vw]">
@@ -81,7 +81,7 @@ export function PortfolioPreview() {
               fill
               loading="lazy"
               sizes="(min-width: 768px) 33vw, 100vw"
-              className="object-cover grayscale opacity-80 transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
             <figcaption className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between gap-3">

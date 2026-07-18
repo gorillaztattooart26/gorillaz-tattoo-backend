@@ -41,5 +41,5 @@ export const NAV_LINKS: NavLink[] = [
   { label: 'artists', href: `${ROUTES.home}${HOME_SECTIONS.artists}` },
   { label: 'studio', href: `${ROUTES.home}${HOME_SECTIONS.studio}` },
   { label: 'aftercare', href: ROUTES.aftercare },
-  { label: 'booking', href: `${ROUTES.home}${HOME_SECTIONS.booking}` },
+  { label: 'gallery', href: ROUTES.gallery },
 ]

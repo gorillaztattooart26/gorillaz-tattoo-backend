@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Select } from '@/components/ui/Select'
 import { fieldClasses } from '@/components/ui/fieldStyles'
-import { ArrowIcon } from '@/components/common/icons'
 import {
   ARTIST_OPTIONS,
   CONTACT_METHOD_OPTIONS,
@@ -228,7 +227,6 @@ export function BookingForm() {
         )}
       >
         {isSubmitting ? 'sending…' : 'send inquiry'}
-        <ArrowIcon />
       </button>
     </form>
   )

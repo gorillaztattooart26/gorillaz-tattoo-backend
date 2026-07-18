@@ -1,7 +1,7 @@
 export const ARTIST_OPTIONS = [
   'preferred tattoo artist',
-  'andrea santos',
-  'miko reyes',
+  'park nichole lladoc',
+  'isaiah recongco',
   'joaquin dela cruz',
 ]
 

@@ -36,7 +36,7 @@ export function FAQ() {
       id="faq"
       role="region"
       aria-label="Frequently asked questions"
-      className="relative w-full bg-black px-8 md:px-20 lg:px-28 pb-24 md:pb-32"
+      className="relative w-full px-8 md:px-20 lg:px-28 pb-24 md:pb-32"
     >
       <h2 className="reveal hero-title uppercase text-white font-medium text-[13vw] md:text-[5.5vw] mb-8 md:mb-12">
         faq
