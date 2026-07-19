@@ -78,10 +78,7 @@ export function GalleryCard({ item, onOpen }: GalleryCardProps) {
       )}
 
       <figcaption className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between gap-3">
-        <div>
-          <p className="text-white text-sm font-semibold">{item.piece}</p>
-          <p className="mt-1 text-xs capitalize text-white/60">tattooed by {item.artistName}</p>
-        </div>
+        <p className="text-xs capitalize text-white/60">tattooed by {item.artistName}</p>
         <span className="text-white/70 text-xs border border-white/30 rounded-full px-3 py-1 whitespace-nowrap capitalize">
           {item.category}
         </span>

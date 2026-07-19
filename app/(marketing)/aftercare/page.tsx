@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { SectionHeading } from '@/components/common/SectionHeading'
 import { AftercareSteps } from '@/components/aftercare/AftercareSteps'
 import { HealingSalveProduct } from '@/components/aftercare/HealingSalveProduct'
-import { BeforeAfterGallery } from '@/components/aftercare/BeforeAfterGallery'
+import { AftercareFaq } from '@/components/aftercare/AftercareFaq'
 import { buildMetadata } from '@/lib/seo'
 import { ROUTES } from '@/lib/routes'
 
@@ -32,12 +32,14 @@ export default function AftercarePage() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black to-transparent" />
 
         <div className="reveal relative z-10 flex flex-col items-center text-center">
-          <Breadcrumbs
-            entries={[
-              { name: 'Home', path: ROUTES.home },
-              { name: 'Aftercare', path: ROUTES.aftercare },
-            ]}
-          />
+          <div className="sr-only">
+            <Breadcrumbs
+              entries={[
+                { name: 'Home', path: ROUTES.home },
+                { name: 'Aftercare', path: ROUTES.aftercare },
+              ]}
+            />
+          </div>
 
           <SectionHeading
             eyebrow="tattoo aftercare"
@@ -47,16 +49,16 @@ export default function AftercarePage() {
             heal it right
           </SectionHeading>
           <p className="mt-6 max-w-lg text-[15px] leading-snug text-white/70">
-            Good aftercare is what separates a tattoo that looks great in ten
-            years from one that fades and blurs. Here&apos;s exactly how to
-            take care of yours.
+            <span className="block">Good aftercare is what separates a tattoo that looks great</span>
+            <span className="block">in ten years from one that fades and blurs.</span>
+            <span className="block">Here&apos;s exactly how to take care of yours.</span>
           </p>
         </div>
       </section>
 
       <AftercareSteps />
       <HealingSalveProduct />
-      <BeforeAfterGallery />
+      <AftercareFaq />
     </div>
   )
 }

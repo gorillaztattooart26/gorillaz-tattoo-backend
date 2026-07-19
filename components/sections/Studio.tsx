@@ -56,7 +56,7 @@ export function Studio() {
           style={{ transitionDelay: '150ms' }}
         >
           <Image
-            src="/images/studio/studio-tattooing.jpg"
+            src="/images/studio/studio-artist-session.jpg"
             alt="inside gorillaz tattoo art — custom tattoo session at our private studio in the philippines"
             title="Gorillaz Tattoo Art studio — Philippines"
             fill

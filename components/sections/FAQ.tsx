@@ -1,4 +1,5 @@
 import { FaqAccordion } from '@/components/faq/FaqAccordion'
+import { FaqSection } from '@/components/faq/FaqSection'
 import type { FaqItem } from '@/types/faq'
 
 const FAQS: FaqItem[] = [
@@ -32,17 +33,12 @@ const FAQS: FaqItem[] = [
 /** FAQ section. Heading is static (server-rendered); the accordion list is a client island. */
 export function FAQ() {
   return (
-    <section
-      id="faq"
-      role="region"
-      aria-label="Frequently asked questions"
-      className="relative w-full px-8 md:px-20 lg:px-28 pb-24 md:pb-32"
-    >
+    <FaqSection id="faq" ariaLabel="Frequently asked questions">
       <h2 className="reveal hero-title uppercase text-white font-medium text-[13vw] md:text-[5.5vw] mb-8 md:mb-12">
         faq
       </h2>
 
       <FaqAccordion faqs={FAQS} />
-    </section>
+    </FaqSection>
   )
 }

@@ -18,13 +18,13 @@ export function HealingSalveProduct() {
       <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
         <div className="reveal relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-neutral-900">
           <Image
-            src="/images/products/healing-salve.png"
+            src="/images/products/tattoo-balm.jpg"
             alt="Gorillaz Tattoo Balm healing salve — 50g tin, available exclusively at Gorillaz Tattoo Art studio"
             title="Gorillaz Tattoo Balm healing salve"
             fill
             loading="lazy"
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="object-contain p-10"
+            className="object-cover"
           />
         </div>
 

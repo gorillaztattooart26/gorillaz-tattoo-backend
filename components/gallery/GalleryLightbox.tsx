@@ -65,10 +65,7 @@ export function GalleryLightbox({ items, itemIndex, imageIndex, onClose, onNavig
             alt={item.alt}
             className="max-h-[78vh] max-w-[75vw] rounded-lg object-contain"
           />
-          <div className="text-center">
-            <p className="text-white text-sm font-semibold">{item.piece}</p>
-            <p className="mt-1 text-xs capitalize text-white/60">tattooed by {item.artistName}</p>
-          </div>
+          <p className="text-center text-xs capitalize text-white/60">tattooed by {item.artistName}</p>
         </div>
 
         <button

@@ -15,16 +15,16 @@ export function Hero() {
       aria-label="Gorillaz Tattoo Art Hero"
       className="relative min-h-screen w-full overflow-hidden bg-neutral-900"
     >
-      {/* Full-bleed background photo, grayscale */}
+      {/* Full-bleed background photo */}
       <div className="animate-settle absolute inset-0">
         <Image
-          src="/images/studio/studio-session.jpg"
-          alt="Tattoo artists at work inside the Gorillaz Tattoo Art studio, black and white"
-          title="gorillaz tattoo art — studio session"
+          src="/images/studio/studio-lounge.jpg"
+          alt="Gorillaz Tattoo Art studio lounge"
+          title="gorillaz tattoo art — studio lounge"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center grayscale"
+          className="object-cover object-center"
         />
       </div>
 

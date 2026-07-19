@@ -16,12 +16,14 @@ export const metadata: Metadata = buildMetadata({
 export default function GalleryPage() {
   return (
     <section className="relative min-h-screen w-full bg-black px-6 md:px-10 pt-28 pb-24 md:pt-32 md:pb-32">
-      <Breadcrumbs
-        entries={[
-          { name: 'Home', path: ROUTES.home },
-          { name: 'Gallery', path: ROUTES.gallery },
-        ]}
-      />
+      <div className="sr-only">
+        <Breadcrumbs
+          entries={[
+            { name: 'Home', path: ROUTES.home },
+            { name: 'Gallery', path: ROUTES.gallery },
+          ]}
+        />
+      </div>
 
       <SectionHeading
         eyebrow="tattoo gallery"
