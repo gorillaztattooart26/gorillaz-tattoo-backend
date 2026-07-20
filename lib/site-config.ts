@@ -14,9 +14,8 @@ export const siteConfig = {
     'fine line tattoo',
     'custom tattoo design',
   ],
-  // TODO: replace with the production domain once it's registered/deployed.
-  url: 'https://gorillaztattoo.art',
-  email: 'bookings@gorillaztattoo.art',
+  url: 'https://gorillaztattooart.com',
+  email: 'bookings@gorillaztattooart.com',
   locale: 'en_US',
   themeColor: '#fabb42',
   social: {
