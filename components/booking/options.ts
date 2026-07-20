@@ -5,7 +5,7 @@ export const ARTIST_OPTIONS = [
   'joaquin dela cruz',
 ]
 
-export const CONTACT_METHOD_OPTIONS = ['email', 'call', 'sms', 'messenger']
+export const CONTACT_METHOD_OPTIONS = ['preferred contact method', 'email', 'call', 'sms', 'messenger']
 
 export const STYLE_OPTIONS = [
   'blackwork',

@@ -1,22 +1,27 @@
 import Image from 'next/image'
+import { Lock, MessageSquare, PenTool, ShieldCheck } from 'lucide-react'
 import { SectionHeading } from '@/components/common/SectionHeading'
 
 const FEATURES = [
   {
     title: 'consultation first',
     copy: 'every session starts with a sit-down. your story, references, and placement before any needle moves.',
+    icon: MessageSquare,
   },
   {
     title: 'hospital-grade sterile',
     copy: 'single-use needles, autoclave sterilization, and sealed stations. 100% safe, every time.',
+    icon: ShieldCheck,
   },
   {
     title: 'custom only',
     copy: 'no flash sheets on the wall. every design is drawn for you and never inked twice.',
+    icon: PenTool,
   },
   {
     title: 'private sessions',
     copy: 'one artist, one client, one room. take your time — the chair is yours for the day.',
+    icon: Lock,
   },
 ]
 
@@ -44,6 +49,7 @@ export function Studio() {
           <dl className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-8">
             {FEATURES.map((feature) => (
               <div key={feature.title}>
+                <feature.icon className="mb-3 h-5 w-5 text-[#fabb42]" aria-hidden="true" />
                 <dt className="text-white text-sm font-semibold mb-2">{feature.title}</dt>
                 <dd className="text-white/70 text-sm leading-snug">{feature.copy}</dd>
               </div>

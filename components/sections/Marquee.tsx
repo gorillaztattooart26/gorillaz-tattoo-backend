@@ -2,7 +2,7 @@ const PHRASES = [
   'custom ink design',
   'blackwork',
   'fine line',
-  'filipino tribal',
+  'polynesian',
   'script',
   'realism',
 ]
