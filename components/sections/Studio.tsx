@@ -49,8 +49,8 @@ export function Studio() {
           <dl className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-8">
             {FEATURES.map((feature) => (
               <div key={feature.title}>
-                <feature.icon className="mb-3 h-5 w-5 text-[#fabb42]" aria-hidden="true" />
-                <dt className="text-white text-sm font-semibold mb-2">{feature.title}</dt>
+                <feature.icon className="mb-3 h-8 w-8 text-[#fabb42]" aria-hidden="true" />
+                <dt className="text-white text-lg font-semibold mb-2">{feature.title}</dt>
                 <dd className="text-white/70 text-sm leading-snug">{feature.copy}</dd>
               </div>
             ))}

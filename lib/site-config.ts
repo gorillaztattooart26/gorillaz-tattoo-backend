@@ -19,8 +19,8 @@ export const siteConfig = {
   locale: 'en_US',
   themeColor: '#fabb42',
   social: {
-    facebook: 'https://facebook.com',
-    instagram: 'https://instagram.com',
+    facebook: 'https://www.facebook.com/GorillazTattooArt',
+    instagram: 'https://www.instagram.com/gorillaztattooart/?hl=en',
   },
   // TODO: no confirmed studio address, phone number, or opening hours exist
   // yet — fill these in for the LocalBusiness JSON-LD once available.

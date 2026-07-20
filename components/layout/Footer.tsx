@@ -11,7 +11,7 @@ export function Footer() {
     >
       <div className="reveal flex flex-col md:flex-row md:items-start md:justify-between gap-10">
         <div>
-          <Logo className="h-12 w-auto" width={188} height={60} />
+          <Logo className="h-20 w-auto" width={310} height={100} />
           <p className="mt-4 max-w-[280px] text-sm leading-snug text-white/70">
             custom ink design studio — philippines. fine lines, bold blackwork,
             permanent self-expression.
@@ -49,13 +49,6 @@ export function Footer() {
             aria-label={`${siteConfig.name} on instagram`}
           >
             instagram
-          </a>
-          <a
-            href={`mailto:${siteConfig.email}`}
-            className="text-neutral-300 hover:text-white transition-colors"
-            aria-label={`email ${siteConfig.name} bookings`}
-          >
-            {siteConfig.email}
           </a>
         </div>
       </div>

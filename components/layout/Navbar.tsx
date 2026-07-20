@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Logo } from '@/components/common/Logo'
+import { MobileNav } from '@/components/layout/MobileNav'
 import { NAV_LINKS, siteConfig } from '@/lib/site-config'
 import { HOME_SECTIONS, ROUTES } from '@/lib/routes'
 
@@ -37,11 +38,13 @@ export function Navbar() {
 
       <Link
         href={`${ROUTES.home}${HOME_SECTIONS.booking}`}
-        className="bg-[#fabb42] text-black text-sm font-semibold rounded-full px-6 py-3 transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)]"
+        className="hidden md:inline-flex bg-[#fabb42] text-black text-sm font-semibold rounded-full px-6 py-3 transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)]"
         aria-label="Jump to the tattoo inquiry form"
       >
         inquire now
       </Link>
+
+      <MobileNav />
     </nav>
   )
 }

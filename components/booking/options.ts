@@ -2,7 +2,6 @@ export const ARTIST_OPTIONS = [
   'preferred tattoo artist',
   'park nichole lladoc',
   'isaiah recongco',
-  'joaquin dela cruz',
 ]
 
 export const CONTACT_METHOD_OPTIONS = ['preferred contact method', 'email', 'call', 'sms', 'messenger']
