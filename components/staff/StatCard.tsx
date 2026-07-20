@@ -8,7 +8,7 @@ interface StatCardProps {
 
 export function StatCard({ icon: Icon, label, value }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-neutral-900/60 p-5">
+    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-neutral-900/60 p-5 md:rounded-2xl">
       <div>
         <p className="text-xs uppercase tracking-wide text-white/50">{label}</p>
         <p className="hero-title mt-2 text-3xl font-medium text-white">{value}</p>

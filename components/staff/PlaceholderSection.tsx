@@ -18,8 +18,8 @@ export function PlaceholderSection({ title, description, icon: Icon }: Placehold
   return (
     <div>
       <StaffPageHeader title={title} />
-      <div className="px-8 py-6">
-        <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-neutral-900/60 px-6 py-24 text-center">
+      <div className="px-4 py-6 md:px-8">
+        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-white/10 bg-neutral-900/60 px-6 py-24 text-center md:rounded-2xl">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fabb42]/10 text-[#fabb42]">
             <Icon className="h-6 w-6" />
           </div>

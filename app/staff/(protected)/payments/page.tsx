@@ -21,8 +21,8 @@ export default async function StaffPaymentsPage() {
     <div>
       <StaffPageHeader title="Payments" description={`${payments.length} total`} />
 
-      <div className="px-8 py-6">
-        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-neutral-900/60">
+      <div className="px-4 py-6 md:px-8">
+        <div className="overflow-x-auto rounded-lg border border-white/10 bg-neutral-900/60 md:rounded-2xl">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 text-xs uppercase tracking-wide text-white/40">

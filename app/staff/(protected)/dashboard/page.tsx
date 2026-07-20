@@ -41,17 +41,25 @@ export default async function StaffDashboardPage() {
       <StaffPageHeader
         title={`Welcome back, ${staffName}`}
         description={`${inquiryCount} total inquiries · ${paymentCounts.pending} pending payments · ${bookingCounts.confirmed} confirmed bookings`}
+        action={
+          <Link
+            href="/staff/create-booking"
+            className="rounded-full bg-[#fabb42] px-5 py-2.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c]"
+          >
+            + create booking
+          </Link>
+        }
       />
 
-      <div className="grid grid-cols-1 gap-4 px-8 py-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 px-4 py-6 sm:grid-cols-2 md:px-8 lg:grid-cols-4">
         <StatCard icon={Inbox} label="Total Inquiries" value={inquiryCount} />
         <StatCard icon={CalendarCheck} label="Total Bookings" value={bookingCounts.total} />
         <StatCard icon={CreditCard} label="Pending Payments" value={paymentCounts.pending} />
         <StatCard icon={CheckCircle2} label="Confirmed Bookings" value={bookingCounts.confirmed} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 px-8 pb-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-neutral-900/60 p-6 lg:col-span-2">
+      <div className="grid grid-cols-1 gap-4 px-4 pb-6 md:px-8 lg:grid-cols-3">
+        <div className="rounded-lg border border-white/10 bg-neutral-900/60 p-6 md:rounded-2xl lg:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-white">Recent Inquiries</h2>
             <Link href="/staff/inquiries" className="text-xs text-[#fabb42] hover:underline">
@@ -76,7 +84,7 @@ export default async function StaffDashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-neutral-900/60 p-6">
+        <div className="rounded-lg border border-white/10 bg-neutral-900/60 p-6 md:rounded-2xl">
           <h2 className="text-base font-semibold text-white">Payment Status</h2>
           <div className="mt-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
@@ -99,8 +107,8 @@ export default async function StaffDashboardPage() {
         </div>
       </div>
 
-      <div className="px-8 pb-10">
-        <div className="rounded-2xl border border-white/10 bg-neutral-900/60 p-6">
+      <div className="px-4 pb-10 md:px-8">
+        <div className="rounded-lg border border-white/10 bg-neutral-900/60 p-6 md:rounded-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-white">Recent Bookings</h2>
             <Link href="/staff/bookings" className="text-xs text-[#fabb42] hover:underline">

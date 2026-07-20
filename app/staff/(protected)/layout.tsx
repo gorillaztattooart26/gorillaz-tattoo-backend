@@ -27,7 +27,7 @@ export default async function ProtectedStaffLayout({
   return (
     <div className="flex min-h-screen w-full">
       <StaffSidebar userEmail={user.email ?? ''} />
-      <main className="min-w-0 flex-1">{children}</main>
+      <main className="min-w-0 flex-1 pl-16">{children}</main>
     </div>
   )
 }
