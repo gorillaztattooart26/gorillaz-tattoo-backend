@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { SectionHeading } from '@/components/common/SectionHeading'
 import { FacebookIcon, InstagramIcon, NextArrowIcon } from '@/components/common/icons'
@@ -38,15 +38,27 @@ const ARTISTS: Artist[] = [
  */
 export function ArtistsPreview() {
   const [index, setIndex] = useState(0)
+  const sectionRef = useRef<HTMLElement>(null)
   const artist = ARTISTS[index]
-  const goNext = () => setIndex((i) => (i + 1) % ARTISTS.length)
+
+  const goNext = () => {
+    setIndex((i) => (i + 1) % ARTISTS.length)
+    // On mobile the card stack is tall enough that the button sits well
+    // below the heading — without this, switching artists leaves the
+    // photo/name off-screen above the visitor instead of showing the new
+    // artist from the top like a fresh card.
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
 
   return (
     <section
+      ref={sectionRef}
       id="artists"
       role="region"
       aria-label="Tattoo artists at Gorillaz Tattoo Art studio"
-      className="relative w-full px-6 md:px-10 py-24 md:py-32"
+      className="relative w-full scroll-mt-28 px-6 md:px-10 py-24 md:py-32"
     >
       <SectionHeading
         eyebrow="the crew"

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { GalleryCard } from '@/components/gallery/GalleryCard'
 import { GalleryLightbox } from '@/components/gallery/GalleryLightbox'
@@ -31,6 +31,7 @@ export function GalleryGrid({ items }: GalleryGridProps) {
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeArtist, setActiveArtist] = useState('all')
   const [isArtistMenuOpen, setIsArtistMenuOpen] = useState(false)
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
   const artistMenuRef = useRef<HTMLDivElement>(null)
 
   const [lightbox, setLightbox] = useState<{ itemIndex: number; imageIndex: number } | null>(null)
@@ -60,7 +61,26 @@ export function GalleryGrid({ items }: GalleryGridProps) {
   return (
     <div>
       <div ref={artistMenuRef} className="reveal mb-10 flex flex-col gap-4 md:mb-12">
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter gallery">
+        <button
+          type="button"
+          onClick={() => setIsMobileFilterOpen((open) => !open)}
+          aria-expanded={isMobileFilterOpen}
+          className="flex w-fit items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs text-white/70 transition-colors hover:border-white/50 hover:text-white md:hidden"
+        >
+          <SlidersHorizontal className="h-3.5 w-3.5" />
+          filter by
+          <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', isMobileFilterOpen && 'rotate-180')} />
+        </button>
+
+        <div
+          className={cn(
+            'flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-neutral-900/40 p-4',
+            'md:rounded-none md:border-0 md:bg-transparent md:p-0',
+            !isMobileFilterOpen && 'hidden md:flex',
+          )}
+          role="group"
+          aria-label="Filter gallery"
+        >
           <button
             type="button"
             onClick={() => setIsArtistMenuOpen((open) => !open)}
