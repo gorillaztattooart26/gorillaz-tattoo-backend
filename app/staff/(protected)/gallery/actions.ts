@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentStaffArtist } from '@/lib/staff/artists'
 
 const GALLERY_BUCKET = 'gallery'
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024 // 10MB
@@ -13,17 +14,23 @@ export interface GalleryActionResult {
 /**
  * Adds a new piece: uploads its photos to the `gallery` Storage bucket,
  * then inserts one `gallery_items` row pointing at their public URLs.
- * Uses the session-aware client so RLS evaluates the staff member's JWT
- * as `authenticated`, not `anon`.
+ * The artist is whoever's logged in (via artists.user_id) rather than a
+ * manual picker — each artist has their own account, so there's nothing
+ * to choose. Uses the session-aware client so RLS evaluates the staff
+ * member's JWT as `authenticated`, not `anon`.
  */
 export async function createGalleryItemAction(formData: FormData): Promise<GalleryActionResult> {
+  const artist = await getCurrentStaffArtist()
+  if (!artist) {
+    return { error: "Your account isn't linked to an artist yet — ask the studio owner to link it." }
+  }
+
   const piece = String(formData.get('piece') ?? '').trim()
   const category = String(formData.get('category') ?? '').trim()
-  const artistName = String(formData.get('artistName') ?? '').trim()
   const alt = String(formData.get('alt') ?? '').trim()
 
-  if (!piece || !category || !artistName || !alt) {
-    return { error: 'Fill in the piece name, category, artist, and alt text.' }
+  if (!piece || !category || !alt) {
+    return { error: 'Fill in the piece name, category, and alt text.' }
   }
 
   const files = formData
@@ -67,7 +74,7 @@ export async function createGalleryItemAction(formData: FormData): Promise<Galle
   const { error: insertError } = await supabase.from('gallery_items').insert({
     piece,
     category,
-    artist_name: artistName,
+    artist_name: artist.name,
     alt,
     images: imageUrls,
     display_order: count ?? 0,
@@ -88,19 +95,32 @@ export async function createGalleryItemAction(formData: FormData): Promise<Galle
  * pieces (migrated from the old static data.ts file) point at local
  * `/images/portfolio/...` files rather than Storage, so those are just
  * skipped — only URLs actually inside the `gallery` bucket get removed.
+ *
+ * Checks the piece's artist_name matches the logged-in artist before
+ * allowing the delete — RLS alone doesn't scope gallery_items per artist,
+ * so this is where that ownership boundary is actually enforced.
  */
 export async function deleteGalleryItemAction(id: string): Promise<GalleryActionResult> {
+  const artist = await getCurrentStaffArtist()
+  if (!artist) {
+    return { error: "Your account isn't linked to an artist yet — ask the studio owner to link it." }
+  }
+
   const supabase = await createClient()
 
   const { data: item, error: fetchError } = await supabase
     .from('gallery_items')
-    .select('images')
+    .select('images, artist_name')
     .eq('id', id)
     .single()
 
   if (fetchError || !item) {
     console.error('[staff/gallery] fetch before delete failed:', fetchError)
     return { error: 'Could not find that piece.' }
+  }
+
+  if (item.artist_name !== artist.name) {
+    return { error: "That piece belongs to another artist's gallery." }
   }
 
   const { error: deleteError } = await supabase.from('gallery_items').delete().eq('id', id)

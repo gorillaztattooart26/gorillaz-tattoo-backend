@@ -108,6 +108,7 @@ export interface Database {
           image_path: string
           instagram_url: string | null
           facebook_url: string | null
+          user_id: string | null
           created_at: string
         }
         Insert: {
@@ -120,6 +121,7 @@ export interface Database {
           image_path: string
           instagram_url?: string | null
           facebook_url?: string | null
+          user_id?: string | null
           created_at?: string
         }
         Update: {
@@ -132,6 +134,7 @@ export interface Database {
           image_path?: string
           instagram_url?: string | null
           facebook_url?: string | null
+          user_id?: string | null
           created_at?: string
         }
         Relationships: []

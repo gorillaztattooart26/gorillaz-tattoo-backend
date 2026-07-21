@@ -5,12 +5,12 @@ import Image from 'next/image'
 import { Trash2, Upload } from 'lucide-react'
 import { createGalleryItemAction, deleteGalleryItemAction } from '@/app/staff/(protected)/gallery/actions'
 import { fieldClasses as sharedFieldClasses } from '@/components/ui/fieldStyles'
+import { ChevronIcon } from '@/components/common/icons'
 import { cn } from '@/lib/utils'
 import type { StaffGalleryItem } from '@/lib/staff/gallery'
-import type { Artist } from '@/types/artist'
 
 // Noticeably roomier than the shared site-wide field style — this form's
-// dropdowns (category, artist) read as cramped at the default py-3.
+// category dropdown read as cramped at the default py-3.
 const fieldClasses = cn(sharedFieldClasses, 'py-4')
 
 const CATEGORIES = [
@@ -28,10 +28,9 @@ const CATEGORIES = [
 
 interface GalleryManagerProps {
   items: StaffGalleryItem[]
-  artists: Artist[]
 }
 
-export function GalleryManager({ items, artists }: GalleryManagerProps) {
+export function GalleryManager({ items }: GalleryManagerProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -77,30 +76,24 @@ export function GalleryManager({ items, artists }: GalleryManagerProps) {
 
         <label className="block">
           <span className="mb-2 block text-xs text-white/50">Category</span>
-          <select name="category" required defaultValue="" className={fieldClasses}>
-            <option value="" disabled>
-              select a category
-            </option>
-            {CATEGORIES.map((category) => (
-              <option key={category} value={category}>
-                {category}
+          <div className="relative">
+            <select
+              name="category"
+              required
+              defaultValue=""
+              className={cn(fieldClasses, 'appearance-none pr-11')}
+            >
+              <option value="" disabled>
+                select a category
               </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="block">
-          <span className="mb-2 block text-xs text-white/50">Artist</span>
-          <select name="artistName" required defaultValue="" className={fieldClasses}>
-            <option value="" disabled>
-              select an artist
-            </option>
-            {artists.map((artist) => (
-              <option key={artist.slug} value={artist.name}>
-                {artist.name}
-              </option>
-            ))}
-          </select>
+              {CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <ChevronIcon className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+          </div>
         </label>
 
         <label className="block">
@@ -164,9 +157,7 @@ export function GalleryManager({ items, artists }: GalleryManagerProps) {
             </div>
             <div className="p-3">
               <p className="truncate text-xs font-medium capitalize text-white">{item.piece}</p>
-              <p className="mt-0.5 truncate text-xs capitalize text-white/50">
-                {item.category} · {item.artist_name}
-              </p>
+              <p className="mt-0.5 truncate text-xs capitalize text-white/50">{item.category}</p>
             </div>
           </div>
         ))}
