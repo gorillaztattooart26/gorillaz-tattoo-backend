@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { HOME_SECTIONS } from '@/lib/routes'
 
 /**
@@ -15,17 +14,25 @@ export function Hero() {
       aria-label="Gorillaz Tattoo Art Hero"
       className="relative min-h-screen w-full overflow-hidden bg-neutral-900"
     >
-      {/* Full-bleed background photo */}
+      {/*
+       * Full-bleed background photo — a separate portrait shot on mobile
+       * rather than the desktop photo cropped down. `next/image` can't
+       * swap to a wholly different source per breakpoint, so this uses a
+       * native `<picture>` with a `max-width` source instead; the browser
+       * picks one and only downloads that one.
+       */}
       <div className="animate-settle absolute inset-0">
-        <Image
-          src="/images/studio/studio-lounge.jpg"
-          alt="Gorillaz Tattoo Art studio lounge"
-          title="gorillaz tattoo art — studio lounge"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
+        <picture>
+          <source media="(max-width: 767px)" srcSet="/images/studio/hero-mobile.jpg" />
+          <img
+            src="/images/studio/studio-lounge.jpg"
+            alt="Gorillaz Tattoo Art studio lounge"
+            title="gorillaz tattoo art — studio lounge"
+            fetchPriority="high"
+            loading="eager"
+            className="h-full w-full object-cover object-center"
+          />
+        </picture>
       </div>
 
       {/* Tagline + links — upper right, beside the portrait */}
