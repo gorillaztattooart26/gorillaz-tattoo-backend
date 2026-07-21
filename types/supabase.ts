@@ -136,6 +136,39 @@ export interface Database {
         }
         Relationships: []
       }
+      gallery_items: {
+        Row: {
+          id: string
+          piece: string
+          category: string
+          artist_name: string
+          alt: string
+          images: string[]
+          display_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          piece: string
+          category: string
+          artist_name: string
+          alt: string
+          images: string[]
+          display_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          piece?: string
+          category?: string
+          artist_name?: string
+          alt?: string
+          images?: string[]
+          display_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           id: string

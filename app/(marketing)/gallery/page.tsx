@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { GalleryGrid } from '@/components/gallery/GalleryGrid'
-import { GALLERY_ITEMS } from '@/components/gallery/data'
+import { getGalleryItems } from '@/lib/gallery'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { SectionHeading } from '@/components/common/SectionHeading'
 import { buildMetadata } from '@/lib/seo'
@@ -13,7 +13,9 @@ export const metadata: Metadata = buildMetadata({
   path: ROUTES.gallery,
 })
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const galleryItems = await getGalleryItems()
+
   return (
     <section className="relative min-h-screen w-full bg-black px-6 md:px-10 pt-28 pb-24 md:pt-32 md:pb-32">
       <div className="sr-only">
@@ -33,7 +35,7 @@ export default function GalleryPage() {
         every piece, every artist
       </SectionHeading>
 
-      <GalleryGrid items={GALLERY_ITEMS} />
+      <GalleryGrid items={galleryItems} />
     </section>
   )
 }

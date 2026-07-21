@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
-import { Image as ImageIcon } from 'lucide-react'
-import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
+import { StaffPageHeader } from '@/components/staff/StaffPageHeader'
+import { GalleryManager } from '@/components/staff/GalleryManager'
+import { getStaffGalleryItems } from '@/lib/staff/gallery'
+import { getArtists } from '@/lib/artists'
 
 export const metadata: Metadata = {
   title: 'Gallery | Staff',
@@ -12,12 +14,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default function StaffGalleryPage() {
+export default async function StaffGalleryPage() {
+  const [items, artists] = await Promise.all([getStaffGalleryItems(), getArtists()])
+
   return (
-    <PlaceholderSection
-      title="Gallery"
-      description="Managing the public portfolio/gallery images from here is coming soon."
-      icon={ImageIcon}
-    />
+    <div>
+      <StaffPageHeader title="Gallery" description={`${items.length} pieces live on the public site`} />
+      <div className="px-4 py-6 md:px-8">
+        <GalleryManager items={items} artists={artists} />
+      </div>
+    </div>
   )
 }
