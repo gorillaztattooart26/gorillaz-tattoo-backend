@@ -65,7 +65,7 @@
             <g transform="matrix(0.86835,0,0,0.86835,-49.915287,3.519759)">
                 <g>
                     <g transform="matrix(1,0,0,1,552.743,461.366)">
-                        <text x="0px" y="0px" style="font-family:'Rowdies-Regular', 'Rowdies';font-size:100px;fill:rgb(240,240,240);">T</text>
+                        <path d="M22,0L22,-54.8L2,-53.8L2,-70.8L60.5,-70.8L60.5,-53.8L40,-54.8L40,-16L41.1,-6L40,0L22,0Z" style="fill:rgb(240,240,240);fill-rule:nonzero;"/>
                     </g>
                     <g transform="matrix(1,0,0,1,608.643,461.366)">
                         <path d="M1,0L5.8,-16.9L5.8,-29.6L13.2,-32.6L26.2,-70.7L52.1,-70.7L68.2,-25.9L75.9,-11.7L75.9,0L58.2,0L53.2,-16L24.1,-16L19.8,0L1,0ZM30.7,-31.4L47.7,-31.4L40.1,-54.3L38,-54.3L30.7,-31.4Z" style="fill:rgb(240,240,240);fill-rule:nonzero;"/>
