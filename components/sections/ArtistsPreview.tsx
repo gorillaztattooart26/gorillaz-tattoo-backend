@@ -6,55 +6,38 @@ import { SectionHeading } from '@/components/common/SectionHeading'
 import { FacebookIcon, InstagramIcon, NextArrowIcon } from '@/components/common/icons'
 import type { Artist } from '@/types/artist'
 
-const ARTISTS: Artist[] = [
-  {
-    slug: 'park-lladoc',
-    src: '/images/artists/artist-1.jpg',
-    name: 'park nichole lladoc',
-    specialty: 'black & grey realism',
-    years: '13 yrs',
-    bio: 'park is a tattoo artist based in the philippines with over 13 years of professional experience. he specializes in realism, black & grey, and hyper-realism, creating detailed, lifelike tattoos that combine technical precision with artistic expression. his work is known for its depth, realism, and commitment to delivering custom pieces that are both visually striking and deeply personal.',
-    instagram: 'https://www.instagram.com/parklladoc/',
-    facebook: 'https://www.facebook.com/park.lladoc',
-    alt: 'park nichole lladoc — black and grey realism tattoo artist at gorillaz tattoo art studio philippines',
-  },
-  {
-    slug: 'isaiah-recongco',
-    src: '/images/artists/artist-2.jpg',
-    name: 'isaiah recongco',
-    specialty: 'black and grey realism & line art',
-    years: '1 year',
-    bio: 'specializing in black & grey realism | fine-line & minimalist art. focused on technical shading: whip, pointillism, and pendulum shading. transforming stories into skin art.',
-    instagram: 'https://www.instagram.com/justsaiinked/',
-    facebook: 'https://www.facebook.com/profile.php?id=61590748843029',
-    alt: 'isaiah recongco — black and grey realism and line art tattoo artist at gorillaz tattoo art studio philippines',
-  },
-]
+interface ArtistsPreviewProps {
+  artists: Artist[]
+}
 
 /**
  * Homepage artist carousel — image / bio+socials / next-artist containers.
  * Needs local state to cycle artists, so this is a Client Component; the
- * eyebrow+heading above it stays static.
+ * eyebrow+heading above it stays static. Artist data comes from the
+ * `artists` table (fetched by the Server Component parent) so staff can
+ * edit it from /staff/artists instead of it being hardcoded here.
  */
-export function ArtistsPreview() {
+export function ArtistsPreview({ artists }: ArtistsPreviewProps) {
   const [index, setIndex] = useState(0)
-  const sectionRef = useRef<HTMLElement>(null)
-  const artist = ARTISTS[index]
+  const photoRef = useRef<HTMLElement>(null)
+
+  if (artists.length === 0) return null
+
+  const artist = artists[index % artists.length]
 
   const goNext = () => {
-    setIndex((i) => (i + 1) % ARTISTS.length)
+    setIndex((i) => (i + 1) % artists.length)
     // On mobile the card stack is tall enough that the button sits well
-    // below the heading — without this, switching artists leaves the
-    // photo/name off-screen above the visitor instead of showing the new
-    // artist from the top like a fresh card.
+    // below the artist's photo — without this, switching artists leaves
+    // the photo/bio off-screen above the visitor instead of showing the
+    // new artist from the top like a fresh card.
     if (window.matchMedia('(max-width: 767px)').matches) {
-      sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      photoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 
   return (
     <section
-      ref={sectionRef}
       id="artists"
       role="region"
       aria-label="Tattoo artists at Gorillaz Tattoo Art studio"
@@ -70,21 +53,28 @@ export function ArtistsPreview() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-4 items-stretch">
         <figure
-          key={`img-${index}`}
-          className="animate-rise relative overflow-hidden rounded-2xl bg-neutral-900 aspect-[4/5]"
+          ref={photoRef}
+          className="relative scroll-mt-28 overflow-hidden rounded-2xl bg-neutral-900 aspect-[4/5]"
         >
-          <Image
-            src={artist.src}
-            alt={artist.alt}
-            title={`${artist.name} — ${artist.specialty} — gorillaz tattoo art studio`}
-            fill
-            sizes="(min-width: 768px) 33vw, 100vw"
-            className="object-cover"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-          <span className="absolute top-5 right-5 text-white/80 text-xs border border-white/30 rounded-full px-3 py-1 whitespace-nowrap backdrop-blur">
-            {artist.years}
-          </span>
+          {/* Keyed on index (not the outer figure) so the rise animation
+              replays on every artist change while the figure itself stays
+              mounted — scrollIntoView targets the figure, and a smooth
+              scroll gets cancelled by the browser if its target is
+              unmounted mid-animation, which a keyed figure would do. */}
+          <div key={`img-${index}`} className="animate-rise absolute inset-0">
+            <Image
+              src={artist.src}
+              alt={artist.alt}
+              title={`${artist.name} — ${artist.specialty} — gorillaz tattoo art studio`}
+              fill
+              sizes="(min-width: 768px) 33vw, 100vw"
+              className="object-cover"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <span className="absolute top-5 right-5 text-white/80 text-xs border border-white/30 rounded-full px-3 py-1 whitespace-nowrap backdrop-blur">
+              {artist.years}
+            </span>
+          </div>
         </figure>
 
         <div

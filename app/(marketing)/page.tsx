@@ -9,6 +9,7 @@ import { FAQ } from '@/components/sections/FAQ'
 import { buildMetadata } from '@/lib/seo'
 import { siteConfig } from '@/lib/site-config'
 import { ROUTES } from '@/lib/routes'
+import { getArtists } from '@/lib/artists'
 
 export const metadata: Metadata = buildMetadata({
   title: siteConfig.title,
@@ -16,7 +17,9 @@ export const metadata: Metadata = buildMetadata({
   path: ROUTES.home,
 })
 
-export default function HomePage() {
+export default async function HomePage() {
+  const artists = await getArtists()
+
   return (
     <div className="relative bg-black">
       {/* Ambient glow behind the page — sits in the black space between
@@ -30,7 +33,7 @@ export default function HomePage() {
       <Hero />
       <Marquee />
       <PortfolioPreview />
-      <ArtistsPreview />
+      <ArtistsPreview artists={artists} />
       <Studio />
       <Booking />
       <FAQ />

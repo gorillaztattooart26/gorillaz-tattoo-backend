@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useMemo, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { Trash2, Upload } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal, Trash2, Upload } from 'lucide-react'
 import { createGalleryItemAction, deleteGalleryItemAction } from '@/app/staff/(protected)/gallery/actions'
 import { fieldClasses as sharedFieldClasses } from '@/components/ui/fieldStyles'
 import { ChevronIcon } from '@/components/common/icons'
@@ -35,6 +35,16 @@ export function GalleryManager({ items }: GalleryManagerProps) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const categories = useMemo(
+    () => ['all', ...Array.from(new Set(items.map((item) => item.category)))],
+    [items],
+  )
+  const [activeCategory, setActiveCategory] = useState('all')
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
+
+  const filteredItems =
+    activeCategory === 'all' ? items : items.filter((item) => item.category === activeCategory)
 
   const onSubmit = (formData: FormData) => {
     setError(null)
@@ -131,37 +141,86 @@ export function GalleryManager({ items }: GalleryManagerProps) {
         </button>
       </form>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="group relative overflow-hidden rounded-lg border border-white/10 bg-neutral-900/60 md:rounded-2xl"
+      {items.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <button
+            type="button"
+            onClick={() => setIsMobileFilterOpen((open) => !open)}
+            aria-expanded={isMobileFilterOpen}
+            className="flex w-fit items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs text-white/70 transition-colors hover:border-white/50 hover:text-white md:hidden"
           >
-            <div className="relative aspect-square">
-              <Image
-                src={item.images[0]}
-                alt={item.alt}
-                fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                className="object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => onDelete(item.id)}
-                disabled={isPending && deletingId === item.id}
-                aria-label={`Delete ${item.piece}`}
-                className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity hover:bg-red-500/80 group-hover:opacity-100 disabled:opacity-60"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="p-3">
-              <p className="truncate text-xs font-medium capitalize text-white">{item.piece}</p>
-              <p className="mt-0.5 truncate text-xs capitalize text-white/50">{item.category}</p>
-            </div>
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            filter by
+            <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', isMobileFilterOpen && 'rotate-180')} />
+          </button>
+
+          <div
+            className={cn(
+              'flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-neutral-900/40 p-4',
+              'md:rounded-none md:border-0 md:bg-transparent md:p-0',
+              !isMobileFilterOpen && 'hidden md:flex',
+            )}
+            role="group"
+            aria-label="Filter your pieces"
+          >
+            {categories.map((category) => {
+              const isActive = category === activeCategory
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setActiveCategory(category)}
+                  aria-pressed={isActive}
+                  className={cn(
+                    'capitalize text-xs md:text-sm rounded-full px-4 py-2 border transition-colors',
+                    isActive
+                      ? 'bg-[#fabb42] border-[#fabb42] text-black font-semibold'
+                      : 'border-white/25 text-white/70 hover:border-white/50 hover:text-white',
+                  )}
+                >
+                  {category}
+                </button>
+              )
+            })}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {items.length > 0 && filteredItems.length === 0 ? (
+        <p className="text-sm text-white/60">No pieces found for this filter yet.</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {filteredItems.map((item) => (
+            <div
+              key={item.id}
+              className="group relative overflow-hidden rounded-lg border border-white/10 bg-neutral-900/60 md:rounded-2xl"
+            >
+              <div className="relative aspect-square">
+                <Image
+                  src={item.images[0]}
+                  alt={item.alt}
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                  className="object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => onDelete(item.id)}
+                  disabled={isPending && deletingId === item.id}
+                  aria-label={`Delete ${item.piece}`}
+                  className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity hover:bg-red-500/80 group-hover:opacity-100 disabled:opacity-60"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="p-3">
+                <p className="truncate text-xs font-medium capitalize text-white">{item.piece}</p>
+                <p className="mt-0.5 truncate text-xs capitalize text-white/50">{item.category}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

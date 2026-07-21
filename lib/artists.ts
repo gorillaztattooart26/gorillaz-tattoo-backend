@@ -17,7 +17,7 @@ function mapArtist(row: ArtistRow): Artist {
 }
 
 export async function getArtists(): Promise<Artist[]> {
-  const { data, error } = await supabase.from('artists').select('*').order('name')
+  const { data, error } = await supabase.from('artists').select('*').order('display_order')
 
   if (error) {
     console.error('[artists] fetch failed:', error)

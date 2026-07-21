@@ -13,13 +13,13 @@ const WORKS: PortfolioWork[] = [
     span: 'md:col-span-2',
   },
   {
-    src: '/images/portfolio/portfolio-20.jpg',
+    src: '/images/portfolio/portfolio-19.jpg',
     style: 'blackwork',
     piece: 'guardian angel leg sleeve',
     alt: 'black and grey guardian angel leg sleeve tattoo — custom tattoo portfolio, gorillaz tattoo art studio',
   },
   {
-    src: '/images/portfolio/portfolio-59.jpg',
+    src: '/images/portfolio/portfolio-75.jpg',
     style: 'realism',
     piece: 'wasteland portrait sleeve',
     alt: 'realism portrait tattoo with burning cityscape reflection — custom ink design, gorillaz tattoo art studio philippines',
@@ -37,7 +37,7 @@ const WORKS: PortfolioWork[] = [
     alt: 'neo traditional tiger and serpent forearm tattoo — custom ink design by gorillaz tattoo art studio',
   },
   {
-    src: '/images/portfolio/portfolio-13.jpg',
+    src: '/images/portfolio/portfolio-14.jpg',
     style: 'anime',
     piece: 'nine-tailed fox side piece',
     alt: 'anime nine-tailed fox side piece tattoo — tattoo portfolio, gorillaz tattoo art studio philippines',
