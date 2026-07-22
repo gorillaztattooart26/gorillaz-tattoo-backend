@@ -17,6 +17,15 @@ const nextConfig: NextConfig = {
             hostname: supabaseHostname,
             pathname: '/storage/v1/object/public/**',
           },
+          // Customer inquiry reference photos live in a private bucket,
+          // so the staff dashboard displays them via signed URLs instead
+          // (see lib/staff/inquiries.ts) — a different Storage path shape
+          // than the public one above.
+          {
+            protocol: 'https',
+            hostname: supabaseHostname,
+            pathname: '/storage/v1/object/sign/**',
+          },
         ]
       : [],
   },

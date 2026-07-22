@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { StaffPageHeader } from '@/components/staff/StaffPageHeader'
 import { getInquiries } from '@/lib/staff/inquiries'
 import { formatDate } from '@/lib/staff/format'
@@ -30,13 +31,14 @@ export default async function StaffInquiriesPage() {
                 <th className="px-5 py-3 font-medium">Artist</th>
                 <th className="px-5 py-3 font-medium">Style</th>
                 <th className="px-5 py-3 font-medium">Placement</th>
+                <th className="px-5 py-3 font-medium">Reference</th>
                 <th className="px-5 py-3 font-medium">Submitted</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {inquiries.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-white/40">
+                  <td colSpan={7} className="px-5 py-10 text-center text-white/40">
                     No inquiries yet.
                   </td>
                 </tr>
@@ -51,6 +53,25 @@ export default async function StaffInquiriesPage() {
                   <td className="px-5 py-4 capitalize text-white/70">{inquiry.preferred_artist}</td>
                   <td className="px-5 py-4 capitalize text-white/70">{inquiry.tattoo_type}</td>
                   <td className="px-5 py-4 text-white/70">{inquiry.placement}</td>
+                  <td className="px-5 py-4">
+                    {inquiry.images.length === 0 ? (
+                      <span className="text-xs text-white/30">none</span>
+                    ) : (
+                      <div className="flex gap-1.5">
+                        {inquiry.images.map((url) => (
+                          <a
+                            key={url}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-md border border-white/10 transition-opacity hover:opacity-80"
+                          >
+                            <Image src={url} alt="Reference image sent with this inquiry" fill sizes="40px" className="object-cover" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </td>
                   <td className="px-5 py-4 text-white/40">{formatDate(inquiry.created_at)}</td>
                 </tr>
               ))}
