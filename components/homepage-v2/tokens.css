@@ -1,0 +1,158 @@
+/*
+ * Design tokens for the /homepage-v2 draft only. Imported exclusively by
+ * app/homepage-v2/layout.tsx — Next.js's route-based CSS chunking means
+ * this file is never fetched/applied on any other route, so it's safe to
+ * declare these as plain :root custom properties without touching (or
+ * colliding with) styles/globals.css, which the rest of the site still
+ * depends on unchanged.
+ */
+/* styles/globals.css hardcodes `body { background: #000 }` for the rest of
+ * the site — pure black, not this palette's warm --gz-ink-950. Since every
+ * v2 section relies on that token instead, any sliver of body showing
+ * through (e.g. mobile Safari's overscroll rubber-band) reads as a visible
+ * seam against them. Overriding it here keeps the two in lockstep, scoped
+ * to the v2 routes the same way the rest of this file already is. */
+body {
+  background: #0b0a09;
+}
+
+:root {
+  --gz-ink-950: #0b0a09;
+  --gz-ink-900: #141312;
+  --gz-ink-800: #1f1d1b;
+  --gz-ink-700: #2e2b28;
+  --gz-ink-600: #454138;
+  --gz-ink-500: #6b655b;
+  --gz-ink-400: #918a7e;
+  --gz-ink-300: #b5aea2;
+  --gz-ink-200: #d6d0c6;
+  --gz-ink-100: #e7e2d9;
+  --gz-ink-050: #f2eee7;
+
+  --gz-paper-000: #ffffff;
+  --gz-paper-050: #fbf9f5;
+  --gz-paper-100: #f6f3ed;
+
+  --gz-copper-050: #fbf0e9;
+  --gz-copper-100: #f4dccc;
+  --gz-copper-300: #dfa279;
+  --gz-copper-500: #c4622b;
+  --gz-copper-600: #a94f1f;
+  --gz-copper-700: #8a3f18;
+
+  --gz-border-subtle: rgba(255, 255, 255, 0.09);
+  --gz-border-default: rgba(255, 255, 255, 0.14);
+  --gz-border-strong: rgba(255, 255, 255, 0.24);
+
+  --gz-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --gz-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --gz-radius-pill: 999px;
+}
+
+@keyframes gz-kenburns {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes gz-panel {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Running glow arcs on the decorative geometric rings — a copper
+   clip-path "sweep" that grows around the ring and fades, then repeats. */
+@keyframes gz-arc-full {
+  0% {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0.25;
+  }
+  45% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0.25;
+  }
+}
+
+@keyframes gz-arc-r {
+  0% {
+    clip-path: inset(0 0 100% 50%);
+    opacity: 0.25;
+  }
+  45% {
+    clip-path: inset(0 0 0 50%);
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 0 0 50%);
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(100% 0 0 50%);
+    opacity: 0.25;
+  }
+}
+
+@keyframes gz-arc {
+  0% {
+    clip-path: inset(0 50% 100% 0);
+    opacity: 0.25;
+  }
+  45% {
+    clip-path: inset(0 50% 0 0);
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 50% 0 0);
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(100% 50% 0 0);
+    opacity: 0.25;
+  }
+}
+
+/* Running glow that travels along a geometric divider line — a short
+   bright dash chases along the stroke, looping continuously. */
+@keyframes gz-line-run {
+  0% {
+    stroke-dashoffset: 300;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gz-kenburns,
+  .gz-arc-full,
+  .gz-arc-r,
+  .gz-arc,
+  .gz-line-run {
+    animation: none !important;
+  }
+}

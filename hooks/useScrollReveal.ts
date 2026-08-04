@@ -27,12 +27,20 @@ export function useScrollReveal() {
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-            observer.unobserve(entry.target)
+            const target = entry.target
+            observer.unobserve(target)
+            // Deferred a frame so elements already in view on mount (the
+            // rootMargin below intentionally covers those) never get their
+            // class mutated in the same tick as React's hydration commit —
+            // doing so raced React's hydration bookkeeping and logged a
+            // spurious "tree hydrated but attributes didn't match" warning,
+            // even though this is a post-hydration reveal, not a real
+            // server/client markup mismatch. One frame is imperceptible.
+            requestAnimationFrame(() => target.classList.add('is-visible'))
           }
         }
       },
-      { rootMargin: '0px 0px -40px 0px', threshold: 0 },
+      { rootMargin: '0px 0px 120px 0px', threshold: 0 },
     )
 
     document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => observer.observe(el))
