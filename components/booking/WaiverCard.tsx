@@ -16,10 +16,10 @@ export function WaiverCard({ value, onChange }: WaiverCardProps) {
   return (
     <Card className="p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Waiver</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Waiver</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 px-0">
-        <label className="flex items-start gap-3 text-sm leading-relaxed text-white/80">
+        <label className="flex items-start gap-3 text-sm leading-relaxed text-[var(--foreground)]/80">
           <Checkbox
             checked={value.agreedToTerms}
             onCheckedChange={(checked) =>
@@ -30,7 +30,7 @@ export function WaiverCard({ value, onChange }: WaiverCardProps) {
           I confirm that I have reviewed my tattoo details and agree to the
           Terms &amp; Conditions.
         </label>
-        <label className="flex items-start gap-3 text-sm leading-relaxed text-white/80">
+        <label className="flex items-start gap-3 text-sm leading-relaxed text-[var(--foreground)]/80">
           <Checkbox
             checked={value.consentToTattoo}
             onCheckedChange={(checked) =>

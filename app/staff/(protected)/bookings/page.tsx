@@ -22,10 +22,10 @@ export default async function StaffBookingsPage() {
       <StaffPageHeader title="Bookings" description={`${bookings.length} total`} />
 
       <div className="px-4 py-6 md:px-8">
-        <div className="overflow-x-auto rounded-lg border border-white/10 bg-neutral-900/60 md:rounded-2xl">
+        <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-xs uppercase tracking-wide text-white/40">
+              <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--foreground)]/40">
                 <th className="px-5 py-3 font-medium">Customer</th>
                 <th className="px-5 py-3 font-medium">Artist</th>
                 <th className="px-5 py-3 font-medium">Status</th>
@@ -34,10 +34,10 @@ export default async function StaffBookingsPage() {
                 <th className="px-5 py-3 font-medium">Down Payment</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[var(--foreground)]/5">
               {bookings.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-white/40">
+                  <td colSpan={6} className="px-5 py-10 text-center text-[var(--foreground)]/40">
                     No bookings yet.
                   </td>
                 </tr>
@@ -45,21 +45,21 @@ export default async function StaffBookingsPage() {
               {bookings.map((booking) => (
                 <tr key={booking.id}>
                   <td className="px-5 py-4">
-                    <p className="font-medium text-white">{booking.customerName}</p>
-                    <p className="text-xs text-white/40">{booking.bookingId}</p>
+                    <p className="font-medium text-[var(--foreground)]">{booking.customerName}</p>
+                    <p className="text-xs text-[var(--foreground)]/40">{booking.bookingId}</p>
                   </td>
-                  <td className="px-5 py-4 capitalize text-white/70">{booking.artistName}</td>
+                  <td className="px-5 py-4 capitalize text-[var(--foreground)]/70">{booking.artistName}</td>
                   <td className="px-5 py-4">
                     <StatusBadge status={booking.status} />
                   </td>
-                  <td className="px-5 py-4 text-white/70">
+                  <td className="px-5 py-4 text-[var(--foreground)]/70">
                     {formatDate(booking.appointmentDate)}
-                    <span className="ml-1 text-xs text-white/40">{booking.appointmentTime}</span>
+                    <span className="ml-1 text-xs text-[var(--foreground)]/40">{booking.appointmentTime}</span>
                   </td>
-                  <td className="px-5 py-4 text-white/70">
+                  <td className="px-5 py-4 text-[var(--foreground)]/70">
                     {formatCurrency(booking.estimatedPrice, booking.currency)}
                   </td>
-                  <td className="px-5 py-4 text-white/70">
+                  <td className="px-5 py-4 text-[var(--foreground)]/70">
                     {formatCurrency(booking.downPaymentAmount, booking.currency)}
                   </td>
                 </tr>

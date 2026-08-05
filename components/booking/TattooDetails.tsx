@@ -7,7 +7,7 @@ export function TattooDetails({ tattoo }: { tattoo: Tattoo }) {
   return (
     <Card className="p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Tattoo Details</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Tattoo Details</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-6 px-0">
         <Field label="Description" value={tattoo.description} />
@@ -27,7 +27,7 @@ export function TattooDetails({ tattoo }: { tattoo: Tattoo }) {
         </div>
 
         <div>
-          <p className="mb-3 text-xs uppercase tracking-wide text-white/40">
+          <p className="mb-3 text-xs uppercase tracking-wide text-[var(--foreground)]/40">
             Reference Images
           </p>
           <ReferenceImageGallery images={tattoo.referenceImages} />

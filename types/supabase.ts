@@ -175,6 +175,45 @@ export interface Database {
         }
         Relationships: []
       }
+      homepage_hero: {
+        Row: {
+          id: string
+          video_url: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          video_url: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          video_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      homepage_portfolio_images: {
+        Row: {
+          slot: number
+          image_url: string
+          alt: string
+          updated_at: string
+        }
+        Insert: {
+          slot: number
+          image_url: string
+          alt: string
+          updated_at?: string
+        }
+        Update: {
+          slot?: number
+          image_url?: string
+          alt?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           id: string

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Select } from '@/components/ui/Select'
-import { fieldClasses } from '@/components/ui/fieldStyles'
+import { CtaPill } from '@/components/common/CtaPill'
+import { FieldGroup, SelectField, fieldClasses } from '@/components/common/FormField'
 import {
   ARTIST_OPTIONS,
   CONTACT_METHOD_OPTIONS,
@@ -26,9 +26,6 @@ const INITIAL_VALUES: BookingFormValues = {
   weight: '',
   idea: '',
 }
-
-const primaryButtonClasses =
-  'inline-flex items-center justify-center gap-2 bg-[#fabb42] text-black text-sm font-semibold rounded-full px-6 py-3.5 transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)]'
 
 /**
  * The tattoo inquiry form. Isolated as its own Client Component so the rest
@@ -76,158 +73,134 @@ export function BookingForm() {
     <form
       onSubmit={handleSubmit}
       aria-label="Tattoo inquiry form"
-      className="reveal lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4"
+      className="reveal lg:col-span-2 flex flex-col gap-4"
     >
-      <label className="block">
-        <span className="sr-only">full name</span>
-        <input
-          type="text"
-          required
-          value={form.fullName}
-          onChange={update('fullName')}
-          placeholder="Full Name"
-          className={fieldClasses}
-        />
-      </label>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FieldGroup label="01 — Who you are">
+          <input
+            type="text"
+            required
+            value={form.fullName}
+            onChange={update('fullName')}
+            placeholder="Full name"
+            aria-label="Full name"
+            className={fieldClasses}
+          />
+          <input
+            type="email"
+            required
+            value={form.email}
+            onChange={update('email')}
+            placeholder="Email address"
+            aria-label="Email address"
+            className={fieldClasses}
+          />
+          <input
+            type="tel"
+            required
+            value={form.phone}
+            onChange={update('phone')}
+            placeholder="Phone number"
+            aria-label="Phone number"
+            className={fieldClasses}
+          />
+          <SelectField
+            value={form.preferredContactMethod}
+            onChange={update('preferredContactMethod')}
+            options={CONTACT_METHOD_OPTIONS}
+            srLabel="Preferred contact method"
+          />
+        </FieldGroup>
 
-      <label className="block">
-        <span className="sr-only">email address</span>
-        <input
-          type="email"
-          required
-          value={form.email}
-          onChange={update('email')}
-          placeholder="Email Address"
-          className={fieldClasses}
-        />
-      </label>
-
-      <label className="block">
-        <span className="sr-only">phone number</span>
-        <input
-          type="tel"
-          required
-          value={form.phone}
-          onChange={update('phone')}
-          placeholder="Phone Number"
-          className={fieldClasses}
-        />
-      </label>
-
-      <Select
-        value={form.preferredContactMethod}
-        onChange={update('preferredContactMethod')}
-        options={CONTACT_METHOD_OPTIONS}
-        srLabel="preferred contact method"
-        capitalize
-      />
-
-      <Select
-        value={form.artist}
-        onChange={update('artist')}
-        options={ARTIST_OPTIONS}
-        srLabel="preferred artist"
-        capitalize
-      />
-
-      <Select
-        value={form.style}
-        onChange={update('style')}
-        options={STYLE_OPTIONS}
-        srLabel="tattoo style"
-        capitalize
-      />
-
-      <label className="block">
-        <span className="sr-only">tattoo placement</span>
-        <input
-          type="text"
-          required
-          value={form.placement}
-          onChange={update('placement')}
-          placeholder="Tattoo Placement (e.g. forearm)"
-          className={fieldClasses}
-        />
-      </label>
-
-      <div className="sm:col-span-2 grid grid-cols-4 gap-4">
-        <div className="col-span-2">
-          <Select
+        <FieldGroup label="02 — The piece">
+          <SelectField
+            value={form.artist}
+            onChange={update('artist')}
+            options={ARTIST_OPTIONS}
+            srLabel="Preferred tattoo artist"
+          />
+          <SelectField
+            value={form.style}
+            onChange={update('style')}
+            options={STYLE_OPTIONS}
+            srLabel="Tattoo style"
+          />
+          <input
+            type="text"
+            required
+            value={form.placement}
+            onChange={update('placement')}
+            placeholder="Placement (e.g. forearm)"
+            aria-label="Tattoo placement"
+            className={fieldClasses}
+          />
+          <SelectField
             value={form.size}
             onChange={update('size')}
             options={SIZE_OPTIONS}
-            srLabel="estimated size"
+            srLabel="Approximate size"
           />
-        </div>
-
-        <label className="block col-span-1">
-          <span className="sr-only">height</span>
-          <input
-            type="text"
-            value={form.height}
-            onChange={update('height')}
-            placeholder="Height"
-            className={fieldClasses}
-          />
-        </label>
-
-        <label className="block col-span-1">
-          <span className="sr-only">weight</span>
-          <input
-            type="text"
-            value={form.weight}
-            onChange={update('weight')}
-            placeholder="Weight"
-            className={fieldClasses}
-          />
-        </label>
+          <div className="flex gap-3.5">
+            <input
+              type="text"
+              value={form.height}
+              onChange={update('height')}
+              placeholder="Height"
+              aria-label="Height"
+              className={fieldClasses}
+            />
+            <input
+              type="text"
+              value={form.weight}
+              onChange={update('weight')}
+              placeholder="Weight"
+              aria-label="Weight"
+              className={fieldClasses}
+            />
+          </div>
+        </FieldGroup>
       </div>
 
-      <label className="block sm:col-span-2 cursor-pointer">
-        <span className="sr-only">reference images upload</span>
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-white/30 bg-neutral-900/90 px-4 py-3 text-sm text-white/50 hover:border-white/50 transition-colors">
-          <span>
+      <div className="flex flex-wrap items-start gap-4">
+        <label className="flex min-h-0 flex-1 cursor-pointer items-center justify-between gap-4 rounded-xl border border-dashed border-[var(--gz-border-default)] px-5 py-6 text-[var(--gz-ink-400)] transition-colors hover:border-[var(--gz-border-strong)] hover:text-[var(--gz-ink-200)] md:min-w-[260px]">
+          <span className="text-sm">
             {referenceFiles && referenceFiles.length > 0
               ? `${referenceFiles.length} file(s) selected`
-              : 'Reference Images Upload'}
+              : 'Reference images'}
           </span>
-          <span className="text-xs text-white/40">browse</span>
-        </div>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => setReferenceFiles(e.target.files)}
-          className="hidden"
-        />
-      </label>
+          <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--gz-ink-500)]">
+            Browse
+          </span>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setReferenceFiles(e.target.files)}
+            className="hidden"
+          />
+        </label>
 
-      <label className="block sm:col-span-2">
-        <span className="sr-only">tell us about your tattoo idea</span>
         <textarea
           required
           value={form.idea}
           onChange={update('idea')}
-          placeholder="Tell Us About Your Tattoo Idea — style, size, placement, references"
+          placeholder="Tell us about your tattoo idea — style, size, placement, references"
+          aria-label="Tattoo brief"
           rows={5}
-          className={cn(fieldClasses, 'resize-none')}
+          className={cn(fieldClasses, 'flex-[2] min-w-[260px] resize-none rounded-xl py-5')}
         />
-      </label>
+      </div>
 
-      {submitError && (
-        <p className="sm:col-span-2 text-sm text-red-400">{submitError}</p>
-      )}
+      {submitError && <p className="text-sm text-red-400">{submitError}</p>}
 
-      <button
+      <CtaPill
+        as="button"
         type="submit"
         disabled={isSubmitting}
-        className={cn(
-          primaryButtonClasses,
-          'sm:col-span-2 mt-2 disabled:pointer-events-none disabled:opacity-60 disabled:shadow-none',
-        )}
+        className="mt-2 self-start"
       >
-        {isSubmitting ? 'sending…' : 'send inquiry'}
-      </button>
+        {isSubmitting ? 'Sending…' : 'Send inquiry'}
+      </CtaPill>
     </form>
   )
 }

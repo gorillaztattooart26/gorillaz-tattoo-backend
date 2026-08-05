@@ -5,7 +5,7 @@ import type { BookingStatus as BookingStatusValue } from '@/types/booking-portal
 const STATUS_CONFIG: Record<BookingStatusValue, { label: string; className: string }> = {
   awaiting_down_payment: {
     label: 'Awaiting Down Payment',
-    className: 'bg-[#fabb42] text-black',
+    className: 'bg-[var(--primary)] text-[var(--primary-foreground)]',
   },
   appointment_confirmed: {
     label: 'Appointment Confirmed',
@@ -13,7 +13,7 @@ const STATUS_CONFIG: Record<BookingStatusValue, { label: string; className: stri
   },
   completed: {
     label: 'Completed',
-    className: 'bg-white/10 text-white/70',
+    className: 'bg-[var(--foreground)]/10 text-[var(--foreground)]/70',
   },
   cancelled: {
     label: 'Cancelled',

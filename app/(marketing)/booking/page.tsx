@@ -12,14 +12,14 @@ export const metadata: Metadata = buildMetadata({
 })
 
 /**
- * The inquiry form already exists in full (unlike about/artists/portfolio,
- * which need new content not yet written), so this route reuses the real
- * Booking section rather than showing a placeholder.
+ * The inquiry form already exists in full (unlike about/artists/contact,
+ * which are still stubs), so this route reuses the real Booking section
+ * rather than showing a placeholder.
  */
 export default function BookingPage() {
   return (
     <>
-      <div className="bg-black px-6 pt-28 md:px-10 md:pt-32">
+      <div className="px-6 pt-28 md:px-10 md:pt-32">
         <Breadcrumbs
           entries={[
             { name: 'Home', path: ROUTES.home },

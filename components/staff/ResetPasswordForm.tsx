@@ -55,17 +55,17 @@ export function ResetPasswordForm() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900/60 p-8 text-center"
+        className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--card)]/60 p-8 text-center"
       >
         <Logo className="mx-auto h-10 w-auto" width={160} height={51} />
-        <h1 className="hero-title mt-6 text-2xl font-medium text-white">Set a new password</h1>
-        <p className="mt-3 text-sm leading-relaxed text-white/60">
+        <h1 className="hero-title mt-6 text-2xl font-medium text-[var(--foreground)]">Set a new password</h1>
+        <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)]/60">
           Choose a new password for your staff account.
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4 text-left">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="password" className="text-white/70">
+            <Label htmlFor="password" className="text-[var(--foreground)]/70">
               New password
             </Label>
             <Input
@@ -73,14 +73,14 @@ export function ResetPasswordForm() {
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
-              className="h-11 bg-black/40 text-white"
+              className="h-11 bg-[var(--background)]/40 text-[var(--foreground)]"
               {...register('password')}
             />
             {errors.password && <p className="text-xs text-red-400">{errors.password.message}</p>}
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="confirmPassword" className="text-white/70">
+            <Label htmlFor="confirmPassword" className="text-[var(--foreground)]/70">
               Confirm new password
             </Label>
             <Input
@@ -88,7 +88,7 @@ export function ResetPasswordForm() {
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
-              className="h-11 bg-black/40 text-white"
+              className="h-11 bg-[var(--background)]/40 text-[var(--foreground)]"
               {...register('confirmPassword')}
             />
             {errors.confirmPassword && (
@@ -101,7 +101,7 @@ export function ResetPasswordForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-auto w-full rounded-full bg-[#fabb42] py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)] disabled:opacity-60"
+            className="h-auto w-full rounded-full bg-[var(--primary)] py-3.5 text-sm font-semibold text-[var(--primary-foreground)] transition-all duration-300 hover:bg-[var(--primary)]/90 hover:shadow-[0_0_24px_rgba(196,98,43,0.5)] disabled:opacity-60"
           >
             {isSubmitting ? 'Saving…' : 'Save new password'}
           </Button>

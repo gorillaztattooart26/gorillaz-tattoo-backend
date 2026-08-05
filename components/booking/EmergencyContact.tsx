@@ -13,7 +13,7 @@ export function EmergencyContact() {
   return (
     <Card className="p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Need Help? Contact the Studio</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Need Help? Contact the Studio</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-4 px-0 sm:grid-cols-2">
         {CONTACT_LINKS.map((contact) => (
@@ -22,10 +22,10 @@ export function EmergencyContact() {
             href={contact.href}
             target={contact.href.startsWith('http') ? '_blank' : undefined}
             rel={contact.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-            className="rounded-xl border border-white/10 px-4 py-3 transition-colors hover:border-white/25"
+            className="rounded-xl border border-[var(--border)] px-4 py-3 transition-colors hover:border-[var(--foreground)]/25"
           >
-            <p className="text-xs uppercase tracking-wide text-white/40">{contact.label}</p>
-            <p className="mt-1 text-sm text-white/80">{contact.value}</p>
+            <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/40">{contact.label}</p>
+            <p className="mt-1 text-sm text-[var(--foreground)]/80">{contact.value}</p>
           </a>
         ))}
       </CardContent>

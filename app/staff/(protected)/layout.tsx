@@ -4,7 +4,7 @@ import { StaffSidebar } from '@/components/staff/StaffSidebar'
 
 /**
  * Shell for every authenticated staff page (Dashboard, Inquiries, Bookings,
- * Payments, Gallery, Artists, Settings). Middleware (lib/supabase/
+ * Payments, Portfolio, Artists, Settings). Middleware (lib/supabase/
  * middleware.ts) already redirects unauthenticated requests away before
  * they reach here, but a Server Component layout shouldn't assume a
  * guarantee it can't verify itself — this re-checks and redirects as a

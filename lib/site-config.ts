@@ -1,6 +1,3 @@
-import type { NavLink } from '@/types/nav'
-import { HOME_SECTIONS, ROUTES } from '@/lib/routes'
-
 export const siteConfig = {
   name: 'gorillaz tattoo art',
   title: 'gorillaz tattoo art — custom ink design & tattoo portfolio',
@@ -28,17 +25,3 @@ export const siteConfig = {
   phone: null,
   openingHours: null,
 } as const
-
-/**
- * Homepage section links use `/#section` (not bare `#section`) so they
- * resolve correctly from the shared layout regardless of which route the
- * visitor is currently on — Next.js scrolls to the anchor after navigating
- * home.
- */
-export const NAV_LINKS: NavLink[] = [
-  { label: 'portfolio', href: `${ROUTES.home}${HOME_SECTIONS.portfolio}` },
-  { label: 'artists', href: `${ROUTES.home}${HOME_SECTIONS.artists}` },
-  { label: 'studio', href: `${ROUTES.home}${HOME_SECTIONS.studio}` },
-  { label: 'aftercare', href: ROUTES.aftercare },
-  { label: 'gallery', href: ROUTES.gallery },
-]

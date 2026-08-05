@@ -86,7 +86,7 @@ export async function createGalleryItemAction(formData: FormData): Promise<Galle
   }
 
   revalidatePath('/staff/gallery')
-  revalidatePath('/gallery')
+  revalidatePath('/portfolio')
   return {}
 }
 
@@ -143,6 +143,6 @@ export async function deleteGalleryItemAction(id: string): Promise<GalleryAction
   }
 
   revalidatePath('/staff/gallery')
-  revalidatePath('/gallery')
+  revalidatePath('/portfolio')
   return {}
 }

@@ -3,11 +3,11 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "/usr/local/bin/npm",
+      "runtimeExecutable": "/Users/albertbacsal/.nvm/versions/node/v24.18.0/bin/npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "env": {
-        "PATH": "/usr/local/bin:/usr/bin:/bin"
+        "PATH": "/Users/albertbacsal/.nvm/versions/node/v24.18.0/bin:/usr/local/bin:/usr/bin:/bin"
       }
     }
   ]

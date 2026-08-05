@@ -12,20 +12,20 @@ export function BookingHeader({ booking }: { booking: Pick<Booking, 'bookingId' 
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       className="text-center"
     >
-      <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-white/40">
+      <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-[var(--foreground)]/40">
         gorillaz tattoo art
       </p>
-      <h1 className="hero-title mt-4 text-white font-medium text-[13vw] md:text-[4.5vw]">
+      <h1 className="hero-title mt-4 text-[var(--foreground)] font-medium text-[13vw] md:text-[4.5vw]">
         Booking Confirmation
       </h1>
-      <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/60 md:text-base">
+      <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-[var(--foreground)]/60 md:text-base">
         Your consultation has been approved. Please review your booking
         details and complete your required down payment to reserve your
         tattoo appointment.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <span className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-white/70 md:text-sm">
-          Booking ID <span className="font-semibold text-white">{booking.bookingId}</span>
+        <span className="rounded-full border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 px-4 py-2 text-xs text-[var(--foreground)]/70 md:text-sm">
+          Booking ID <span className="font-semibold text-[var(--foreground)]">{booking.bookingId}</span>
         </span>
         <BookingStatus status={booking.status} />
       </div>

@@ -31,17 +31,17 @@ export default async function StaffSettingsPage() {
     <div>
       <StaffPageHeader title="Settings" description="Manage your account." />
       <div className="flex flex-col gap-6 px-4 py-6 md:px-8">
-        <div className="rounded-lg border border-white/10 bg-neutral-900/60 p-6 md:rounded-2xl">
-          <h2 className="text-base font-semibold text-white">Account</h2>
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--card)]/60 p-6 md:rounded-2xl">
+          <h2 className="text-base font-semibold text-[var(--foreground)]">Account</h2>
           <dl className="mt-4 flex flex-col gap-3 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-white/50">Email</dt>
-              <dd className="text-white">{user.email}</dd>
+              <dt className="text-[var(--foreground)]/50">Email</dt>
+              <dd className="text-[var(--foreground)]">{user.email}</dd>
             </div>
             {artist && (
               <div className="flex justify-between gap-4">
-                <dt className="text-white/50">Artist profile</dt>
-                <dd className="capitalize text-white">{artist.name}</dd>
+                <dt className="text-[var(--foreground)]/50">Artist profile</dt>
+                <dd className="capitalize text-[var(--foreground)]">{artist.name}</dd>
               </div>
             )}
           </dl>

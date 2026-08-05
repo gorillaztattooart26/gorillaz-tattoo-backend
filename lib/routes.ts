@@ -7,7 +7,6 @@ export const ROUTES = {
   about: '/about',
   artists: '/artists',
   portfolio: '/portfolio',
-  gallery: '/gallery',
   booking: '/booking',
   contact: '/contact',
   aftercare: '/aftercare',
@@ -18,9 +17,10 @@ export type RouteKey = keyof typeof ROUTES
 /** In-page anchor sections on the homepage (single scrolling page). */
 export const HOME_SECTIONS = {
   hero: '#hero',
-  portfolio: '#portfolio',
+  work: '#work',
   artists: '#artists',
-  studio: '#studio',
-  booking: '#booking',
+  about: '#about',
+  process: '#process',
+  inquire: '#inquire',
   faq: '#faq',
 } as const

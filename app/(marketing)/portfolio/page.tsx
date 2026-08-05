@@ -1,25 +1,22 @@
 import type { Metadata } from 'next'
-import { ComingSoonSection } from '@/components/common/ComingSoonSection'
+import { PortfolioGallery } from '@/components/portfolio/PortfolioGallery'
+import { getGalleryItems } from '@/lib/gallery'
 import { buildMetadata } from '@/lib/seo'
+import { siteConfig } from '@/lib/site-config'
 import { ROUTES } from '@/lib/routes'
 
 export const metadata: Metadata = buildMetadata({
   title: 'Portfolio',
-  description:
-    'The complete gorillaz tattoo art gallery — blackwork, fine line, script, realism, and more. Coming soon.',
+  description: siteConfig.description,
   path: ROUTES.portfolio,
 })
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const items = await getGalleryItems()
+
   return (
-    <ComingSoonSection
-      eyebrow="tattoo portfolio"
-      title="the full gallery is coming soon"
-      description="We're building a complete, filterable gallery of past work. See a curated preview on the homepage in the meantime."
-      breadcrumbs={[
-        { name: 'Home', path: ROUTES.home },
-        { name: 'Portfolio', path: ROUTES.portfolio },
-      ]}
-    />
+    <div className="relative bg-[var(--gz-ink-950)]">
+      <PortfolioGallery items={items} />
+    </div>
   )
 }

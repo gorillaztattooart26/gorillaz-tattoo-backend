@@ -36,7 +36,7 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="whitespace-nowrap rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/70 transition-colors hover:border-white/50 hover:text-white"
+        className="whitespace-nowrap rounded-full border border-[var(--foreground)]/25 px-3 py-1.5 text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:border-[var(--foreground)]/50 hover:text-[var(--foreground)]"
       >
         view full inquiry
       </button>
@@ -47,22 +47,22 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
           aria-modal="true"
           aria-label={`Full inquiry from ${inquiry.full_name}`}
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-[var(--background)]/80 p-4"
         >
           <div
             onClick={(event) => event.stopPropagation()}
-            className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-y-auto rounded-2xl border border-white/10 bg-neutral-900 p-6"
+            className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold capitalize text-white">{inquiry.full_name}</h2>
-                <p className="mt-1 text-xs text-white/40">submitted {formatDate(inquiry.created_at)}</p>
+                <h2 className="text-lg font-semibold capitalize text-[var(--foreground)]">{inquiry.full_name}</h2>
+                <p className="mt-1 text-xs text-[var(--foreground)]/40">submitted {formatDate(inquiry.created_at)}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Close"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--foreground)]/60 transition-colors hover:bg-[var(--foreground)]/10 hover:text-[var(--foreground)]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -83,7 +83,7 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
 
             {inquiry.images.length > 0 && (
               <div className="mt-4">
-                <p className="text-xs text-white/40">Reference images</p>
+                <p className="text-xs text-[var(--foreground)]/40">Reference images</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {inquiry.images.map((url) => (
                     <a
@@ -91,7 +91,7 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="relative block h-20 w-20 overflow-hidden rounded-lg border border-white/10 transition-opacity hover:opacity-80"
+                      className="relative block h-20 w-20 overflow-hidden rounded-lg border border-[var(--border)] transition-opacity hover:opacity-80"
                     >
                       <Image
                         src={url}
@@ -127,8 +127,8 @@ function Field({
 }) {
   return (
     <div className={className}>
-      <dt className="text-xs text-white/40">{label}</dt>
-      <dd className={cn('mt-1 text-white/80', capitalize && 'capitalize', multiline && 'whitespace-pre-wrap leading-relaxed')}>
+      <dt className="text-xs text-[var(--foreground)]/40">{label}</dt>
+      <dd className={cn('mt-1 text-[var(--foreground)]/80', capitalize && 'capitalize', multiline && 'whitespace-pre-wrap leading-relaxed')}>
         {value}
       </dd>
     </div>

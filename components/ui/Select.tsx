@@ -21,12 +21,12 @@ export function Select({ value, onChange, options, srLabel, capitalize = false }
         className={cn(fieldClasses, 'appearance-none pr-11', capitalize && 'capitalize')}
       >
         {options.map((option) => (
-          <option key={option} value={option} className="bg-neutral-900">
+          <option key={option} value={option} className="bg-[var(--card)]">
             {option}
           </option>
         ))}
       </select>
-      <ChevronIcon className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+      <ChevronIcon className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
     </label>
   )
 }

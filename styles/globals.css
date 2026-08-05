@@ -14,8 +14,8 @@ html {
 }
 
 body {
-  background: #000;
-  color: #fff;
+  background: #0b0a09;
+  color: #fbf9f5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -160,42 +160,45 @@ body {
 /*
  * This site is dark-only (no light/dark toggle), so the brand palette is
  * set directly on :root rather than gated behind a .dark class. Values
- * mirror the black/white/#fabb42 palette already used throughout the
- * hand-authored sections (see lib/site-config.ts `themeColor`).
+ * mirror the warm-ink and copper palette used by the public marketing
+ * site V2 design system (see the ink and copper color scale in
+ * styles/gz-tokens.css) so the staff dashboard and booking portal share
+ * the same visual language, expressed as plain hex/rgba here since those
+ * routes do not load gz-tokens.css.
  */
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #171717;
-  --card-foreground: #ffffff;
-  --popover: #171717;
-  --popover-foreground: #ffffff;
-  --primary: #fabb42;
-  --primary-foreground: #000000;
-  --secondary: #262626;
-  --secondary-foreground: #ffffff;
-  --muted: #262626;
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: #262626;
-  --accent-foreground: #ffffff;
+  --background: #0b0a09;
+  --foreground: #fbf9f5;
+  --card: #141312;
+  --card-foreground: #fbf9f5;
+  --popover: #141312;
+  --popover-foreground: #fbf9f5;
+  --primary: #c4622b;
+  --primary-foreground: #fbf9f5;
+  --secondary: #1f1d1b;
+  --secondary-foreground: #fbf9f5;
+  --muted: #1f1d1b;
+  --muted-foreground: #918a7e;
+  --accent: #1f1d1b;
+  --accent-foreground: #fbf9f5;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: #fabb42;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: #c4622b;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 1rem;
-  --sidebar: #171717;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #fabb42;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #262626;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #fabb42;
+  --sidebar: #141312;
+  --sidebar-foreground: #fbf9f5;
+  --sidebar-primary: #c4622b;
+  --sidebar-primary-foreground: #fbf9f5;
+  --sidebar-accent: #1f1d1b;
+  --sidebar-accent-foreground: #fbf9f5;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: #c4622b;
 }
 
 @layer base {

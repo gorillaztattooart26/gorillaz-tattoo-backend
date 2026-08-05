@@ -10,7 +10,7 @@ export function Breadcrumbs({ entries }: BreadcrumbsProps) {
   const jsonLd = buildBreadcrumbJsonLd(entries)
 
   return (
-    <nav aria-label="Breadcrumb" className="text-xs md:text-sm text-white/50">
+    <nav aria-label="Breadcrumb" className="font-mono text-xs uppercase tracking-[0.1em] text-[var(--gz-ink-400)] md:text-sm">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -21,11 +21,11 @@ export function Breadcrumbs({ entries }: BreadcrumbsProps) {
           return (
             <li key={entry.path} className="flex items-center gap-2">
               {isLast ? (
-                <span aria-current="page" className="text-white/80">
+                <span aria-current="page" className="text-[var(--gz-paper-050)]">
                   {entry.name}
                 </span>
               ) : (
-                <Link href={entry.path} className="hover:text-white transition-colors">
+                <Link href={entry.path} className="transition-colors hover:text-[var(--gz-paper-050)]">
                   {entry.name}
                 </Link>
               )}

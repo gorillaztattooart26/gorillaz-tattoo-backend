@@ -15,7 +15,7 @@ export function AppointmentCard({ appointment }: { appointment: Appointment }) {
   return (
     <Card className="p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Appointment Details</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Appointment Details</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-6 px-0">
         <Field label="Studio Address" value={appointment.studioAddress} />
@@ -31,7 +31,7 @@ export function AppointmentCard({ appointment }: { appointment: Appointment }) {
             href={appointment.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-full border border-white/20 px-5 py-3 text-center text-sm font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white"
+            className="flex-1 rounded-full border border-[var(--foreground)]/20 px-5 py-3 text-center text-sm font-semibold text-[var(--foreground)]/80 transition-colors hover:border-[var(--foreground)]/40 hover:text-[var(--foreground)]"
           >
             Google Map
           </a>
@@ -39,7 +39,7 @@ export function AppointmentCard({ appointment }: { appointment: Appointment }) {
             href={appointment.directionsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-full bg-[#fabb42] px-5 py-3 text-center text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)]"
+            className="flex-1 rounded-full bg-[var(--primary)] px-5 py-3 text-center text-sm font-semibold text-[var(--primary-foreground)] transition-all duration-300 hover:bg-[var(--primary)]/90 hover:shadow-[0_0_24px_rgba(196,98,43,0.5)]"
           >
             Directions
           </a>

@@ -8,18 +8,18 @@ import { cn } from '@/lib/utils'
  * good/confirmed, red = failed/cancelled, neutral = done/inert).
  */
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  awaiting_down_payment: { label: 'Awaiting Down Payment', className: 'bg-[#fabb42] text-black' },
+  awaiting_down_payment: { label: 'Awaiting Down Payment', className: 'bg-[var(--primary)] text-[var(--primary-foreground)]' },
   appointment_confirmed: { label: 'Confirmed', className: 'bg-emerald-500/15 text-emerald-300' },
-  completed: { label: 'Completed', className: 'bg-white/10 text-white/70' },
+  completed: { label: 'Completed', className: 'bg-[var(--muted)] text-[var(--muted-foreground)]' },
   cancelled: { label: 'Cancelled', className: 'bg-red-500/15 text-red-300' },
-  pending: { label: 'Pending', className: 'bg-[#fabb42] text-black' },
+  pending: { label: 'Pending', className: 'bg-[var(--primary)] text-[var(--primary-foreground)]' },
   paid: { label: 'Paid', className: 'bg-emerald-500/15 text-emerald-300' },
   failed: { label: 'Failed', className: 'bg-red-500/15 text-red-300' },
-  refunded: { label: 'Refunded', className: 'bg-white/10 text-white/70' },
+  refunded: { label: 'Refunded', className: 'bg-[var(--muted)] text-[var(--muted-foreground)]' },
 }
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
-  const config = STATUS_CONFIG[status] ?? { label: status, className: 'bg-white/10 text-white/70' }
+  const config = STATUS_CONFIG[status] ?? { label: status, className: 'bg-[var(--muted)] text-[var(--muted-foreground)]' }
   return (
     <Badge
       className={cn(

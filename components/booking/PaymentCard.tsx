@@ -33,12 +33,12 @@ export function PaymentCard({ booking, disabled }: PaymentCardProps) {
   }
 
   return (
-    <Card className="border-[#fabb42]/30 bg-[#fabb42]/5 p-6">
+    <Card className="border-[var(--primary)]/30 bg-[var(--primary)]/5 p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Reserve Your Appointment</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Reserve Your Appointment</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-5 px-0">
-        <p className="text-sm leading-relaxed text-white/70">
+        <p className="text-sm leading-relaxed text-[var(--foreground)]/70">
           Complete your required down payment securely using PayMongo.
         </p>
 
@@ -46,7 +46,7 @@ export function PaymentCard({ booking, disabled }: PaymentCardProps) {
           {PAYMENT_METHODS.map((method) => (
             <span
               key={method}
-              className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/70"
+              className="rounded-full border border-[var(--foreground)]/20 px-3 py-1 text-xs text-[var(--foreground)]/70"
             >
               {method}
             </span>
@@ -57,7 +57,7 @@ export function PaymentCard({ booking, disabled }: PaymentCardProps) {
           type="button"
           disabled={disabled || isRedirecting}
           onClick={handlePayment}
-          className="h-auto w-full rounded-full bg-[#fabb42] py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none"
+          className="h-auto w-full rounded-full bg-[var(--primary)] py-3.5 text-sm font-semibold text-[var(--primary-foreground)] transition-all duration-300 hover:bg-[var(--primary)]/90 hover:shadow-[0_0_24px_rgba(196,98,43,0.5)] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none"
         >
           {isRedirecting ? 'Redirecting…' : 'Pay Down Payment'}
         </Button>
@@ -65,7 +65,7 @@ export function PaymentCard({ booking, disabled }: PaymentCardProps) {
         {payError && <p className="text-center text-xs text-red-400">{payError}</p>}
 
         {disabled && !payError && (
-          <p className="text-center text-xs text-white/40">
+          <p className="text-center text-xs text-[var(--foreground)]/40">
             Please agree to both waiver items above to continue.
           </p>
         )}

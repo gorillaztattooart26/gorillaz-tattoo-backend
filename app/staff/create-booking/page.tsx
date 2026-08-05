@@ -18,13 +18,13 @@ export default async function CreateBookingPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16 md:py-24">
       <div className="text-center">
-        <p className="text-xs uppercase tracking-[0.2em] text-white/40 md:text-sm">
+        <p className="text-xs uppercase tracking-[0.2em] text-[var(--foreground)]/40 md:text-sm">
           internal tool
         </p>
-        <h1 className="hero-title mt-4 text-[10vw] font-medium text-white md:text-[3.5vw]">
+        <h1 className="hero-title mt-4 text-[10vw] font-medium text-[var(--foreground)] md:text-[3.5vw]">
           Create a Booking
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-white/60">
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[var(--foreground)]/60">
           Fill this out after a consultation is approved. Submitting
           generates the customer&apos;s private booking link automatically.
         </p>

@@ -30,15 +30,15 @@ export function ChangePasswordForm() {
       ref={formRef}
       action={onSubmit}
       onChange={() => setSaved(false)}
-      className="flex flex-col gap-6 rounded-lg border border-white/10 bg-neutral-900/60 p-6 md:rounded-2xl"
+      className="flex flex-col gap-6 rounded-lg border border-[var(--border)] bg-[var(--card)]/60 p-6 md:rounded-2xl"
     >
       <div>
-        <h2 className="text-base font-semibold text-white">Change password</h2>
-        <p className="mt-1 text-sm text-white/50">Update the password you use to log in to this dashboard.</p>
+        <h2 className="text-base font-semibold text-[var(--foreground)]">Change password</h2>
+        <p className="mt-1 text-sm text-[var(--foreground)]/50">Update the password you use to log in to this dashboard.</p>
       </div>
 
       <label className="block">
-        <span className="mb-2 block text-xs text-white/50">Current password</span>
+        <span className="mb-2 block text-xs text-[var(--foreground)]/50">Current password</span>
         <input
           name="currentPassword"
           type="password"
@@ -49,7 +49,7 @@ export function ChangePasswordForm() {
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-xs text-white/50">New password</span>
+        <span className="mb-2 block text-xs text-[var(--foreground)]/50">New password</span>
         <input
           name="newPassword"
           type="password"
@@ -61,7 +61,7 @@ export function ChangePasswordForm() {
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-xs text-white/50">Confirm new password</span>
+        <span className="mb-2 block text-xs text-[var(--foreground)]/50">Confirm new password</span>
         <input
           name="confirmPassword"
           type="password"
@@ -78,7 +78,7 @@ export function ChangePasswordForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="flex items-center justify-center gap-2 rounded-full bg-[#fabb42] px-6 py-2.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c] disabled:opacity-60 lg:w-fit"
+        className="flex items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-6 py-2.5 text-sm font-semibold text-[var(--primary-foreground)] transition-all duration-300 hover:bg-[var(--primary)]/90 disabled:opacity-60 lg:w-fit"
       >
         <KeyRound className="h-4 w-4" />
         {isPending ? 'saving…' : 'change password'}

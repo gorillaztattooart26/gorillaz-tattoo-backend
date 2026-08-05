@@ -15,14 +15,14 @@ export function StaffPageHeader({ title, description, action }: StaffPageHeaderP
   })
 
   return (
-    <div className="flex flex-col gap-4 border-b border-white/10 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-8">
+    <div className="flex flex-col gap-4 border-b border-[var(--border)] px-4 py-6 md:flex-row md:items-center md:justify-between md:px-8">
       <div>
-        <h1 className="hero-title text-2xl font-medium text-white">{title}</h1>
-        {description && <p className="mt-1 text-sm text-white/50">{description}</p>}
+        <h1 className="hero-title text-2xl font-medium text-[var(--foreground)]">{title}</h1>
+        {description && <p className="mt-1 text-sm text-[var(--muted-foreground)]">{description}</p>}
       </div>
       <div className="flex items-center gap-4">
         {action}
-        <span className="text-xs text-white/40">{today}</span>
+        <span className="text-xs text-[var(--muted-foreground)]">{today}</span>
       </div>
     </div>
   )

@@ -24,7 +24,7 @@ const NAV_LINKS = [
   { label: 'Inquiries', href: '/staff/inquiries', icon: Inbox },
   { label: 'Bookings', href: '/staff/bookings', icon: CalendarCheck },
   { label: 'Payments', href: '/staff/payments', icon: CreditCard },
-  { label: 'Gallery', href: '/staff/gallery', icon: ImageIcon },
+  { label: 'Portfolio', href: '/staff/gallery', icon: ImageIcon },
   { label: 'Artists', href: '/staff/artists', icon: Users },
   { label: 'Settings', href: '/staff/settings', icon: Settings },
 ]
@@ -56,7 +56,7 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
   return (
     <aside
       className={cn(
-        'group fixed left-0 top-0 z-30 flex h-screen flex-col overflow-hidden border-r border-white/10 bg-neutral-950 py-6 transition-all duration-200',
+        'group fixed left-0 top-0 z-30 flex h-screen flex-col overflow-hidden border-r border-[var(--border)] bg-[var(--sidebar)] py-6 transition-all duration-200',
         pinned ? 'w-56' : 'w-16 hover:w-56',
       )}
     >
@@ -72,7 +72,7 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
           onClick={() => setPinned((prev) => !prev)}
           aria-label={pinned ? 'Collapse sidebar' : 'Expand sidebar'}
           aria-expanded={pinned}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition-colors hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]"
         >
           {pinned ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
         </button>
@@ -88,7 +88,9 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
               href={link.href}
               className={cn(
                 'flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive ? 'bg-[#fabb42] text-black' : 'text-white/60 hover:bg-white/5 hover:text-white',
+                isActive
+                  ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                  : 'text-[var(--muted-foreground)] hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]',
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -102,13 +104,13 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
         <form action={logoutAction}>
           <button
             type="submit"
-            className="flex w-full items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+            className="flex w-full items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm text-[var(--muted-foreground)] transition-colors hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             <span className={labelClass}>Logout</span>
           </button>
         </form>
-        <p className={cn('mt-2 truncate px-3 text-xs text-white/40', labelClass)}>{userEmail}</p>
+        <p className={cn('mt-2 truncate px-3 text-xs text-[var(--muted-foreground)]', labelClass)}>{userEmail}</p>
       </div>
     </aside>
   )

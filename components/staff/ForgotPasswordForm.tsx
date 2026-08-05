@@ -50,24 +50,24 @@ export function ForgotPasswordForm() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900/60 p-8 text-center"
+        className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--card)]/60 p-8 text-center"
       >
         <Logo className="mx-auto h-10 w-auto" width={160} height={51} />
-        <h1 className="hero-title mt-6 text-2xl font-medium text-white">Reset your password</h1>
+        <h1 className="hero-title mt-6 text-2xl font-medium text-[var(--foreground)]">Reset your password</h1>
 
         {submitted ? (
-          <p className="mt-4 text-sm leading-relaxed text-white/60">
+          <p className="mt-4 text-sm leading-relaxed text-[var(--foreground)]/60">
             If that email belongs to a staff account, a password reset link is on its
             way — check your inbox.
           </p>
         ) : (
           <>
-            <p className="mt-3 text-sm leading-relaxed text-white/60">
+            <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)]/60">
               Enter your email and we&apos;ll send you a link to reset your password.
             </p>
             <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4 text-left">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="email" className="text-white/70">
+                <Label htmlFor="email" className="text-[var(--foreground)]/70">
                   Email
                 </Label>
                 <Input
@@ -75,7 +75,7 @@ export function ForgotPasswordForm() {
                   type="email"
                   autoComplete="email"
                   placeholder="you@gorillaztattoo.art"
-                  className="h-11 bg-black/40 text-white"
+                  className="h-11 bg-[var(--background)]/40 text-[var(--foreground)]"
                   {...register('email')}
                 />
                 {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
@@ -85,7 +85,7 @@ export function ForgotPasswordForm() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-auto w-full rounded-full bg-[#fabb42] py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)] disabled:opacity-60"
+                className="h-auto w-full rounded-full bg-[var(--primary)] py-3.5 text-sm font-semibold text-[var(--primary-foreground)] transition-all duration-300 hover:bg-[var(--primary)]/90 hover:shadow-[0_0_24px_rgba(196,98,43,0.5)] disabled:opacity-60"
               >
                 {isSubmitting ? 'Sending…' : 'Send reset link'}
               </Button>
@@ -95,7 +95,7 @@ export function ForgotPasswordForm() {
 
         <Link
           href="/staff/login"
-          className="mt-6 inline-block text-sm text-white/50 transition-colors hover:text-white/80"
+          className="mt-6 inline-block text-sm text-[var(--foreground)]/50 transition-colors hover:text-[var(--foreground)]/80"
         >
           Back to login
         </Link>

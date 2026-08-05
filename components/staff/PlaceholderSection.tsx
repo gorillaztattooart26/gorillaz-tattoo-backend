@@ -19,13 +19,13 @@ export function PlaceholderSection({ title, description, icon: Icon }: Placehold
     <div>
       <StaffPageHeader title={title} />
       <div className="px-4 py-6 md:px-8">
-        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-white/10 bg-neutral-900/60 px-6 py-24 text-center md:rounded-2xl">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fabb42]/10 text-[#fabb42]">
+        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)]/60 px-6 py-24 text-center md:rounded-2xl">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--primary)]/10 text-[var(--primary)]">
             <Icon className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-base font-semibold text-white">Coming soon</p>
-            <p className="mt-1 max-w-sm text-sm text-white/50">
+            <p className="text-base font-semibold text-[var(--foreground)]">Coming soon</p>
+            <p className="mt-1 max-w-sm text-sm text-[var(--foreground)]/50">
               {description ?? `${title} management isn't built yet.`}
             </p>
           </div>

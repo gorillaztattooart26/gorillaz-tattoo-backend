@@ -75,7 +75,7 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
     <form onSubmit={onSubmit} className="flex flex-col gap-8">
       <Card className="p-6">
         <CardHeader className="px-0 pb-2">
-          <CardTitle className="text-lg text-white">Customer Information</CardTitle>
+          <CardTitle className="text-lg text-[var(--foreground)]">Customer Information</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 px-0 sm:grid-cols-2">
           <FormField label="Full Name" error={errors.customerName?.message}>
@@ -100,7 +100,7 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
           <FormField label="Preferred Contact Method" error={errors.preferredContactMethod?.message}>
             <NativeSelect {...register('preferredContactMethod')}>
               {CONTACT_METHODS.map((method) => (
-                <option key={method} value={method} className="bg-neutral-900 capitalize">
+                <option key={method} value={method} className="bg-[var(--card)] capitalize">
                   {method}
                 </option>
               ))}
@@ -111,13 +111,13 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
 
       <Card className="p-6">
         <CardHeader className="px-0 pb-2">
-          <CardTitle className="text-lg text-white">Tattoo &amp; Artist</CardTitle>
+          <CardTitle className="text-lg text-[var(--foreground)]">Tattoo &amp; Artist</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 px-0 sm:grid-cols-2">
           <FormField label="Assigned Artist" error={errors.artistSlug?.message}>
             <NativeSelect {...register('artistSlug')}>
               {artists.map((artist) => (
-                <option key={artist.slug} value={artist.slug} className="bg-neutral-900 capitalize">
+                <option key={artist.slug} value={artist.slug} className="bg-[var(--card)] capitalize">
                   {artist.name}
                 </option>
               ))}
@@ -159,7 +159,7 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
               className={cn(fieldClasses, 'resize-none')}
             />
           </FormField>
-          <p className="text-xs text-white/40 sm:col-span-2">
+          <p className="text-xs text-[var(--foreground)]/40 sm:col-span-2">
             Reference image upload isn&apos;t wired to storage yet — newly
             created bookings use sample images until that&apos;s connected.
           </p>
@@ -168,7 +168,7 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
 
       <Card className="p-6">
         <CardHeader className="px-0 pb-2">
-          <CardTitle className="text-lg text-white">Appointment</CardTitle>
+          <CardTitle className="text-lg text-[var(--foreground)]">Appointment</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 px-0 sm:grid-cols-2">
           <FormField label="Studio Address" error={errors.studioAddress?.message} className="sm:col-span-2">
@@ -192,7 +192,7 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
 
       <Card className="p-6">
         <CardHeader className="px-0 pb-2">
-          <CardTitle className="text-lg text-white">Pricing</CardTitle>
+          <CardTitle className="text-lg text-[var(--foreground)]">Pricing</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4 px-0">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -208,14 +208,14 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
             </FormField>
           </div>
 
-          <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-black/40 p-4 text-sm">
-            <div className="flex items-center justify-between text-white/60">
+          <div className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-[var(--background)]/40 p-4 text-sm">
+            <div className="flex items-center justify-between text-[var(--foreground)]/60">
               <span>Down payment due</span>
-              <span className="font-semibold text-[#fabb42]">{formatPHP(downPaymentAmount)}</span>
+              <span className="font-semibold text-[var(--primary)]">{formatPHP(downPaymentAmount)}</span>
             </div>
-            <div className="flex items-center justify-between text-white/60">
+            <div className="flex items-center justify-between text-[var(--foreground)]/60">
               <span>Remaining balance</span>
-              <span className="font-semibold text-white">{formatPHP(remainingBalance)}</span>
+              <span className="font-semibold text-[var(--foreground)]">{formatPHP(remainingBalance)}</span>
             </div>
           </div>
         </CardContent>
@@ -226,7 +226,7 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="h-auto w-full rounded-full bg-[#fabb42] py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#ffc85c] hover:shadow-[0_0_24px_rgba(250,187,66,0.7)] disabled:opacity-60"
+        className="h-auto w-full rounded-full bg-[var(--primary)] py-4 text-sm font-semibold text-[var(--primary-foreground)] transition-all duration-300 hover:bg-[var(--primary)]/90 hover:shadow-[0_0_24px_rgba(196,98,43,0.5)] disabled:opacity-60"
       >
         {isSubmitting ? 'Creating booking…' : 'Create Booking & Generate Link'}
       </Button>
@@ -247,7 +247,7 @@ function FormField({
 }) {
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      <Label className="text-xs uppercase tracking-wide text-white/50">{label}</Label>
+      <Label className="text-xs uppercase tracking-wide text-[var(--foreground)]/50">{label}</Label>
       {children}
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
@@ -264,7 +264,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HT
       >
         {children}
       </select>
-      <ChevronIcon className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+      <ChevronIcon className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)]/40" />
     </div>
   ),
 )

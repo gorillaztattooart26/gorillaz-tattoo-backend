@@ -16,14 +16,14 @@ interface ReferenceImageGalleryProps {
 /** Responsive thumbnail grid; each thumbnail opens its own fullscreen dialog. */
 export function ReferenceImageGallery({ images }: ReferenceImageGalleryProps) {
   if (images.length === 0) {
-    return <p className="text-sm text-white/50">No reference images attached.</p>
+    return <p className="text-sm text-[var(--foreground)]/50">No reference images attached.</p>
   }
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {images.map((image) => (
         <Dialog key={image.src}>
-          <DialogTrigger className="group relative aspect-square overflow-hidden rounded-xl bg-neutral-900">
+          <DialogTrigger className="group relative aspect-square overflow-hidden rounded-xl bg-[var(--card)]">
             <Image
               src={image.src}
               alt={image.alt}
@@ -32,7 +32,7 @@ export function ReferenceImageGallery({ images }: ReferenceImageGalleryProps) {
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </DialogTrigger>
-          <DialogContent className="max-w-3xl bg-black p-2 sm:max-w-3xl">
+          <DialogContent className="max-w-3xl bg-[var(--background)] p-2 sm:max-w-3xl">
             <DialogTitle className="sr-only">{image.alt}</DialogTitle>
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg sm:aspect-video">
               <Image

@@ -9,6 +9,13 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      // The old standalone gallery page was superseded by the richer,
+      // filterable /portfolio page (same underlying gallery_items data).
+      { source: '/gallery', destination: '/portfolio', permanent: true },
+    ]
+  },
   images: {
     remotePatterns: supabaseHostname
       ? [

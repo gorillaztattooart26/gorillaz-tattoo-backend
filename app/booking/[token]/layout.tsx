@@ -10,7 +10,7 @@ import { ROUTES } from '@/lib/routes'
  */
 export default function PrivateBookingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen w-full bg-black">
+    <div className="min-h-screen w-full bg-[var(--background)]">
       <header className="flex justify-center px-6 pt-8">
         <Link href={ROUTES.home} aria-label="Gorillaz Tattoo Art home">
           <Logo className="h-10 w-auto" width={160} height={51} />

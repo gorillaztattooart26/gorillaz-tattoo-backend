@@ -3,16 +3,16 @@ import { cn } from '@/lib/utils'
 import type { TimelineStep } from '@/types/booking-portal'
 
 const DOT_STYLES: Record<TimelineStep['status'], string> = {
-  complete: 'bg-[#fabb42] border-[#fabb42]',
-  current: 'bg-black border-[#fabb42] ring-4 ring-[#fabb42]/20',
-  upcoming: 'bg-black border-white/20',
+  complete: 'bg-[var(--primary)] border-[var(--primary)]',
+  current: 'bg-[var(--background)] border-[var(--primary)] ring-4 ring-[var(--primary)]/20',
+  upcoming: 'bg-[var(--background)] border-[var(--foreground)]/20',
 }
 
 export function Timeline({ steps }: { steps: TimelineStep[] }) {
   return (
     <Card className="p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Booking Timeline</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Booking Timeline</CardTitle>
       </CardHeader>
       <CardContent className="px-0">
         <ol className="flex flex-col gap-8">
@@ -20,7 +20,7 @@ export function Timeline({ steps }: { steps: TimelineStep[] }) {
             <li key={step.key} className="relative flex gap-4 pl-1">
               {index < steps.length - 1 && (
                 <span
-                  className="absolute top-4 left-[9px] h-[calc(100%+1.5rem)] w-px bg-white/10"
+                  className="absolute top-4 left-[9px] h-[calc(100%+1.5rem)] w-px bg-[var(--foreground)]/10"
                   aria-hidden="true"
                 />
               )}
@@ -34,16 +34,16 @@ export function Timeline({ steps }: { steps: TimelineStep[] }) {
                 <p
                   className={cn(
                     'text-sm font-semibold',
-                    step.status === 'upcoming' ? 'text-white/50' : 'text-white',
+                    step.status === 'upcoming' ? 'text-[var(--foreground)]/50' : 'text-[var(--foreground)]',
                   )}
                 >
                   {step.label}
                 </p>
-                <p className="mt-1 text-xs leading-relaxed text-white/50">
+                <p className="mt-1 text-xs leading-relaxed text-[var(--foreground)]/50">
                   {step.description}
                 </p>
                 {step.date && (
-                  <p className="mt-1 text-xs text-white/30">
+                  <p className="mt-1 text-xs text-[var(--foreground)]/30">
                     {new Date(`${step.date}T00:00:00`).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',

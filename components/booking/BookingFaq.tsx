@@ -33,9 +33,9 @@ export function BookingFaq() {
   return (
     <Card className="p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Frequently Asked Questions</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Frequently Asked Questions</CardTitle>
       </CardHeader>
-      <CardContent className="border-t border-white/10 px-0">
+      <CardContent className="border-t border-[var(--border)] px-0">
         {FAQS.map((faq, index) => (
           <AccordionItem
             key={faq.question}

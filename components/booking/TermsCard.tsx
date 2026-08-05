@@ -12,10 +12,10 @@ export function TermsCard() {
   return (
     <Card className="p-6">
       <CardHeader className="px-0 pb-2">
-        <CardTitle className="text-lg text-white">Terms &amp; Conditions</CardTitle>
+        <CardTitle className="text-lg text-[var(--foreground)]">Terms &amp; Conditions</CardTitle>
       </CardHeader>
       <CardContent className="px-0">
-        <ol className="max-h-56 list-decimal space-y-3 overflow-y-auto rounded-xl border border-white/10 bg-black/40 p-5 pl-9 text-sm leading-relaxed text-white/70">
+        <ol className="max-h-56 list-decimal space-y-3 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--background)]/40 p-5 pl-9 text-sm leading-relaxed text-[var(--foreground)]/70">
           {TERMS.map((term) => (
             <li key={term}>{term}</li>
           ))}

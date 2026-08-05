@@ -8,5 +8,5 @@
  * would just be a redundant, stacked second logo bar.
  */
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-screen w-full bg-black">{children}</div>
+  return <div className="min-h-screen w-full bg-[var(--background)]">{children}</div>
 }
