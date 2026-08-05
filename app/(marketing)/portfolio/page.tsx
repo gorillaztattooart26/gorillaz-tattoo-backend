@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { PortfolioGallery } from '@/components/portfolio/PortfolioGallery'
 import { getGalleryItems } from '@/lib/gallery'
@@ -16,7 +17,9 @@ export default async function PortfolioPage() {
 
   return (
     <div className="relative bg-[var(--gz-ink-950)]">
-      <PortfolioGallery items={items} />
+      <Suspense>
+        <PortfolioGallery items={items} />
+      </Suspense>
     </div>
   )
 }

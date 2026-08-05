@@ -309,7 +309,7 @@ export function PortfolioImagesManager({ slots, existingImages }: PortfolioImage
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((item) => item.id)} strategy={rectSortingStrategy}>
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {items.map((item, index) => (
               <SlotCard
                 key={item.id}

@@ -1,7 +1,10 @@
 import { InquireForm } from '@/components/sections/InquireForm'
+import { getGalleryItems } from '@/lib/gallery'
 
 /** Homepage inquiry section. The heading is static; the form is a client island. */
-export function Inquire() {
+export async function Inquire() {
+  const galleryItems = await getGalleryItems()
+
   return (
     <section
       id="inquire"
@@ -21,7 +24,7 @@ export function Inquire() {
           </div>
         </div>
 
-        <InquireForm />
+        <InquireForm galleryItems={galleryItems} />
       </div>
     </section>
   )

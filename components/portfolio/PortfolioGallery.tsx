@@ -2,10 +2,12 @@
 
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { HOME_SECTIONS, ROUTES } from '@/lib/routes'
 import { CtaPill } from '@/components/common/CtaPill'
 import { cn } from '@/utils/cn'
+import { artistNameKey } from '@/utils/artistName'
 import type { GalleryItem } from '@/types/gallery'
 
 interface PortfolioGalleryProps {
@@ -104,8 +106,21 @@ export function PortfolioGallery({ items }: PortfolioGalleryProps) {
     () => ['All', ...Array.from(new Set(items.map((item) => item.artistName)))],
     [items],
   )
+
+  // Deep link from the homepage's "View work" button, e.g. /portfolio?artist=park-lladoc.
+  // Resolved synchronously in useState's lazy initializer rather than an effect, so the
+  // correct filter is active from the very first render (no flash of "All" first) and the
+  // match can't be skipped by an unrelated re-render — an effect-based version of this
+  // was found to occasionally miss re-applying across client-side navigations in local dev
+  // (React Strict Mode double-invokes effects; production builds were unaffected either way).
+  const searchParams = useSearchParams()
+  const artistQuery = searchParams.get('artist')
   const [category, setCategory] = useState('All')
-  const [artist, setArtist] = useState('All')
+  const [artist, setArtist] = useState(() => {
+    if (!artistQuery) return 'All'
+    const targetKey = artistNameKey(artistQuery)
+    return artists.find((label) => label !== 'All' && artistNameKey(label) === targetKey) ?? 'All'
+  })
   const railRef = useRef<HTMLDivElement>(null)
   const categoryTrackRef = useRef<HTMLDivElement>(null)
   const [railPad, setRailPad] = useState({ start: 0, end: 0 })
@@ -177,26 +192,28 @@ export function PortfolioGallery({ items }: PortfolioGalleryProps) {
           </p>
         </div>
 
-        <div className="reveal flex flex-wrap items-center justify-center gap-2 md:gap-6">
+        <div className="reveal flex flex-col items-center gap-2 md:gap-3">
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--gz-ink-400)]">
             Artist
           </span>
-          {artists.map((label) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => setArtist(label)}
-              aria-pressed={label === artist}
-              className={cn(
-                'border-b py-1 font-mono text-[11px] uppercase tracking-[0.14em] capitalize transition-colors',
-                label === artist
-                  ? 'border-[var(--gz-copper-500)] text-[var(--gz-paper-050)]'
-                  : 'border-transparent text-[var(--gz-ink-400)] hover:text-[var(--gz-paper-050)]',
-              )}
-            >
-              {label}
-            </button>
-          ))}
+          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-6">
+            {artists.map((label) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setArtist(label)}
+                aria-pressed={label === artist}
+                className={cn(
+                  'border-b py-1 font-mono text-[11px] uppercase tracking-[0.14em] capitalize transition-colors',
+                  label === artist
+                    ? 'border-[var(--gz-copper-500)] text-[var(--gz-paper-050)]'
+                    : 'border-transparent text-[var(--gz-ink-400)] hover:text-[var(--gz-paper-050)]',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div

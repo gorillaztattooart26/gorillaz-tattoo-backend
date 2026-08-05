@@ -23,7 +23,8 @@ const CONTACT_METHODS = ['email', 'sms', 'call', 'messenger'] as const
 
 const DEFAULT_VALUES: Partial<CreateBookingFormInput> = {
   preferredContactMethod: 'email',
-  studioAddress: 'Unit 4B, Poblacion Arts District, Makati City, Metro Manila, Philippines',
+  studioAddress:
+    'Blk 8 Lot 18 Sutter Street, Phase 5, 3 Garden Villas Subdivision, City of Santa Rosa, Laguna',
   consultationMethod: 'In-person consultation completed at the studio',
   estimatedSessionHours: 3,
   estimatedSessionCount: 1,

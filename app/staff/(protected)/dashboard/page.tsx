@@ -52,10 +52,15 @@ export default async function StaffDashboardPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 px-4 py-6 sm:grid-cols-2 md:px-8 lg:grid-cols-4">
-        <StatCard icon={Inbox} label="Total Inquiries" value={inquiryCount} />
-        <StatCard icon={CalendarCheck} label="Total Bookings" value={bookingCounts.total} />
-        <StatCard icon={CreditCard} label="Pending Payments" value={paymentCounts.pending} />
-        <StatCard icon={CheckCircle2} label="Confirmed Bookings" value={bookingCounts.confirmed} />
+        <StatCard icon={Inbox} label="Total Inquiries" value={inquiryCount} href="/staff/inquiries" />
+        <StatCard icon={CalendarCheck} label="Total Bookings" value={bookingCounts.total} href="/staff/bookings" />
+        <StatCard icon={CreditCard} label="Pending Payments" value={paymentCounts.pending} href="/staff/payments" />
+        <StatCard
+          icon={CheckCircle2}
+          label="Confirmed Bookings"
+          value={bookingCounts.confirmed}
+          href="/staff/bookings"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 px-4 pb-6 md:px-8 lg:grid-cols-3">

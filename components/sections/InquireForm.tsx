@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   ARTIST_OPTIONS,
   CONTACT_METHOD_OPTIONS,
@@ -10,7 +10,10 @@ import {
 import { submitInquiryAction } from '@/components/booking/actions'
 import { CtaPill } from '@/components/common/CtaPill'
 import { FieldGroup, SelectField, fieldClasses } from '@/components/common/FormField'
+import { ArtistWorkModal } from '@/components/portfolio/ArtistWorkModal'
+import { artistNameKey } from '@/utils/artistName'
 import type { BookingFormValues } from '@/types/booking'
+import type { GalleryItem } from '@/types/gallery'
 import { cn } from '@/utils/cn'
 
 const INITIAL_VALUES: BookingFormValues = {
@@ -33,11 +36,19 @@ const INITIAL_VALUES: BookingFormValues = {
  * writes to Supabase `inquiries`/`inquiry_images` and triggers the same
  * two Resend emails, then redirects to /thank-you on success.
  */
-export function InquireForm() {
+export function InquireForm({ galleryItems }: { galleryItems: GalleryItem[] }) {
   const [form, setForm] = useState<BookingFormValues>(INITIAL_VALUES)
   const [referenceFiles, setReferenceFiles] = useState<FileList | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isWorkModalOpen, setIsWorkModalOpen] = useState(false)
+
+  const hasChosenArtist = form.artist !== ARTIST_OPTIONS[0]
+  const selectedArtistItems = useMemo(() => {
+    if (!hasChosenArtist) return []
+    const targetKey = artistNameKey(form.artist)
+    return galleryItems.filter((item) => artistNameKey(item.artistName) === targetKey)
+  }, [galleryItems, form.artist, hasChosenArtist])
 
   const update =
     (key: keyof BookingFormValues) =>
@@ -69,6 +80,7 @@ export function InquireForm() {
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit} aria-label="Tattoo inquiry form" className="reveal flex flex-col gap-6 md:gap-8">
       <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         <FieldGroup label="01 — Who you are">
@@ -114,6 +126,16 @@ export function InquireForm() {
             options={ARTIST_OPTIONS}
             srLabel="Preferred tattoo artist"
           />
+          {hasChosenArtist && (
+            <button
+              type="button"
+              onClick={() => setIsWorkModalOpen(true)}
+              className="-mt-1 flex items-center justify-center gap-1.5 self-center font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--gz-copper-300)] transition-colors hover:text-[var(--gz-copper-500)]"
+            >
+              View artist work
+              <span aria-hidden>→</span>
+            </button>
+          )}
           <SelectField
             value={form.style}
             onChange={update('style')}
@@ -211,5 +233,13 @@ export function InquireForm() {
         </CtaPill>
       </div>
     </form>
+
+    <ArtistWorkModal
+      open={isWorkModalOpen}
+      onClose={() => setIsWorkModalOpen(false)}
+      artistLabel={form.artist}
+      items={selectedArtistItems}
+    />
+    </>
   )
 }

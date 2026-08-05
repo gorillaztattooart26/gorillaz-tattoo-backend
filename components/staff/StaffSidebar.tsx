@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -13,8 +13,8 @@ import {
   Users,
   Settings,
   LogOut,
-  PanelLeftOpen,
-  PanelLeftClose,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logoutAction } from '@/app/staff/actions'
@@ -47,6 +47,22 @@ interface StaffSidebarProps {
 export function StaffSidebar({ userEmail }: StaffSidebarProps) {
   const pathname = usePathname()
   const [pinned, setPinned] = useState(false)
+  const asideRef = useRef<HTMLElement>(null)
+
+  // On touch devices the rail has no hover state, so a tap pins it open —
+  // without this, tapping anywhere else on the page would leave it stuck open.
+  useEffect(() => {
+    if (!pinned) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (asideRef.current && !asideRef.current.contains(event.target as Node)) {
+        setPinned(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [pinned])
 
   const labelClass = cn(
     'opacity-0 transition-opacity duration-150 group-hover:opacity-100',
@@ -55,6 +71,7 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
 
   return (
     <aside
+      ref={asideRef}
       className={cn(
         'group fixed left-0 top-0 z-30 flex h-screen flex-col overflow-hidden border-r border-[var(--border)] bg-[var(--sidebar)] py-6 transition-all duration-200',
         pinned ? 'w-56' : 'w-16 hover:w-56',
@@ -66,7 +83,7 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
         </Link>
       </div>
 
-      <div className="mt-3 flex justify-center px-2 md:hidden">
+      <div className="mt-3 flex justify-center px-2 lg:hidden">
         <button
           type="button"
           onClick={() => setPinned((prev) => !prev)}
@@ -74,7 +91,7 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
           aria-expanded={pinned}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition-colors hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]"
         >
-          {pinned ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+          {pinned ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
       </div>
 

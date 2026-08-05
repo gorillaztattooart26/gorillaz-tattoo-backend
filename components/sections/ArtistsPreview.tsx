@@ -210,10 +210,9 @@ export function ArtistsPreview({ artists }: ArtistsPreviewProps) {
         }}
       >
         <CtaPill
-          href={artist.instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${artist.name} on Instagram`}
+          as="link"
+          href={`${ROUTES.portfolio}?artist=${encodeURIComponent(artist.slug)}`}
+          aria-label={`View ${artist.name}'s work in the portfolio`}
           className="self-start whitespace-nowrap"
           iconPosition="right"
           iconVariant="default"
