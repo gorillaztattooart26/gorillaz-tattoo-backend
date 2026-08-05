@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { ROUTES } from '@/lib/routes'
 import { CtaPill } from '@/components/common/CtaPill'
 import { cn } from '@/utils/cn'
@@ -12,11 +12,19 @@ interface PortfolioGalleryProps {
   tiles: PortfolioTile[]
 }
 
-/** A real portfolio photo, cropped to fill its tile. */
+/**
+ * A real portfolio photo, cropped to fill its tile. Tiles flagged
+ * `grayscale` desaturate by default and reveal full color on hover; since
+ * touch devices have no hover, `revealed`/`onToggleReveal` let a tap drive
+ * the same effect (wired from the parent, which tracks which tiles have
+ * been tapped).
+ */
 function PhotoTile({
   src,
   alt,
   grayscale,
+  revealed,
+  onToggleReveal,
   className,
   imgClassName,
   sizes = '(min-width: 768px) 33vw, 100vw',
@@ -25,21 +33,34 @@ function PhotoTile({
   src: string
   alt: string
   grayscale?: boolean
+  revealed?: boolean
+  onToggleReveal?: () => void
   className?: string
   imgClassName?: string
   sizes?: string
   priority?: boolean
 }) {
   return (
-    <div className={cn('relative h-full w-full overflow-hidden bg-[var(--gz-ink-800)]', className)}>
+    <div
+      className={cn(
+        'group relative h-full w-full overflow-hidden bg-[var(--gz-ink-800)]',
+        grayscale && 'cursor-pointer',
+        className,
+      )}
+      onClick={grayscale ? onToggleReveal : undefined}
+    >
       <Image
         src={src}
         alt={alt}
         fill
         sizes={sizes}
         priority={priority}
-        className={cn('object-cover', imgClassName)}
-        style={grayscale ? { filter: 'grayscale(1)' } : undefined}
+        className={cn(
+          'object-cover',
+          grayscale &&
+            cn('transition-[filter] duration-500 ease-out group-hover:grayscale-0', !revealed && 'grayscale'),
+          imgClassName,
+        )}
       />
     </div>
   )
@@ -62,6 +83,21 @@ export function PortfolioGallery({ tiles }: PortfolioGalleryProps) {
   const row2 = tiles.slice(3, 6)
   const anchorTile = tiles[6]
   const growTile = tiles[7]
+
+  // Which grayscale tiles (by slot) a touch user has tapped to reveal
+  // color — desktop gets the same reveal for free via CSS :hover.
+  const [revealedSlots, setRevealedSlots] = useState<Set<number>>(new Set())
+  const toggleReveal = (slot: number) => {
+    setRevealedSlots((prev) => {
+      const next = new Set(prev)
+      if (next.has(slot)) {
+        next.delete(slot)
+      } else {
+        next.add(slot)
+      }
+      return next
+    })
+  }
 
   const trackRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -223,6 +259,8 @@ export function PortfolioGallery({ tiles }: PortfolioGalleryProps) {
                 src={tile.src}
                 alt={tile.alt}
                 grayscale={tile.grayscale}
+                revealed={revealedSlots.has(tile.slot)}
+                onToggleReveal={() => toggleReveal(tile.slot)}
                 className="h-full w-full"
                 priority={tileIndex === 0}
               />
@@ -241,7 +279,14 @@ export function PortfolioGallery({ tiles }: PortfolioGalleryProps) {
                 transitionDelay: `${tileIndex * 70}ms`,
               }}
             >
-              <PhotoTile src={tile.src} alt={tile.alt} grayscale={tile.grayscale} className="h-full w-full" />
+              <PhotoTile
+                src={tile.src}
+                alt={tile.alt}
+                grayscale={tile.grayscale}
+                revealed={revealedSlots.has(tile.slot)}
+                onToggleReveal={() => toggleReveal(tile.slot)}
+                className="h-full w-full"
+              />
             </div>
           ))}
         </div>
