@@ -14,6 +14,18 @@ let cachedClient: SupabaseClient<Database> | null = null
  * whose authenticity isn't independently verified first — doing so would
  * let anyone bypass every RLS policy in the project.
  *
+ * Narrow, deliberate exception: `lib/booking.ts` also uses this client to
+ * call the `get_booking_by_token(uuid)` RPC from the booking portal's
+ * Server Component / Server Actions, which ARE directly browser-reachable
+ * pre-verification. This is safe specifically because that RPC is a single
+ * SECURITY DEFINER function scoped to one row by an unguessable UUID
+ * argument — not an open `.from(table).select()` — and `anon` /
+ * `authenticated` have had EXECUTE revoked on it (migration
+ * 20260805020818), so the service-role client is the only way to call it
+ * at all. It does not reopen general RLS-bypassing access; do not use this
+ * as precedent for other tables/functions without the same narrow-scope +
+ * revoked-anon-access reasoning.
+ *
  * Deliberately a separate module from lib/supabase.ts (the anon client used
  * everywhere else) so the two can never be confused at the import site.
  *

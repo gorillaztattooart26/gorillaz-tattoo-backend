@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import type { Booking, BookingStatus, TimelineStep } from '@/types/booking-portal'
 import type { Artist } from '@/types/artist'
 
@@ -116,9 +116,17 @@ function mapArtist(row: ArtistRpcRow): Artist {
  * the full customer/appointment list via the REST API. The function is
  * SECURITY DEFINER and only ever returns data for the exact token supplied,
  * an unguessable UUID.
+ *
+ * Called with the service-role client, not the anon client: EXECUTE on this
+ * function is no longer granted to `anon`/`authenticated` (see migration
+ * 20260805020818) specifically so it can't be invoked directly through the
+ * public REST API. This module is the only intended caller, and every
+ * caller of it in turn is trusted server-only code (Server Components /
+ * Server Actions never bundled to the client) — never call these exports
+ * from anywhere a browser could reach before its own request is verified.
  */
 export async function getBookingByToken(token: string): Promise<Booking | null> {
-  const { data, error } = await supabase.rpc('get_booking_by_token', { p_token: token })
+  const { data, error } = await getSupabaseAdmin().rpc('get_booking_by_token', { p_token: token })
 
   if (error) {
     console.error('[bookings] get_booking_by_token failed:', error)
@@ -175,6 +183,18 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
   }
 }
 
+/**
+ * Existence-only check used before identity verification. Still calls the
+ * same RPC internally (there's no narrower SELECT path available under the
+ * current RLS policies — `bookings` has no anon SELECT policy), but the
+ * result is collapsed to a boolean here and never leaves this function, so
+ * no customer/booking data reaches the caller pre-verification.
+ */
+export async function bookingTokenExists(token: string): Promise<boolean> {
+  const record = await getBookingRecordByToken(token)
+  return record !== null
+}
+
 export interface BookingRecord {
   /** Raw `bookings.id` UUID — the FK target for `payments.booking_id`. */
   id: string
@@ -194,7 +214,7 @@ export interface BookingRecord {
  * threading an internal DB id through unrelated UI code.
  */
 export async function getBookingRecordByToken(token: string): Promise<BookingRecord | null> {
-  const { data, error } = await supabase.rpc('get_booking_by_token', { p_token: token })
+  const { data, error } = await getSupabaseAdmin().rpc('get_booking_by_token', { p_token: token })
 
   if (error || !data) {
     if (error) console.error('[bookings] get_booking_by_token failed:', error)

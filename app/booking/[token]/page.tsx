@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { getBookingByToken } from '@/lib/booking'
-import { BookingPortal } from '@/components/booking/BookingPortal'
+import { bookingTokenExists, getBookingByToken } from '@/lib/booking'
+import { BOOKING_SESSION_COOKIE_NAME, isBookingSessionValid } from '@/lib/booking-session'
+import { VerifyGate } from '@/components/booking/VerifyGate'
 import { BookingHeader } from '@/components/booking/BookingHeader'
 import { CustomerCard } from '@/components/booking/CustomerCard'
 import { ArtistCard } from '@/components/booking/ArtistCard'
@@ -37,6 +39,22 @@ interface PageProps {
 export default async function PrivateBookingPage({ params }: PageProps) {
   const { token } = await params
 
+  // Gate first: check only whether a verified session exists for this
+  // exact token. No booking data is fetched or rendered until this passes.
+  const cookieStore = await cookies()
+  const sessionCookie = cookieStore.get(BOOKING_SESSION_COOKIE_NAME)?.value
+  const verified = isBookingSessionValid(token, sessionCookie)
+
+  if (!verified) {
+    // Confirm the link itself is real (for the 404 case) without ever
+    // handing booking data to a component that could render/serialize it.
+    const exists = await bookingTokenExists(token)
+    if (!exists) {
+      notFound()
+    }
+    return <VerifyGate token={token} />
+  }
+
   const booking = await getBookingByToken(token)
 
   if (!booking) {
@@ -44,21 +62,19 @@ export default async function PrivateBookingPage({ params }: PageProps) {
   }
 
   return (
-    <BookingPortal booking={booking}>
-      <div className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16 md:py-24">
-        <BookingHeader booking={booking} />
-        <CustomerCard customer={booking.customer} />
-        <ArtistCard artist={booking.artist} />
-        <TattooDetails tattoo={booking.tattoo} />
-        <AppointmentCard appointment={booking.appointment} />
-        <InvoiceCard invoice={booking.invoice} />
-        <TermsCard />
-        <WaiverAndPayment booking={booking} />
-        <Timeline steps={booking.timeline} />
-        <BookingFaq />
-        <EmergencyContact />
-        <BookingFooter />
-      </div>
-    </BookingPortal>
+    <div className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16 md:py-24">
+      <BookingHeader booking={booking} />
+      <CustomerCard customer={booking.customer} />
+      <ArtistCard artist={booking.artist} />
+      <TattooDetails tattoo={booking.tattoo} />
+      <AppointmentCard appointment={booking.appointment} />
+      <InvoiceCard invoice={booking.invoice} />
+      <TermsCard />
+      <WaiverAndPayment booking={booking} />
+      <Timeline steps={booking.timeline} />
+      <BookingFaq />
+      <EmergencyContact />
+      <BookingFooter />
+    </div>
   )
 }

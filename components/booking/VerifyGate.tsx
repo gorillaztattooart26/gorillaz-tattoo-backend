@@ -9,7 +9,7 @@ import { Logo } from '@/components/common/Logo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import type { Customer } from '@/types/booking-portal'
+import { verifyBookingIdentity } from '@/app/booking/[token]/actions'
 
 const verifySchema = z.object({
   identifier: z
@@ -21,22 +21,17 @@ const verifySchema = z.object({
 type VerifyValues = z.infer<typeof verifySchema>
 
 interface VerifyGateProps {
-  customer: Pick<Customer, 'email' | 'mobile'>
-  onVerified: () => void
-}
-
-function normalize(value: string): string {
-  return value.trim().toLowerCase().replace(/[\s-]/g, '')
+  token: string
 }
 
 /**
- * Confirms the visitor holding this private link is actually the
- * customer before revealing booking details. Checked client-side against
- * mock data for now — the future version replaces `matches()` with a
- * Supabase RPC validating (token, email|phone) server-side, and should
- * rate-limit attempts.
+ * Collects the visitor's verification input and submits it to the server
+ * — it has no authorization role of its own. `verifyBookingIdentity` (a
+ * Server Action) does the actual identity check and, on success, sets an
+ * HttpOnly session cookie and redirects back to this route; the page
+ * Server Component only then fetches and renders booking data.
  */
-export function VerifyGate({ customer, onVerified }: VerifyGateProps) {
+export function VerifyGate({ token }: VerifyGateProps) {
   const [formError, setFormError] = useState<string | null>(null)
   const {
     register,
@@ -48,17 +43,13 @@ export function VerifyGate({ customer, onVerified }: VerifyGateProps) {
 
   const onSubmit = handleSubmit(async ({ identifier }) => {
     setFormError(null)
-    // TODO: replace with a Supabase RPC: verifyBookingAccess(token, identifier)
-    await new Promise((resolve) => setTimeout(resolve, 400))
-
-    const matches =
-      normalize(identifier) === normalize(customer.email) ||
-      normalize(identifier) === normalize(customer.mobile)
-
-    if (matches) {
-      onVerified()
-    } else {
-      setFormError("We couldn't find a booking matching that email or mobile number.")
+    const result = await verifyBookingIdentity(token, identifier)
+    // A successful verification redirects server-side and never returns
+    // here — reaching this line means verification failed.
+    if (result && !result.success) {
+      setFormError(
+        result.error ?? "We couldn't find a booking matching that email or mobile number.",
+      )
     }
   })
 
