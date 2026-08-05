@@ -306,7 +306,7 @@ export function ArtistsPreview({ artists }: ArtistsPreviewProps) {
           <div className="absolute bottom-4 right-4 z-[1]">{socialLinks}</div>
         </motion.div>
 
-        <h3 className="m-0 whitespace-nowrap text-left text-[15vw] font-normal uppercase leading-[0.78] tracking-[-0.01em] text-[var(--gz-paper-050)] [font-family:var(--font-gz-display)]">
+        <h3 className="m-0 whitespace-nowrap text-left text-[15vw] font-normal uppercase leading-[0.9] tracking-[-0.01em] text-[var(--gz-paper-050)] [font-family:var(--font-gz-display)]">
           <NameReveal key={index} displayName={displayName} inView={inView} reduceMotion={reduceMotion} />
         </h3>
 
@@ -381,7 +381,7 @@ export function ArtistsPreview({ artists }: ArtistsPreviewProps) {
         </div>
 
         {/* Giant name overlay */}
-        <h3 className="pointer-events-none absolute bottom-[17px] left-6 right-0 z-[4] m-0 whitespace-nowrap text-left text-[13vw] font-normal uppercase leading-[0.78] tracking-[-0.01em] text-[var(--gz-paper-050)] lg:left-10 [font-family:var(--font-gz-display)]">
+        <h3 className="pointer-events-none absolute bottom-[17px] left-6 right-0 z-[4] m-0 whitespace-nowrap text-left text-[13vw] font-normal uppercase leading-[0.9] tracking-[-0.01em] text-[var(--gz-paper-050)] lg:left-10 [font-family:var(--font-gz-display)]">
           <NameReveal key={index} displayName={displayName} inView={inView} reduceMotion={reduceMotion} />
         </h3>
       </div>

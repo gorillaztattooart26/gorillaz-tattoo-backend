@@ -268,11 +268,24 @@ export function PortfolioGallery({ tiles }: PortfolioGalleryProps) {
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2 md:gap-3.5">
+        {/* Row 2 mirrors row 1's bespoke mobile grid — without it, a plain
+            flex-wrap row of 3 unevenly-ratioed tiles has no stable place to
+            break: it happens to land as 2+1 around 375px wide but collapses
+            to 3 stacked full-width tiles at 320px, an inconsistent result
+            depending on viewport rather than a deliberate layout. Unlike
+            row 1, the full-width tile leads here (order-1) with the side-by-
+            side pair dropping underneath, so the two rows alternate which
+            tile drops instead of both dropping the same slot. */}
+        <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:gap-3.5">
           {row2.map((tile, tileIndex) => (
             <div
               key={tile.slot}
-              className="reveal min-w-0"
+              className={cn(
+                'reveal min-w-0',
+                tileIndex === 0 && 'order-2 md:order-none',
+                tileIndex === 1 && 'order-1 col-span-2 md:order-none md:col-span-1',
+                tileIndex === 2 && 'order-3 md:order-none',
+              )}
               style={{
                 flex: `${tile.ratio} 1 calc(${tile.ratio} * 132px)`,
                 aspectRatio: tile.ratio,
