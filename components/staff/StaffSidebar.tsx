@@ -103,6 +103,7 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
             <Link
               key={link.href}
               href={link.href}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive

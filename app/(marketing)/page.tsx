@@ -12,7 +12,12 @@ import { buildMetadata } from '@/lib/seo'
 import { siteConfig } from '@/lib/site-config'
 import { ROUTES } from '@/lib/routes'
 import { getArtists } from '@/lib/artists'
-import { getHomepageHeroVideoUrl, getHomepagePortfolioTiles } from '@/lib/homepage-media'
+import {
+  getHomepageAboutImage,
+  getHomepageHeroVideoUrl,
+  getHomepagePortfolioTiles,
+  getHomepageSlideshowImages,
+} from '@/lib/homepage-media'
 
 export const metadata: Metadata = buildMetadata({
   title: siteConfig.title,
@@ -21,10 +26,12 @@ export const metadata: Metadata = buildMetadata({
 })
 
 export default async function HomePage() {
-  const [artists, heroVideoUrl, portfolioTiles] = await Promise.all([
+  const [artists, heroVideoUrl, portfolioTiles, aboutImage, slideshowImages] = await Promise.all([
     getArtists(),
     getHomepageHeroVideoUrl(),
     getHomepagePortfolioTiles(),
+    getHomepageAboutImage(),
+    getHomepageSlideshowImages(),
   ])
 
   return (
@@ -32,8 +39,8 @@ export default async function HomePage() {
       <Hero videoUrl={heroVideoUrl} />
       <PortfolioGallery tiles={portfolioTiles} />
       <ArtistsPreview artists={artists} />
-      <About />
-      <Process />
+      <About image={aboutImage.src} imageAlt={aboutImage.alt} />
+      <Process slides={slideshowImages} />
       <Inquire />
       <Divider />
       <FAQ />

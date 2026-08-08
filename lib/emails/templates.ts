@@ -1,3 +1,5 @@
+import { RESERVATION_POLICY_TERMS } from '@/lib/policy'
+
 export interface EmailContent {
   subject: string
   html: string
@@ -123,6 +125,118 @@ export function staffNewInquiryTemplate(params: {
       </table>
       <p style="margin-top:16px;color:#71717a;">Idea:</p>
       <p>${params.message}</p>
+    `),
+  }
+}
+
+export function staffPaymentReceivedTemplate(params: {
+  bookingId: string
+  customerName: string
+  artistName: string
+  amount: number
+  currency: string
+}): EmailContent {
+  const formattedAmount = new Intl.NumberFormat('en-PH', {
+    style: 'currency',
+    currency: params.currency,
+    maximumFractionDigits: 0,
+  }).format(params.amount)
+
+  return {
+    subject: `Payment received — ${params.bookingId}`,
+    html: emailShell(`
+      <p>${params.customerName} just paid the down payment for booking <strong>${params.bookingId}</strong> with <strong>${params.artistName}</strong>.</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#71717a;">Amount</td><td style="padding:6px 0;">${formattedAmount}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Artist</td><td style="padding:6px 0;">${params.artistName}</td></tr>
+      </table>
+      <p style="margin-top:16px;color:#71717a;">The appointment is now confirmed.</p>
+    `),
+  }
+}
+
+export function staffBookingCancelledTemplate(params: {
+  bookingId: string
+  customerName: string
+  artistName: string
+  appointmentDate: string
+  appointmentTime: string
+  cancelledBy: string
+}): EmailContent {
+  return {
+    subject: `Booking cancelled — ${params.bookingId}`,
+    html: emailShell(`
+      <p>Booking <strong>${params.bookingId}</strong> for <strong>${params.customerName}</strong> with <strong>${params.artistName}</strong> was just cancelled.</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#71717a;">Was scheduled for</td><td style="padding:6px 0;">${params.appointmentDate} at ${params.appointmentTime}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Cancelled by</td><td style="padding:6px 0;">${params.cancelledBy}</td></tr>
+      </table>
+    `),
+  }
+}
+
+export function staffBookingRescheduledTemplate(params: {
+  bookingId: string
+  customerName: string
+  artistName: string
+  oldDate: string
+  oldTime: string
+  newDate: string
+  newTime: string
+  rescheduledBy: string
+}): EmailContent {
+  return {
+    subject: `Booking rescheduled — ${params.bookingId}`,
+    html: emailShell(`
+      <p>Booking <strong>${params.bookingId}</strong> for <strong>${params.customerName}</strong> with <strong>${params.artistName}</strong> was just rescheduled.</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#71717a;">Was</td><td style="padding:6px 0;">${params.oldDate} at ${params.oldTime}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Now</td><td style="padding:6px 0;">${params.newDate} at ${params.newTime}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Rescheduled by</td><td style="padding:6px 0;">${params.rescheduledBy}</td></tr>
+      </table>
+    `),
+  }
+}
+
+export function customerBookingCancelledTemplate(params: {
+  customerName: string
+  bookingId: string
+  artistName: string
+  appointmentDate: string
+  appointmentTime: string
+}): EmailContent {
+  return {
+    subject: `Your booking has been cancelled — ${params.bookingId}`,
+    html: emailShell(`
+      <p>Hi ${params.customerName},</p>
+      <p>Your booking <strong>${params.bookingId}</strong> with <strong>${params.artistName}</strong>, previously scheduled for <strong>${params.appointmentDate} at ${params.appointmentTime}</strong>, has been cancelled.</p>
+      <p style="margin-top:16px;color:#71717a;font-size:13px;">${RESERVATION_POLICY_TERMS[0]} Per studio policy, your reservation payment has been forfeited.</p>
+      <p style="margin-top:16px;">If you believe this is a mistake, or you'd like to book a new appointment, please contact the studio.</p>
+    `),
+  }
+}
+
+export function customerBookingRescheduledTemplate(params: {
+  customerName: string
+  bookingId: string
+  artistName: string
+  oldDate: string
+  oldTime: string
+  newDate: string
+  newTime: string
+  bookingUrl: string
+}): EmailContent {
+  return {
+    subject: `Your booking has been rescheduled — ${params.bookingId}`,
+    html: emailShell(`
+      <p>Hi ${params.customerName},</p>
+      <p>Your booking <strong>${params.bookingId}</strong> with <strong>${params.artistName}</strong> has been rescheduled.</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#71717a;">Was</td><td style="padding:6px 0;">${params.oldDate} at ${params.oldTime}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Now</td><td style="padding:6px 0;">${params.newDate} at ${params.newTime}</td></tr>
+      </table>
+      <p style="margin-top:16px;color:#71717a;font-size:13px;">${RESERVATION_POLICY_TERMS[2]}</p>
+      ${button('View Your Booking', params.bookingUrl)}
     `),
   }
 }

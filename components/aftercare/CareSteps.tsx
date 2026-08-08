@@ -83,8 +83,8 @@ export function CareSteps() {
           ))}
         </div>
 
-        <div className="reveal flex max-w-[72ch] items-start gap-[clamp(14px,1.6vw,22px)] border border-[var(--gz-border-default)] bg-[var(--gz-ink-900)] p-[clamp(18px,2.2vw,28px)]">
-          <span className="flex-none pt-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--gz-copper-300)]">
+        <div className="reveal flex max-w-[72ch] flex-col items-start gap-2 border border-[var(--gz-border-default)] bg-[var(--gz-ink-900)] p-[clamp(18px,2.2vw,28px)] sm:flex-row sm:gap-[clamp(14px,1.6vw,22px)]">
+          <span className="flex-none font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--gz-copper-300)] sm:pt-0.5">
             See a doctor
           </span>
           <p className="m-0 text-sm leading-relaxed text-[var(--gz-ink-200)]">

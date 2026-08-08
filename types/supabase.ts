@@ -110,6 +110,7 @@ export interface Database {
           facebook_url: string | null
           user_id: string | null
           display_order: number
+          is_owner: boolean
           created_at: string
         }
         Insert: {
@@ -124,6 +125,7 @@ export interface Database {
           facebook_url?: string | null
           user_id?: string | null
           display_order?: number
+          is_owner?: boolean
           created_at?: string
         }
         Update: {
@@ -138,6 +140,7 @@ export interface Database {
           facebook_url?: string | null
           user_id?: string | null
           display_order?: number
+          is_owner?: boolean
           created_at?: string
         }
         Relationships: []
@@ -193,6 +196,27 @@ export interface Database {
         }
         Relationships: []
       }
+      homepage_about: {
+        Row: {
+          id: string
+          image_url: string
+          alt: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          image_url: string
+          alt: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          image_url?: string
+          alt?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       homepage_portfolio_images: {
         Row: {
           slot: number
@@ -210,6 +234,36 @@ export interface Database {
           slot?: number
           image_url?: string
           alt?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      homepage_slideshow_images: {
+        Row: {
+          id: string
+          image_url: string
+          alt: string
+          display_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          image_url: string
+          alt: string
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          image_url?: string
+          alt?: string
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
           updated_at?: string
         }
         Relationships: []

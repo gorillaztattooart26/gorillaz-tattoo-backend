@@ -236,3 +236,44 @@ export async function getBookingRecordByToken(token: string): Promise<BookingRec
     },
   }
 }
+
+export interface LatestPaymentAttempt {
+  status: 'pending' | 'paid' | 'failed' | 'refunded'
+  method: string | null
+  createdAt: string
+}
+
+/**
+ * Read-only lookup of a booking's most recent payment attempt, for the
+ * Payment Failed page to show what actually happened (still pending
+ * server-side confirmation vs. a confirmed decline) instead of guessing
+ * from the booking status alone. Pure addition alongside the existing
+ * booking reads above — doesn't touch payment creation, the webhook, or
+ * any status-transition logic.
+ *
+ * `bookingId` here is always the internal UUID already resolved by
+ * `getBookingRecordByToken()` (itself gated by the unguessable token),
+ * never a raw value from the request — same trust boundary as every
+ * other admin-client read in this file.
+ */
+export async function getLatestPaymentAttempt(bookingId: string): Promise<LatestPaymentAttempt | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('payments')
+    .select('status, method, created_at')
+    .eq('booking_id', bookingId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    console.error('[bookings] getLatestPaymentAttempt failed:', error)
+    return null
+  }
+  if (!data) return null
+
+  return {
+    status: data.status as LatestPaymentAttempt['status'],
+    method: data.method,
+    createdAt: data.created_at,
+  }
+}

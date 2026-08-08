@@ -6,6 +6,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      disallow: ['/staff', '/booking/'],
     },
     sitemap: new URL('/sitemap.xml', siteConfig.url).toString(),
   }

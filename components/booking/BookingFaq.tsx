@@ -3,17 +3,16 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AccordionItem } from '@/components/ui/Accordion'
+import { RESERVATION_POLICY_PARAGRAPH } from '@/lib/policy'
 
 const FAQS = [
   {
     question: 'Can I reschedule?',
-    answer:
-      'Yes — let us know at least 48 hours before your appointment and your down payment transfers to the new date. Rescheduling within 48 hours or after a missed appointment forfeits the reservation fee.',
+    answer: RESERVATION_POLICY_PARAGRAPH,
   },
   {
     question: 'Is my reservation fee refundable?',
-    answer:
-      'The down payment is non-refundable, but it can be transferred once to a new appointment date if you reschedule with at least 48 hours notice.',
+    answer: RESERVATION_POLICY_PARAGRAPH,
   },
   {
     question: 'Can I change the tattoo design?',

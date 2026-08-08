@@ -98,8 +98,12 @@ export function ArtistProfileForm({ artist }: ArtistProfileFormProps) {
         />
       </label>
 
-      {error && <p className="text-sm text-red-400 lg:col-span-2">{error}</p>}
-      {saved && !error && <p className="text-sm text-emerald-400 lg:col-span-2">Profile updated.</p>}
+      {error && <p role="alert" className="text-sm text-red-400 lg:col-span-2">{error}</p>}
+      {saved && !error && (
+        <p role="status" aria-live="polite" className="text-sm text-emerald-400 lg:col-span-2">
+          Profile updated.
+        </p>
+      )}
 
       <button
         type="submit"

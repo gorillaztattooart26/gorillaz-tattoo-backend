@@ -1,14 +1,27 @@
 'use server'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { createBookingSchema, type CreateBookingValues } from '@/app/staff/create-booking/schema'
 import { getBaseUrl } from '@/lib/url'
 import { sendBookingConfirmationEmail } from '@/lib/emails'
+import { checkBookingConflict } from '@/lib/staff/booking-availability'
+import type { Database } from '@/types/supabase'
 
 const DEFAULT_REFERENCE_IMAGES = [
   { path: '/images/portfolio/portfolio-1.jpg', alt: 'Reference image on file for this booking' },
   { path: '/images/portfolio/portfolio-3.jpg', alt: 'Reference image on file for this booking' },
 ]
+
+const REFERENCES_BUCKET = 'references'
+// Reuses the existing public `homepage-media` bucket (already staff-
+// writable, see supabase-setup-homepage-media.sql) under its own prefix,
+// rather than standing up a dedicated bucket just for this — booking
+// reference photos need a durable public URL the same way homepage media
+// does, and `booking_reference_images.image_path` already just expects a
+// plain browsable URL (see DEFAULT_REFERENCE_IMAGES above).
+const CARRYOVER_BUCKET = 'homepage-media'
 
 /** Unambiguous alphabet (no 0/O/1/I) for human-typed reference codes. */
 const BOOKING_ID_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -22,8 +35,68 @@ function generateBookingId(): string {
 }
 
 export interface CreateBookingActionResult {
-  token: string
-  bookingId: string
+  token?: string
+  bookingId?: string
+  error?: string
+}
+
+/**
+ * Downloads each of an inquiry's reference photos from the private
+ * `references` bucket and re-uploads them to the public `homepage-media`
+ * bucket so the resulting booking has a durable, directly-browsable URL
+ * for its gallery — a signed URL from the private bucket would expire
+ * long before the booking's appointment date.
+ *
+ * Uses the staff session client — reading the private bucket and writing
+ * to homepage-media both require the `authenticated` role, which this
+ * Server Action only has because /staff/create-booking is auth-gated by
+ * middleware. Best-effort: any failure here just falls back to the sample
+ * images below rather than blocking booking creation.
+ */
+async function copyInquiryReferenceImages(
+  sessionSupabase: SupabaseClient<Database>,
+  inquiryId: string,
+  bookingId: string,
+): Promise<{ path: string; alt: string }[]> {
+  const { data: images, error } = await sessionSupabase
+    .from('inquiry_images')
+    .select('image_path')
+    .eq('inquiry_id', inquiryId)
+
+  if (error || !images || images.length === 0) {
+    if (error) console.error('[bookings] fetching inquiry images for carryover failed:', error)
+    return []
+  }
+
+  const copied: { path: string; alt: string }[] = []
+
+  for (const { image_path } of images) {
+    const { data: file, error: downloadError } = await sessionSupabase.storage
+      .from(REFERENCES_BUCKET)
+      .download(image_path)
+
+    if (downloadError || !file) {
+      console.error('[bookings] downloading inquiry reference image failed:', downloadError)
+      continue
+    }
+
+    const filename = image_path.split('/').pop() ?? `${crypto.randomUUID()}.jpg`
+    const newPath = `booking-references/${bookingId}/${crypto.randomUUID()}-${filename}`
+
+    const { error: uploadError } = await sessionSupabase.storage
+      .from(CARRYOVER_BUCKET)
+      .upload(newPath, file, { contentType: file.type || 'image/jpeg' })
+
+    if (uploadError) {
+      console.error('[bookings] uploading carried-over reference image failed:', uploadError)
+      continue
+    }
+
+    const { data: publicUrl } = sessionSupabase.storage.from(CARRYOVER_BUCKET).getPublicUrl(newPath)
+    copied.push({ path: publicUrl.publicUrl, alt: 'Reference photo from customer inquiry' })
+  }
+
+  return copied
 }
 
 /**
@@ -31,22 +104,22 @@ export interface CreateBookingActionResult {
  * server-side (never trust client input), looks up the artist row, then
  * inserts the booking.
  *
- * `id`/`token`/`booking_id` are generated here rather than read back via
- * `.select()` after insert — `bookings` deliberately has no SELECT policy
- * for the anon role, and Postgres RLS requires the SELECT policy to also
- * pass for `INSERT ... RETURNING` to hand back a row, so relying on
- * `.select()` wouldn't work. Same pattern as the inquiry form's
- * `inquiryId` in components/booking/actions.ts.
+ * The booking and reference-image inserts run on the staff session client
+ * (`sessionSupabase`, `authenticated` role) — this action only ever runs
+ * behind /staff/create-booking's auth gate, so the write should carry the
+ * caller's real role rather than the anon key. `bookings` has no SELECT
+ * policy for `authenticated` beyond what the Bookings tab already relies
+ * on, and Postgres RLS requires the SELECT policy to also pass for
+ * `INSERT ... RETURNING` to hand back a row, so `id`/`token`/`booking_id`
+ * are generated here rather than read back via `.select()` — same pattern
+ * as the inquiry form's `inquiryId` in components/booking/actions.ts,
+ * which has the equivalent constraint under `anon`.
  *
- * Reference images aren't actually uploaded/stored anywhere yet (no
- * upload UI is wired to storage), so newly created bookings get a couple
- * of sample images so the resulting /booking/[token] page has something
- * to show in its gallery — swap this for real uploaded files once that's
- * connected.
+ * Reference images fall back to a couple of sample photos when there's
+ * no source inquiry (or it had none of its own) — real upload UI still
+ * isn't wired to storage for a from-scratch booking.
  */
-export async function createBookingAction(
-  values: CreateBookingValues,
-): Promise<CreateBookingActionResult> {
+export async function createBookingAction(values: CreateBookingValues): Promise<CreateBookingActionResult> {
   const parsed = createBookingSchema.parse(values)
 
   const { data: artist, error: artistError } = await supabase
@@ -59,12 +132,31 @@ export async function createBookingAction(
     throw new Error(`Unknown artist: ${parsed.artistSlug}`)
   }
 
+  // Best-effort double-booking guard — uses the staff session client
+  // (authenticated already has SELECT on bookings, proven by the
+  // Bookings tab) rather than the anon client above, which has no read
+  // access to this table at all. Any read failure here just skips the
+  // check rather than blocking booking creation.
+  const sessionSupabase = await createClient()
+  const conflict = await checkBookingConflict(sessionSupabase, {
+    artistId: artist.id,
+    date: parsed.appointmentDate,
+    time: parsed.appointmentTime,
+    durationHours: parsed.estimatedSessionHours,
+  })
+
+  if (conflict.hasConflict) {
+    return {
+      error: `${artist.name} already has a booking (${conflict.conflictingBookingRef}) that overlaps this time slot. Pick a different time or check the Bookings tab.`,
+    }
+  }
+
   const id = crypto.randomUUID()
   const token = crypto.randomUUID()
   const bookingId = generateBookingId()
   const downPaymentAmount = Math.round(parsed.estimatedPrice * (parsed.downPaymentPercent / 100))
 
-  const { error: insertError } = await supabase.from('bookings').insert({
+  const { error: insertError } = await sessionSupabase.from('bookings').insert({
     id,
     token,
     booking_id: bookingId,
@@ -96,8 +188,13 @@ export async function createBookingAction(
     throw new Error('Something went wrong creating this booking.')
   }
 
-  for (const image of DEFAULT_REFERENCE_IMAGES) {
-    const { error: imageInsertError } = await supabase.from('booking_reference_images').insert({
+  const carriedOverImages = parsed.sourceInquiryId
+    ? await copyInquiryReferenceImages(sessionSupabase, parsed.sourceInquiryId, id)
+    : []
+  const referenceImages = carriedOverImages.length > 0 ? carriedOverImages : DEFAULT_REFERENCE_IMAGES
+
+  for (const image of referenceImages) {
+    const { error: imageInsertError } = await sessionSupabase.from('booking_reference_images').insert({
       booking_id: id,
       image_path: image.path,
       alt_text: image.alt,

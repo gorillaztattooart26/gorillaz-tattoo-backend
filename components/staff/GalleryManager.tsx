@@ -147,6 +147,7 @@ export function GalleryManager({ items }: GalleryManagerProps) {
             type="button"
             onClick={() => setIsMobileFilterOpen((open) => !open)}
             aria-expanded={isMobileFilterOpen}
+            aria-controls="gallery-filter-group"
             className="flex w-fit items-center gap-2 rounded-full border border-[var(--foreground)]/25 px-4 py-2 text-xs text-[var(--foreground)]/70 transition-colors hover:border-[var(--foreground)]/50 hover:text-[var(--foreground)] md:hidden"
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -162,6 +163,7 @@ export function GalleryManager({ items }: GalleryManagerProps) {
             )}
             role="group"
             aria-label="Filter your pieces"
+            id="gallery-filter-group"
           >
             {categories.map((category) => {
               const isActive = category === activeCategory
@@ -208,7 +210,7 @@ export function GalleryManager({ items }: GalleryManagerProps) {
                   onClick={() => onDelete(item.id)}
                   disabled={isPending && deletingId === item.id}
                   aria-label={`Delete ${item.piece}`}
-                  className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--background)]/70 text-[var(--foreground)] opacity-0 transition-opacity hover:bg-red-500/80 group-hover:opacity-100 disabled:opacity-60"
+                  className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--background)]/70 text-[var(--foreground)] opacity-0 transition-opacity hover:bg-red-500/80 group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-60"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

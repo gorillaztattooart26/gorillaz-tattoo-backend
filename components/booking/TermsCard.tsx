@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { RESERVATION_POLICY_TERMS } from '@/lib/policy'
 
 const TERMS = [
   'Tattoo appointments are only confirmed after the required down payment has been received.',
-  'The down payment is non-refundable but may be transferred once if rescheduled with at least 48 hours notice.',
+  ...RESERVATION_POLICY_TERMS,
   'Late arrivals exceeding 30 minutes may require rescheduling.',
-  'Failure to appear without notice forfeits the reservation fee.',
   'Clients must present a valid ID before the tattoo session.',
 ]
 

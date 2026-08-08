@@ -2,8 +2,13 @@ import Image from 'next/image'
 import { HOME_SECTIONS, ROUTES } from '@/lib/routes'
 import { CtaPill } from '@/components/common/CtaPill'
 
+interface AboutProps {
+  image: string
+  imageAlt: string
+}
+
 /** Homepage "about the studio" section. Server Component. */
-export function About() {
+export function About({ image, imageAlt }: AboutProps) {
   return (
     <section
       id="about"
@@ -36,8 +41,8 @@ export function About() {
         <div className="grid w-full grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-13">
           <div className="reveal relative row-span-2 aspect-[4/5] w-full overflow-hidden bg-[var(--gz-ink-900)] lg:[grid-column:1/2] lg:[grid-row:1/3]">
             <Image
-              src="/images/studio/studio-interior.jpg"
-              alt="Inside Gorillaz Tattoo Art — private tattoo studio in the Philippines"
+              src={image}
+              alt={imageAlt}
               title="Gorillaz Tattoo Art — studio interior"
               fill
               loading="lazy"

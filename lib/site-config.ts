@@ -19,9 +19,30 @@ export const siteConfig = {
     facebook: 'https://www.facebook.com/GorillazTattooArt',
     instagram: 'https://www.instagram.com/gorillaztattooart/?hl=en',
   },
-  // TODO: no confirmed studio address, phone number, or opening hours exist
-  // yet — fill these in for the LocalBusiness JSON-LD once available.
-  address: null,
+  // Address sourced from the staff Create Booking form's own default
+  // studio address (components/staff/CreateBookingForm.tsx) — the same
+  // address already put on every booking's appointment details, so it's
+  // treated as confirmed. Hours sourced from the customer-facing booking
+  // portal footer (components/booking/BookingFooter.tsx), shown to every
+  // customer today. Phone is still genuinely unconfirmed — the only
+  // number in the codebase (components/booking/EmergencyContact.tsx,
+  // "+63 917 000 0000") is an obvious placeholder, not a real line, so it
+  // stays null rather than publishing a fake number in SEO structured
+  // data.
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Blk 8 Lot 18 Sutter Street, Phase 5, 3 Garden Villas Subdivision',
+    addressLocality: 'Santa Rosa',
+    addressRegion: 'Laguna',
+    addressCountry: 'PH',
+  },
   phone: null,
-  openingHours: null,
+  openingHours: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '11:00',
+      closes: '20:00',
+    },
+  ],
 } as const

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Readex_Pro } from 'next/font/google'
 import { siteConfig } from '@/lib/site-config'
 import { buildLocalBusinessJsonLd } from '@/lib/seo'
+import { Analytics } from '@/components/analytics/Analytics'
 import '@/styles/globals.css'
 
 const readexPro = Readex_Pro({
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <Analytics />
         {children}
       </body>
     </html>

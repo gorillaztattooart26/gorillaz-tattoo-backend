@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AccordionItem } from '@/components/ui/Accordion'
 import type { FaqItem } from '@/types/faq'
+import { RESERVATION_POLICY_PARAGRAPH } from '@/lib/policy'
 
 const FAQS: FaqItem[] = [
   {
@@ -36,9 +37,8 @@ const FAQS: FaqItem[] = [
       '18 and over, no exceptions, even with a parent present. Bring a government-issued ID to the consultation and to every session.',
   },
   {
-    question: 'What if I need to cancel?',
-    answer:
-      'Move a date once with advance notice and the deposit follows you. Later than that, or a second change, and the deposit is retained.',
+    question: 'Can I reschedule, or get a refund?',
+    answer: RESERVATION_POLICY_PARAGRAPH,
   },
 ]
 

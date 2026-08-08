@@ -5,9 +5,10 @@ import { StaffPageHeader } from '@/components/staff/StaffPageHeader'
 import { StatCard } from '@/components/staff/StatCard'
 import { StatusBadge } from '@/components/staff/StatusBadge'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentStaffArtist } from '@/lib/staff/artists'
 import { getInquiryCount, getRecentInquiries } from '@/lib/staff/inquiries'
-import { getBookingCounts, getRecentBookings } from '@/lib/staff/bookings'
-import { getPaymentCounts } from '@/lib/staff/payments'
+import { getBookingCountsForStaffArtist, getRecentBookingsForStaffArtist } from '@/lib/staff/bookings'
+import { getPaymentCountsForStaffArtist } from '@/lib/staff/payments'
 import { formatCurrency, formatDate } from '@/lib/staff/format'
 
 export const metadata: Metadata = {
@@ -25,13 +26,21 @@ export default async function StaffDashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  const artist = await getCurrentStaffArtist()
 
+  // Inquiries stay studio-wide for every staff account, unlike Bookings/
+  // Payments below — `inquiries.preferred_artist` is free text typed into
+  // a dropdown (see components/booking/options.ts), not a foreign key, so
+  // there's no reliable way to scope it per artist without risking a
+  // customer's inquiry going unseen by the very artist they asked for
+  // over a wording mismatch. Every artist seeing every new lead is the
+  // safer default until that field is normalized.
   const [inquiryCount, bookingCounts, paymentCounts, recentInquiries, recentBookings] = await Promise.all([
     getInquiryCount(),
-    getBookingCounts(),
-    getPaymentCounts(),
+    getBookingCountsForStaffArtist(artist),
+    getPaymentCountsForStaffArtist(artist),
     getRecentInquiries(5),
-    getRecentBookings(5),
+    getRecentBookingsForStaffArtist(artist, 5),
   ])
 
   const staffName = user?.email?.split('@')[0] ?? 'there'
@@ -40,7 +49,11 @@ export default async function StaffDashboardPage() {
     <div>
       <StaffPageHeader
         title={`Welcome back, ${staffName}`}
-        description={`${inquiryCount} total inquiries · ${paymentCounts.pending} pending payments · ${bookingCounts.confirmed} confirmed bookings`}
+        description={
+          artist && !artist.is_owner
+            ? `${inquiryCount} total inquiries · ${paymentCounts.pending} of your pending payments · ${bookingCounts.confirmed} of your confirmed bookings`
+            : `${inquiryCount} total inquiries · ${paymentCounts.pending} pending payments · ${bookingCounts.confirmed} confirmed bookings`
+        }
         action={
           <Link
             href="/staff/create-booking"
@@ -125,11 +138,11 @@ export default async function StaffDashboardPage() {
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--foreground)]/40">
-                  <th className="py-2 pr-4 font-medium">Customer</th>
-                  <th className="py-2 pr-4 font-medium">Artist</th>
-                  <th className="py-2 pr-4 font-medium">Status</th>
-                  <th className="py-2 pr-4 font-medium">Appointment</th>
-                  <th className="py-2 pr-4 font-medium">Price</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Customer</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Artist</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Status</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Appointment</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Price</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--foreground)]/5">

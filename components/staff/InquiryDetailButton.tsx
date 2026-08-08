@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -21,19 +21,46 @@ interface InquiryDetailButtonProps {
  */
 export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!isOpen) return
+
+    const triggerNode = triggerRef.current
+    const modalNode = modalRef.current
+    const focusable = modalNode?.querySelectorAll<HTMLElement>(
+      'a[href], button, [tabindex]:not([tabindex="-1"])',
+    )
+    focusable?.[0]?.focus()
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsOpen(false)
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+        return
+      }
+      if (event.key !== 'Tab' || !focusable || focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
     document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      triggerNode?.focus()
+    }
   }, [isOpen])
 
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(true)}
         className="whitespace-nowrap rounded-full border border-[var(--foreground)]/25 px-3 py-1.5 text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:border-[var(--foreground)]/50 hover:text-[var(--foreground)]"
@@ -50,6 +77,7 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
           className="fixed inset-0 z-[60] flex items-center justify-center bg-[var(--background)]/80 p-4"
         >
           <div
+            ref={modalRef}
             onClick={(event) => event.stopPropagation()}
             className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6"
           >
@@ -85,7 +113,7 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
               <div className="mt-4">
                 <p className="text-xs text-[var(--foreground)]/40">Reference images</p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {inquiry.images.map((url) => (
+                  {inquiry.images.map((url, index) => (
                     <a
                       key={url}
                       href={url}
@@ -95,7 +123,7 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
                     >
                       <Image
                         src={url}
-                        alt="Reference image sent with this inquiry"
+                        alt={`Reference image ${index + 1} of ${inquiry.images.length} from ${inquiry.full_name}`}
                         fill
                         sizes="80px"
                         className="object-cover"

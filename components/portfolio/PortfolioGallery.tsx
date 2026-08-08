@@ -125,10 +125,14 @@ export function PortfolioGallery({ items }: PortfolioGalleryProps) {
   const categoryTrackRef = useRef<HTMLDivElement>(null)
   const [railPad, setRailPad] = useState({ start: 0, end: 0 })
 
-  const filtered = items.filter(
-    (item) =>
-      (category === 'All' || item.category === category) &&
-      (artist === 'All' || item.artistName === artist),
+  const filtered = useMemo(
+    () =>
+      items.filter(
+        (item) =>
+          (category === 'All' || item.category === category) &&
+          (artist === 'All' || item.artistName === artist),
+      ),
+    [items, category, artist],
   )
 
   // Pads the scrollable rail so "All" (the first pill) sits centered in the

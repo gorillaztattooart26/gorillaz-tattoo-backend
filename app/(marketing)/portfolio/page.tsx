@@ -3,12 +3,12 @@ import type { Metadata } from 'next'
 import { PortfolioGallery } from '@/components/portfolio/PortfolioGallery'
 import { getGalleryItems } from '@/lib/gallery'
 import { buildMetadata } from '@/lib/seo'
-import { siteConfig } from '@/lib/site-config'
 import { ROUTES } from '@/lib/routes'
 
 export const metadata: Metadata = buildMetadata({
   title: 'Portfolio',
-  description: siteConfig.description,
+  description:
+    'Browse the gorillaz tattoo art portfolio — fine line, blackwork, and custom tattoo pieces from our resident artists.',
   path: ROUTES.portfolio,
 })
 

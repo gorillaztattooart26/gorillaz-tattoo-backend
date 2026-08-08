@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { CreateBookingForm } from '@/components/staff/CreateBookingForm'
 import { getArtists } from '@/lib/artists'
+import { getInquiryById } from '@/lib/staff/inquiries'
+import { buildBookingPrefillFromInquiry } from '@/lib/staff/inquiry-to-booking'
 
 export const metadata: Metadata = {
   title: 'Create Booking | Staff',
@@ -12,8 +14,18 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function CreateBookingPage() {
-  const artists = await getArtists()
+export default async function CreateBookingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ fromInquiry?: string }>
+}) {
+  const { fromInquiry } = await searchParams
+  const [artists, inquiry] = await Promise.all([
+    getArtists(),
+    fromInquiry ? getInquiryById(fromInquiry) : Promise.resolve(null),
+  ])
+
+  const prefill = inquiry ? buildBookingPrefillFromInquiry(inquiry, artists) : undefined
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16 md:py-24">
@@ -25,12 +37,13 @@ export default async function CreateBookingPage() {
           Create a Booking
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[var(--foreground)]/60">
-          Fill this out after a consultation is approved. Submitting
-          generates the customer&apos;s private booking link automatically.
+          {inquiry
+            ? `Prefilled from ${inquiry.full_name}'s inquiry — review the details below, then submit to generate their private booking link.`
+            : "Fill this out after a consultation is approved. Submitting generates the customer's private booking link automatically."}
         </p>
       </div>
 
-      <CreateBookingForm artists={artists} />
+      <CreateBookingForm artists={artists} prefill={prefill} referenceImages={inquiry?.images ?? []} />
     </div>
   )
 }

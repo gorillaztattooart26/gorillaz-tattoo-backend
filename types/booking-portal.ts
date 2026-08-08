@@ -1,4 +1,5 @@
 import type { Artist } from '@/types/artist'
+import type { PaymentProviderName } from '@/types/payment'
 
 export type BookingStatus =
   | 'awaiting_down_payment'
@@ -51,7 +52,7 @@ export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded'
 
 export interface Payment {
   id: string
-  provider: 'paymongo'
+  provider: PaymentProviderName
   method: string | null
   status: PaymentStatus
   amount: number

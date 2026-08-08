@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import type { HomepageSlide } from '@/lib/homepage-media'
 
 interface Step {
   number: string
@@ -9,12 +10,10 @@ interface Step {
   copy: string
 }
 
-const SLIDES = [
-  { src: '/images/homepage-v2/slider/slide-1-concert.png', alt: 'Live show at Gorillaz Tattoo Art — studio community' },
-  { src: '/images/homepage-v2/slider/slide-2-bmx.png', alt: 'BMX rider at night — Gorillaz Tattoo Art studio community' },
-  { src: '/images/homepage-v2/slider/slide-3-skate.png', alt: 'Tattooed hand resting on a skateboard — Gorillaz Tattoo Art' },
-  { src: '/images/homepage-v2/slider/slide-4-swim.png', alt: 'Competitive swimmer training — Gorillaz Tattoo Art studio community' },
-]
+interface ProcessProps {
+  /** The "Dominate" interstitial's crossfade slides — CMS-managed via the Homepage Studio Portfolio Slideshow card in the staff dashboard, falls back to the original static set when nothing's been uploaded. Always non-empty. */
+  slides: HomepageSlide[]
+}
 
 const STEPS: Step[] = [
   {
@@ -47,17 +46,18 @@ const STEPS: Step[] = [
  * the line climbs the timeline in step with scroll position rather than
  * just toggling on once a segment enters view.
  */
-export function Process() {
+export function Process({ slides }: ProcessProps) {
   const trackRefs = useRef<(HTMLSpanElement | null)[]>([])
   const fillRefs = useRef<(HTMLSpanElement | null)[]>([])
   const [slide, setSlide] = useState(0)
 
   useEffect(() => {
+    if (slides.length <= 1) return
     const id = setInterval(() => {
-      setSlide((s) => (s + 1) % SLIDES.length)
+      setSlide((s) => (s + 1) % slides.length)
     }, 4500)
     return () => clearInterval(id)
-  }, [])
+  }, [slides.length])
 
   useEffect(() => {
     let raf = 0
@@ -167,7 +167,7 @@ export function Process() {
       {/* Decorative full-bleed interstitial banner — a 4-slide crossfade,
           matching the design's beat between Process and Inquiry. */}
       <div className="reveal relative mt-16 h-[clamp(280px,52vw,620px)] overflow-hidden bg-[var(--gz-ink-900)] md:mt-24">
-        {SLIDES.map((s, i) => (
+        {slides.map((s, i) => (
           <div
             key={s.src}
             className="absolute inset-0 transition-opacity duration-[1400ms] ease-out"

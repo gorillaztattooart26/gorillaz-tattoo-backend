@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { WaiverCard, type WaiverValue } from '@/components/booking/WaiverCard'
 import { PaymentCard } from '@/components/booking/PaymentCard'
+import { RESERVATION_POLICY_TERMS } from '@/lib/policy'
 import type { Booking } from '@/types/booking-portal'
 
 const INITIAL_WAIVER: WaiverValue = { agreedToTerms: false, consentToTattoo: false }
@@ -28,7 +29,7 @@ export function WaiverAndPayment({ booking }: WaiverAndPaymentProps) {
         <CardContent className="px-0">
           <p className="text-sm leading-relaxed text-[var(--foreground)]/70">
             {booking.status === 'cancelled'
-              ? 'This booking has been cancelled. Contact the studio if you believe this is a mistake.'
+              ? `This booking has been cancelled. ${RESERVATION_POLICY_TERMS[0]} Per studio policy, your reservation payment has been forfeited. Contact the studio if you believe this is a mistake.`
               : 'Your down payment has been received and your appointment slot is reserved. See the timeline below for what happens next.'}
           </p>
         </CardContent>

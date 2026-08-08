@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import { StaffPageHeader } from '@/components/staff/StaffPageHeader'
 import { InquiryDetailButton } from '@/components/staff/InquiryDetailButton'
 import { getInquiries } from '@/lib/staff/inquiries'
@@ -27,20 +28,20 @@ export default async function StaffInquiriesPage() {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--foreground)]/40">
-                <th className="px-5 py-3 font-medium">
+                <th scope="col" className="px-5 py-3 font-medium">
                   <span className="sr-only">Actions</span>
                 </th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Name</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Contact</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Artist</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Style</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Placement</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Size</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Height</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Weight</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Description</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Reference</th>
-                <th className="whitespace-nowrap px-5 py-3 font-medium">Submitted</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Name</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Contact</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Artist</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Style</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Placement</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Size</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Height</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Weight</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Description</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Reference</th>
+                <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Submitted</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--foreground)]/5">
@@ -54,7 +55,15 @@ export default async function StaffInquiriesPage() {
               {inquiries.map((inquiry) => (
                 <tr key={inquiry.id}>
                   <td className="px-5 py-4">
-                    <InquiryDetailButton inquiry={inquiry} />
+                    <div className="flex flex-col items-start gap-1.5">
+                      <InquiryDetailButton inquiry={inquiry} />
+                      <Link
+                        href={`/staff/create-booking?fromInquiry=${inquiry.id}`}
+                        className="whitespace-nowrap rounded-full border border-[var(--primary)]/40 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10"
+                      >
+                        convert to booking
+                      </Link>
+                    </div>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 font-medium text-[var(--foreground)]">{inquiry.full_name}</td>
                   <td className="whitespace-nowrap px-5 py-4 text-[var(--foreground)]/70">
@@ -77,7 +86,7 @@ export default async function StaffInquiriesPage() {
                       <span className="text-xs text-[var(--foreground)]/30">none</span>
                     ) : (
                       <div className="flex gap-1.5">
-                        {inquiry.images.map((url) => (
+                        {inquiry.images.map((url, index) => (
                           <a
                             key={url}
                             href={url}
@@ -85,7 +94,13 @@ export default async function StaffInquiriesPage() {
                             rel="noopener noreferrer"
                             className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-md border border-[var(--border)] transition-opacity hover:opacity-80"
                           >
-                            <Image src={url} alt="Reference image sent with this inquiry" fill sizes="40px" className="object-cover" />
+                            <Image
+                              src={url}
+                              alt={`Reference image ${index + 1} of ${inquiry.images.length} from ${inquiry.full_name}`}
+                              fill
+                              sizes="40px"
+                              className="object-cover"
+                            />
                           </a>
                         ))}
                       </div>

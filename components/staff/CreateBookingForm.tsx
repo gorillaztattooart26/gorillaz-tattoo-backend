@@ -18,6 +18,7 @@ import {
   type CreateBookingValues,
 } from '@/app/staff/create-booking/schema'
 import type { Artist } from '@/types/artist'
+import type { BookingPrefill } from '@/lib/staff/inquiry-to-booking'
 
 const CONTACT_METHODS = ['email', 'sms', 'call', 'messenger'] as const
 
@@ -40,9 +41,18 @@ function formatPHP(amount: number): string {
   }).format(amount)
 }
 
-export function CreateBookingForm({ artists }: { artists: Artist[] }) {
+export function CreateBookingForm({
+  artists,
+  prefill,
+  referenceImages = [],
+}: {
+  artists: Artist[]
+  prefill?: BookingPrefill
+  referenceImages?: string[]
+}) {
   const router = useRouter()
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [hasSucceeded, setHasSucceeded] = useState(false)
 
   const {
     register,
@@ -51,7 +61,11 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
     formState: { errors, isSubmitting },
   } = useForm<CreateBookingFormInput, unknown, CreateBookingValues>({
     resolver: zodResolver(createBookingSchema),
-    defaultValues: { ...DEFAULT_VALUES, artistSlug: artists[0]?.slug },
+    defaultValues: {
+      ...DEFAULT_VALUES,
+      artistSlug: artists[0]?.slug,
+      ...prefill,
+    },
   })
 
   const estimatedPrice = Number(watch('estimatedPrice')) || 0
@@ -64,8 +78,13 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
   const onSubmit = handleSubmit(async (values) => {
     setSubmitError(null)
     try {
-      const { token } = await createBookingAction(values)
-      router.push(`/booking/${token}`)
+      const result = await createBookingAction(values)
+      if (result.error || !result.token) {
+        setSubmitError(result.error ?? 'Something went wrong creating this booking. Please try again.')
+        return
+      }
+      setHasSucceeded(true)
+      router.push(`/booking/${result.token}`)
     } catch (error) {
       console.error(error)
       setSubmitError('Something went wrong creating this booking. Please try again.')
@@ -160,10 +179,32 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
               className={cn(fieldClasses, 'resize-none')}
             />
           </FormField>
-          <p className="text-xs text-[var(--foreground)]/40 sm:col-span-2">
-            Reference image upload isn&apos;t wired to storage yet — newly
-            created bookings use sample images until that&apos;s connected.
-          </p>
+          {prefill?.sourceInquiryId ? <input type="hidden" {...register('sourceInquiryId')} /> : null}
+
+          {referenceImages.length > 0 ? (
+            <div className="sm:col-span-2">
+              <p className="text-xs text-[var(--foreground)]/40">
+                {referenceImages.length} reference {referenceImages.length === 1 ? 'photo' : 'photos'} from this
+                inquiry will be attached to the booking automatically.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {referenceImages.map((url) => (
+                  // eslint-disable-next-line @next/next/no-img-element -- short-lived signed preview URL, not worth Next/Image's remote-pattern config for a staff-only convenience thumbnail
+                  <img
+                    key={url}
+                    src={url}
+                    alt="Reference photo from this inquiry"
+                    className="h-16 w-16 rounded-lg border border-[var(--border)] object-cover"
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-[var(--foreground)]/40 sm:col-span-2">
+              Reference image upload isn&apos;t wired to storage yet — newly
+              created bookings use sample images until that&apos;s connected.
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -179,7 +220,7 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
             <Input type="date" {...register('appointmentDate')} className={fieldClasses} />
           </FormField>
           <FormField label="Appointment Time" error={errors.appointmentTime?.message}>
-            <Input {...register('appointmentTime')} placeholder="2:00 PM" className={fieldClasses} />
+            <Input type="time" {...register('appointmentTime')} className={fieldClasses} />
           </FormField>
           <FormField
             label="Consultation Method"
@@ -222,14 +263,18 @@ export function CreateBookingForm({ artists }: { artists: Artist[] }) {
         </CardContent>
       </Card>
 
-      {submitError && <p className="text-center text-sm text-red-400">{submitError}</p>}
+      {submitError && (
+        <p role="alert" className="text-center text-sm text-red-400">
+          {submitError}
+        </p>
+      )}
 
       <Button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || hasSucceeded}
         className="h-auto w-full rounded-full bg-[var(--primary)] py-4 text-sm font-semibold text-[var(--primary-foreground)] transition-all duration-300 hover:bg-[var(--primary)]/90 hover:shadow-[0_0_24px_rgba(196,98,43,0.5)] disabled:opacity-60"
       >
-        {isSubmitting ? 'Creating booking…' : 'Create Booking & Generate Link'}
+        {isSubmitting || hasSucceeded ? 'Creating booking…' : 'Create Booking & Generate Link'}
       </Button>
     </form>
   )

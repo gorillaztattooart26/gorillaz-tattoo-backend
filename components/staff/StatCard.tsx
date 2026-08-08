@@ -25,7 +25,7 @@ export function StatCard({ icon: Icon, label, value, href }: StatCardProps) {
     return (
       <Link
         href={href}
-        className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--card)]/60 p-5 transition-colors hover:border-[var(--foreground)]/40 md:rounded-2xl"
+        className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--card)]/60 p-5 transition-colors hover:border-[var(--foreground)]/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] md:rounded-2xl"
       >
         {content}
       </Link>

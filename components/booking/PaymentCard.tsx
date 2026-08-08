@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createCheckoutSessionAction } from '@/components/booking/payment-actions'
+import { RESERVATION_POLICY_SHORT } from '@/lib/policy'
 import type { Booking } from '@/types/booking-portal'
 
 const PAYMENT_METHODS = ['GCash', 'Maya', 'Visa', 'Mastercard']
@@ -69,6 +70,8 @@ export function PaymentCard({ booking, disabled }: PaymentCardProps) {
             Please agree to both waiver items above to continue.
           </p>
         )}
+
+        <p className="text-center text-xs text-[var(--foreground)]/40">{RESERVATION_POLICY_SHORT}</p>
       </CardContent>
     </Card>
   )

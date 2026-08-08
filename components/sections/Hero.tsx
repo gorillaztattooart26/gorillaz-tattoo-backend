@@ -31,12 +31,14 @@ export function Hero({ videoUrl = '/videos/homepage-v2/hero-video.mp4' }: HeroPr
       className="relative flex min-h-[clamp(560px,100svh,900px)] flex-col justify-between gap-10 overflow-hidden pt-[100px] md:pt-[130px]"
     >
       {/* Decorative geometric accent, top right — purely ornamental.
-          Mobile pushes much further right (translate-x-[82%] vs 34% on
-          desktop) so it clears the headline instead of overlapping it —
-          most of the box sits off-screen, only a sliver peeks in. */}
+          Mobile pushes much further right (translate-x-[82%]) so it clears
+          the headline, only a sliver peeking in. Tablet (md, 768–1023) gets
+          its own value rather than inheriting desktop's 34% — at that width
+          34% sits too close in, crowding the headline — then lg resets back
+          to the desktop position once there's enough room again. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-0 z-0 h-[360px] w-[300px] translate-x-[82%] translate-y-[-48%] opacity-30 md:h-[720px] md:w-[620px] md:translate-x-[34%]"
+        className="pointer-events-none absolute right-0 top-0 z-0 h-[360px] w-[300px] translate-x-[82%] translate-y-[-48%] opacity-30 md:h-[720px] md:w-[620px] md:translate-x-[58%] lg:translate-x-[34%]"
       >
         <div className="absolute inset-0 border border-white/[0.13]" />
         <div className="gz-arc-full absolute inset-0 border border-[var(--gz-copper-500)] shadow-[0_0_8px_rgba(196,98,43,0.45)] [animation:gz-arc-full_6.5s_cubic-bezier(0.45,0,0.55,1)_infinite]" />

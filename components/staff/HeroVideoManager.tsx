@@ -80,9 +80,9 @@ export function HeroVideoManager({ hero }: HeroVideoManagerProps) {
             />
           </label>
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
           {success && (
-            <p className="flex items-center gap-1.5 text-sm text-emerald-400">
+            <p role="status" aria-live="polite" className="flex items-center gap-1.5 text-sm text-emerald-400">
               <CheckCircle2 className="h-4 w-4" />
               {success}
             </p>

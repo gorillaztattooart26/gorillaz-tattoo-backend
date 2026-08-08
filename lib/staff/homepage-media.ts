@@ -3,6 +3,7 @@ import { PORTFOLIO_SLOT_DEFAULTS } from '@/lib/homepage-media'
 import type { Database } from '@/types/supabase'
 
 export type HomepageHeroRow = Database['public']['Tables']['homepage_hero']['Row']
+export type HomepageAboutRow = Database['public']['Tables']['homepage_about']['Row']
 export type HomepagePortfolioImageRow = Database['public']['Tables']['homepage_portfolio_images']['Row']
 
 export interface StaffPortfolioSlot {
@@ -20,6 +21,13 @@ export interface ExistingSiteImage {
   label: string
 }
 
+export interface StaffSlideshowImage {
+  id: string
+  imageUrl: string
+  alt: string
+  displayOrder: number
+}
+
 /** Session-aware read for the staff dashboard's "Homepage Hero Video" card. */
 export async function getStaffHomepageHero(): Promise<HomepageHeroRow | null> {
   const supabase = await createClient()
@@ -27,6 +35,18 @@ export async function getStaffHomepageHero(): Promise<HomepageHeroRow | null> {
 
   if (error) {
     console.warn('[staff/homepage-media] getStaffHomepageHero failed:', error)
+    return null
+  }
+  return data
+}
+
+/** Session-aware read for the staff dashboard's "Homepage About Image" card. */
+export async function getStaffHomepageAbout(): Promise<HomepageAboutRow | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('homepage_about').select('*').eq('id', 'about').maybeSingle()
+
+  if (error) {
+    console.warn('[staff/homepage-media] getStaffHomepageAbout failed:', error)
     return null
   }
   return data
@@ -54,6 +74,27 @@ export async function getStaffPortfolioSlots(): Promise<StaffPortfolioSlot[]> {
       isCustom: Boolean(row),
     }
   })
+}
+
+/** Session-aware read for the staff dashboard's "Homepage Studio Portfolio Slideshow" card — every slide, in display order. */
+export async function getStaffSlideshowImages(): Promise<StaffSlideshowImage[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('homepage_slideshow_images')
+    .select('id, image_url, alt, display_order')
+    .order('display_order', { ascending: true })
+
+  if (error) {
+    console.warn('[staff/homepage-media] getStaffSlideshowImages failed:', error)
+    return []
+  }
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    imageUrl: row.image_url,
+    alt: row.alt,
+    displayOrder: row.display_order,
+  }))
 }
 
 /**

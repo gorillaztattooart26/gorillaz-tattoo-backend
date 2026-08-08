@@ -53,6 +53,38 @@ export async function getInquiries(): Promise<StaffInquiry[]> {
   )
 }
 
+/** Single inquiry lookup (with signed reference-image URLs) — powers the "Convert to booking" flow's prefill + reference-photo preview on the Create Booking form. */
+export async function getInquiryById(id: string): Promise<StaffInquiry | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('inquiries')
+    .select('*, inquiry_images(image_path)')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (error) {
+    console.error('[staff/inquiries] getInquiryById failed:', error)
+    return null
+  }
+  if (!data) return null
+
+  const { inquiry_images, ...inquiry } = data
+  const images = await Promise.all(
+    inquiry_images.map(async ({ image_path }) => {
+      const { data: signed, error: signError } = await supabase.storage
+        .from(REFERENCES_BUCKET)
+        .createSignedUrl(image_path, SIGNED_URL_EXPIRY_SECONDS)
+
+      if (signError || !signed) {
+        console.error('[staff/inquiries] createSignedUrl failed:', signError)
+        return null
+      }
+      return signed.signedUrl
+    }),
+  )
+  return { ...inquiry, images: images.filter((url): url is string => Boolean(url)) }
+}
+
 export async function getRecentInquiries(limit = 5): Promise<Inquiry[]> {
   const supabase = await createClient()
   const { data, error } = await supabase

@@ -84,6 +84,15 @@ export function PortfolioGallery({ tiles }: PortfolioGalleryProps) {
   const anchorTile = tiles[6]
   const growTile = tiles[7]
 
+  // On mobile each row's two side-by-side tiles (index 0 and 2 — index 1
+  // drops full-width below them) sit in the same grid row but each kept
+  // its own masonry aspect-ratio, so a shorter tile left a gap under it
+  // instead of matching its neighbour's height. Averaging the pair's
+  // ratios gives both a shared mobile height while desktop keeps the
+  // original per-tile masonry ratios untouched (see the md: override below).
+  const row1PairRatio = (row1[0].ratio + row1[2].ratio) / 2
+  const row2PairRatio = (row2[0].ratio + row2[2].ratio) / 2
+
   // Which grayscale tiles (by slot) a touch user has tapped to reveal
   // color — desktop gets the same reveal for free via CSS :hover.
   const [revealedSlots, setRevealedSlots] = useState<Set<number>>(new Set())
@@ -241,31 +250,38 @@ export function PortfolioGallery({ tiles }: PortfolioGalleryProps) {
             tile 2 drops full-width underneath. Desktop keeps the original
             flex-wrap masonry row untouched via md:flex. */}
         <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:gap-3.5">
-          {row1.map((tile, tileIndex) => (
-            <div
-              key={tile.slot}
-              className={cn(
-                'reveal min-w-0',
-                tileIndex === 1 && 'order-3 col-span-2 md:order-none md:col-span-1',
-                tileIndex === 2 && 'order-2 md:order-none',
-              )}
-              style={{
-                flex: `${tile.ratio} 1 calc(${tile.ratio} * 132px)`,
-                aspectRatio: tile.ratio,
-                transitionDelay: `${tileIndex * 70}ms`,
-              }}
-            >
-              <PhotoTile
-                src={tile.src}
-                alt={tile.alt}
-                grayscale={tile.grayscale}
-                revealed={revealedSlots.has(tile.slot)}
-                onToggleReveal={() => toggleReveal(tile.slot)}
-                className="h-full w-full"
-                priority={tileIndex === 0}
-              />
-            </div>
-          ))}
+          {row1.map((tile, tileIndex) => {
+            const isPaired = tileIndex !== 1
+            return (
+              <div
+                key={tile.slot}
+                className={cn(
+                  'reveal min-w-0',
+                  isPaired && 'aspect-[var(--mobile-ratio)] md:[aspect-ratio:var(--tile-ratio)]',
+                  tileIndex === 1 && 'order-3 col-span-2 md:order-none md:col-span-1',
+                  tileIndex === 2 && 'order-2 md:order-none',
+                )}
+                style={{
+                  flex: `${tile.ratio} 1 calc(${tile.ratio} * 132px)`,
+                  aspectRatio: isPaired ? undefined : tile.ratio,
+                  transitionDelay: `${tileIndex * 70}ms`,
+                  ...(isPaired
+                    ? ({ '--mobile-ratio': row1PairRatio, '--tile-ratio': tile.ratio } as React.CSSProperties)
+                    : {}),
+                }}
+              >
+                <PhotoTile
+                  src={tile.src}
+                  alt={tile.alt}
+                  grayscale={tile.grayscale}
+                  revealed={revealedSlots.has(tile.slot)}
+                  onToggleReveal={() => toggleReveal(tile.slot)}
+                  className="h-full w-full"
+                  priority={tileIndex === 0}
+                />
+              </div>
+            )
+          })}
         </div>
 
         {/* Row 2 mirrors row 1's bespoke mobile grid — without it, a plain
@@ -277,39 +293,48 @@ export function PortfolioGallery({ tiles }: PortfolioGalleryProps) {
             side pair dropping underneath, so the two rows alternate which
             tile drops instead of both dropping the same slot. */}
         <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:gap-3.5">
-          {row2.map((tile, tileIndex) => (
-            <div
-              key={tile.slot}
-              className={cn(
-                'reveal min-w-0',
-                tileIndex === 0 && 'order-2 md:order-none',
-                tileIndex === 1 && 'order-1 col-span-2 md:order-none md:col-span-1',
-                tileIndex === 2 && 'order-3 md:order-none',
-              )}
-              style={{
-                flex: `${tile.ratio} 1 calc(${tile.ratio} * 132px)`,
-                aspectRatio: tile.ratio,
-                transitionDelay: `${tileIndex * 70}ms`,
-              }}
-            >
-              <PhotoTile
-                src={tile.src}
-                alt={tile.alt}
-                grayscale={tile.grayscale}
-                revealed={revealedSlots.has(tile.slot)}
-                onToggleReveal={() => toggleReveal(tile.slot)}
-                className="h-full w-full"
-              />
-            </div>
-          ))}
+          {row2.map((tile, tileIndex) => {
+            const isPaired = tileIndex !== 1
+            return (
+              <div
+                key={tile.slot}
+                className={cn(
+                  'reveal min-w-0',
+                  isPaired && 'aspect-[var(--mobile-ratio)] md:[aspect-ratio:var(--tile-ratio)]',
+                  tileIndex === 0 && 'order-2 md:order-none',
+                  tileIndex === 1 && 'order-1 col-span-2 md:order-none md:col-span-1',
+                  tileIndex === 2 && 'order-3 md:order-none',
+                )}
+                style={{
+                  flex: `${tile.ratio} 1 calc(${tile.ratio} * 132px)`,
+                  aspectRatio: isPaired ? undefined : tile.ratio,
+                  transitionDelay: `${tileIndex * 70}ms`,
+                  ...(isPaired
+                    ? ({ '--mobile-ratio': row2PairRatio, '--tile-ratio': tile.ratio } as React.CSSProperties)
+                    : {}),
+                }}
+              >
+                <PhotoTile
+                  src={tile.src}
+                  alt={tile.alt}
+                  grayscale={tile.grayscale}
+                  revealed={revealedSlots.has(tile.slot)}
+                  onToggleReveal={() => toggleReveal(tile.slot)}
+                  className="h-full w-full"
+                />
+              </div>
+            )
+          })}
         </div>
       </div>
 
       {/* Scroll-jacked growing panel — a tall spacer + sticky stage.
           items-start (not items-center) + a top pad matching the row gap
           above keeps this row flush under row 2 instead of floating
-          vertically centered in the full-viewport-height sticky stage. */}
-      <div ref={trackRef} className="relative mt-2 md:mt-3.5 h-[225svh]">
+          vertically centered in the full-viewport-height sticky stage.
+          The pad alone supplies that gap — no margin on the track itself,
+          which would otherwise stack on top of it and double the space. */}
+      <div ref={trackRef} className="relative h-[225svh]">
         <div
           ref={stageRef}
           className="sticky top-0 flex h-svh items-start overflow-hidden pt-2 md:pt-3.5"

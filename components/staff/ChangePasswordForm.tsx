@@ -72,8 +72,12 @@ export function ChangePasswordForm() {
         />
       </label>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
-      {saved && !error && <p className="text-sm text-emerald-400">Password changed.</p>}
+      {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+      {saved && !error && (
+        <p role="status" aria-live="polite" className="text-sm text-emerald-400">
+          Password changed.
+        </p>
+      )}
 
       <button
         type="submit"

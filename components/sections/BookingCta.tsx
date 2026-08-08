@@ -25,8 +25,8 @@ export function BookingCta() {
 
           <div className="flex flex-col flex-wrap items-start justify-between gap-8 md:flex-row md:items-end">
             <p className="max-w-[40ch] text-[15px] leading-relaxed text-[var(--gz-ink-300)] md:text-base">
-              Tell the studio what you want tattooed. We reply within one
-              business day with the right resident artist, a scope, a price
+              Tell the studio what you want tattooed. We reply within 48
+              hours with the right resident artist, a scope, a price
               band and the next open date.
             </p>
 

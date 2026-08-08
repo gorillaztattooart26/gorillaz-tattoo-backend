@@ -2,6 +2,21 @@ import { supabase } from '@/lib/supabase'
 
 /** Static fallbacks — the original Homepage V2 assets, used until staff upload replacements through the dashboard. */
 const DEFAULT_HERO_VIDEO_URL = '/videos/homepage-v2/hero-video.mp4'
+const DEFAULT_ABOUT_IMAGE_URL = '/images/studio/studio-interior.jpg'
+const DEFAULT_ABOUT_ALT = 'Inside Gorillaz Tattoo Art — private tattoo studio in the Philippines'
+
+export interface HomepageSlide {
+  src: string
+  alt: string
+}
+
+/** Original 4-slide "Dominate" interstitial banner (components/sections/Process.tsx), used whenever the owner hasn't uploaded any custom slides yet. */
+const DEFAULT_SLIDESHOW_IMAGES: HomepageSlide[] = [
+  { src: '/images/homepage-v2/slider/slide-1-concert.png', alt: 'Live show at Gorillaz Tattoo Art — studio community' },
+  { src: '/images/homepage-v2/slider/slide-2-bmx.png', alt: 'BMX rider at night — Gorillaz Tattoo Art studio community' },
+  { src: '/images/homepage-v2/slider/slide-3-skate.png', alt: 'Tattooed hand resting on a skateboard — Gorillaz Tattoo Art' },
+  { src: '/images/homepage-v2/slider/slide-4-swim.png', alt: 'Competitive swimmer training — Gorillaz Tattoo Art studio community' },
+]
 
 export interface PortfolioSlotDefaults {
   slot: number
@@ -91,6 +106,26 @@ export async function getHomepageHeroVideoUrl(): Promise<string> {
   return data?.video_url ?? DEFAULT_HERO_VIDEO_URL
 }
 
+export interface AboutImage {
+  src: string
+  alt: string
+}
+
+/** Public read for the homepage "About the studio" photo — anon-readable, falls back to the static file if nothing's been uploaded yet. */
+export async function getHomepageAboutImage(): Promise<AboutImage> {
+  const { data, error } = await supabase.from('homepage_about').select('image_url, alt').eq('id', 'about').maybeSingle()
+
+  if (error) {
+    console.warn('[homepage-media] getHomepageAboutImage failed:', error)
+    return { src: DEFAULT_ABOUT_IMAGE_URL, alt: DEFAULT_ABOUT_ALT }
+  }
+
+  return {
+    src: data?.image_url ?? DEFAULT_ABOUT_IMAGE_URL,
+    alt: data?.alt ?? DEFAULT_ABOUT_ALT,
+  }
+}
+
 /** Public read for the homepage "Studio Portfolio" tiles — anon-readable, missing/unreplaced slots fall back to the original static photos. */
 export async function getHomepagePortfolioTiles(): Promise<PortfolioTile[]> {
   const { data, error } = await supabase.from('homepage_portfolio_images').select('slot, image_url, alt')
@@ -111,4 +146,28 @@ export async function getHomepagePortfolioTiles(): Promise<PortfolioTile[]> {
       alt: row?.alt ?? defaults.defaultAlt,
     }
   })
+}
+
+/**
+ * Public read for the homepage "Dominate" interstitial slideshow — the
+ * full-bleed crossfade banner between Process and Inquire. Anon-readable,
+ * active slides only, in display order. Falls back to the original static
+ * 4-slide set whenever no custom slides have been uploaded yet (or the
+ * table isn't reachable), so the section never renders empty.
+ */
+export async function getHomepageSlideshowImages(): Promise<HomepageSlide[]> {
+  const { data, error } = await supabase
+    .from('homepage_slideshow_images')
+    .select('image_url, alt')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+
+  if (error) {
+    console.warn('[homepage-media] getHomepageSlideshowImages failed:', error)
+    return DEFAULT_SLIDESHOW_IMAGES
+  }
+
+  if (!data || data.length === 0) return DEFAULT_SLIDESHOW_IMAGES
+
+  return data.map((row) => ({ src: row.image_url, alt: row.alt }))
 }

@@ -3,7 +3,7 @@
 import { supabase } from '@/lib/supabase'
 import { getBookingRecordByToken } from '@/lib/booking'
 import { getBaseUrl } from '@/lib/url'
-import { createCheckoutSession } from '@/services/paymongo'
+import { getActivePaymentProvider } from '@/lib/payments/service'
 
 export interface CreateCheckoutSessionActionResult {
   checkoutUrl?: string
@@ -30,10 +30,11 @@ export async function createCheckoutSessionAction(
   }
 
   const baseUrl = await getBaseUrl()
+  const provider = getActivePaymentProvider()
 
   let session
   try {
-    session = await createCheckoutSession({
+    session = await provider.createCheckoutSession({
       bookingToken: token,
       bookingId: booking.bookingId,
       amount: booking.downPaymentAmount,
@@ -41,7 +42,14 @@ export async function createCheckoutSessionAction(
       description: `Down payment for booking ${booking.bookingId}`,
       customer: booking.customer,
       successUrl: `${baseUrl}/booking/${token}`,
-      cancelUrl: `${baseUrl}/booking/${token}`,
+      // Routing target only — everything about how/whether the payment
+      // itself succeeds is still entirely the provider + its webhook's
+      // call. Sends the customer to the dedicated Payment Failed page
+      // instead of back to the same booking page when they cancel or bail
+      // out of checkout, so they land somewhere that explains what
+      // happened and offers a retry rather than just re-showing the same
+      // pay button.
+      cancelUrl: `${baseUrl}/booking/${token}/payment-failed`,
     })
   } catch (error) {
     console.error('[payments] createCheckoutSession failed:', error)
@@ -51,7 +59,7 @@ export async function createCheckoutSessionAction(
   const { error: insertError } = await supabase.from('payments').insert({
     booking_id: booking.id,
     checkout_session_id: session.id,
-    provider: 'paymongo',
+    provider: provider.name,
     status: 'pending',
     amount: booking.downPaymentAmount,
     currency: booking.currency,

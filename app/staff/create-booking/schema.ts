@@ -17,11 +17,17 @@ export const createBookingSchema = z.object({
 
   studioAddress: z.string().trim().min(5, 'Enter the studio address.'),
   appointmentDate: z.string().min(1, 'Select an appointment date.'),
-  appointmentTime: z.string().trim().min(1, 'Enter an appointment time.'),
+  appointmentTime: z
+    .string()
+    .trim()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Select a valid appointment time.'),
   consultationMethod: z.string().trim().min(1, 'Enter the consultation method.'),
 
   estimatedPrice: z.coerce.number().min(1, 'Enter the estimated price.'),
   downPaymentPercent: z.coerce.number().min(1).max(100),
+
+  /** Set when this booking is created from the Inquiries tab's "Convert to booking" action — lets the server action carry the inquiry's own reference photos over instead of the sample placeholders. */
+  sourceInquiryId: z.string().optional(),
 })
 
 /** Post-validation shape (numbers coerced) — what the server action receives. */

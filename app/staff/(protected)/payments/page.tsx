@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
+import { CreditCard } from 'lucide-react'
 import { StaffPageHeader } from '@/components/staff/StaffPageHeader'
 import { StatusBadge } from '@/components/staff/StatusBadge'
-import { getPayments } from '@/lib/staff/payments'
+import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
+import { getPaymentsForStaffArtist } from '@/lib/staff/payments'
+import { getCurrentStaffArtist } from '@/lib/staff/artists'
 import { formatCurrency, formatDate } from '@/lib/staff/format'
 
 export const metadata: Metadata = {
@@ -15,23 +18,42 @@ export const metadata: Metadata = {
 }
 
 export default async function StaffPaymentsPage() {
-  const payments = await getPayments()
+  const artist = await getCurrentStaffArtist()
+
+  if (!artist) {
+    return (
+      <PlaceholderSection
+        title="Payments"
+        description="Your account isn't linked to an artist yet — ask the studio owner to link it before you can see payments."
+        icon={CreditCard}
+      />
+    )
+  }
+
+  const payments = await getPaymentsForStaffArtist(artist)
 
   return (
     <div>
-      <StaffPageHeader title="Payments" description={`${payments.length} total`} />
+      <StaffPageHeader
+        title="Payments"
+        description={
+          artist.is_owner
+            ? `${payments.length} total — every artist's payments`
+            : `${payments.length} total — payments for bookings assigned to you`
+        }
+      />
 
       <div className="px-4 py-6 md:px-8">
         <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--foreground)]/40">
-                <th className="px-5 py-3 font-medium">Booking</th>
-                <th className="px-5 py-3 font-medium">Customer</th>
-                <th className="px-5 py-3 font-medium">Amount</th>
-                <th className="px-5 py-3 font-medium">Status</th>
-                <th className="px-5 py-3 font-medium">Method</th>
-                <th className="px-5 py-3 font-medium">Paid</th>
+                <th scope="col" className="px-5 py-3 font-medium">Booking</th>
+                <th scope="col" className="px-5 py-3 font-medium">Customer</th>
+                <th scope="col" className="px-5 py-3 font-medium">Amount</th>
+                <th scope="col" className="px-5 py-3 font-medium">Status</th>
+                <th scope="col" className="px-5 py-3 font-medium">Method</th>
+                <th scope="col" className="px-5 py-3 font-medium">Paid</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--foreground)]/5">
