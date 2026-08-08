@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { createClient } from '@/lib/supabase/server'
@@ -215,6 +216,15 @@ export async function createBookingAction(values: CreateBookingValues): Promise<
     appointmentDate: parsed.appointmentDate,
     appointmentTime: parsed.appointmentTime,
   })
+
+  // Staff are redirected straight to the customer-facing /booking/[token]
+  // page after creating a booking (to hand off the link), not back to the
+  // Bookings tab — without this, the next visit to /staff/bookings within
+  // Next's client Router Cache window could still serve the pre-creation
+  // list. Matches the revalidatePath calls every other bookings-mutating
+  // action already makes (app/staff/(protected)/bookings/actions.ts).
+  revalidatePath('/staff/bookings')
+  revalidatePath('/staff/dashboard')
 
   return { token, bookingId }
 }
