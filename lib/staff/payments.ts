@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import type { PaymentRow } from '@/types/supabase'
+import type { RecordView } from '@/lib/staff/bookings'
 
 export interface StaffPayment {
   id: string
+  bookingId: string
   bookingRef: string
   customerName: string
   amount: number
@@ -11,7 +13,11 @@ export interface StaffPayment {
   method: string | null
   paidAt: string | null
   createdAt: string
+  archivedAt: string | null
 }
+
+/** Payment statuses this feature ever allows permanently deleting — never paid/refunded. See supabase/migrations/20260808200200_add_owner_maintenance_functions.sql for why 'pending'/'failed' (this schema has no separate cancelled/expired status). */
+export const DELETABLE_PAYMENT_STATUSES = ['pending', 'failed'] as const
 
 /** See lib/staff/bookings.ts's BookingWithArtistRow for why this is manual. */
 interface PaymentWithBookingRow extends PaymentRow {
@@ -21,6 +27,7 @@ interface PaymentWithBookingRow extends PaymentRow {
 function mapPayment(row: PaymentWithBookingRow): StaffPayment {
   return {
     id: row.id,
+    bookingId: row.booking_id,
     bookingRef: row.bookings?.booking_id ?? 'Unknown',
     customerName: row.bookings?.customer_name ?? 'Unknown',
     amount: row.amount,
@@ -29,6 +36,7 @@ function mapPayment(row: PaymentWithBookingRow): StaffPayment {
     method: row.method,
     paidAt: row.paid_at,
     createdAt: row.created_at,
+    archivedAt: row.archived_at,
   }
 }
 
@@ -57,6 +65,7 @@ export async function getPayments(): Promise<StaffPayment[]> {
  */
 export async function getPaymentsForStaffArtist(
   artist: { id: string; is_owner: boolean } | null,
+  view: RecordView = 'active',
 ): Promise<StaffPayment[]> {
   if (!artist) return []
 
@@ -69,6 +78,8 @@ export async function getPaymentsForStaffArtist(
   if (!artist.is_owner) {
     query = query.eq('bookings.artist_id', artist.id)
   }
+
+  query = view === 'archived' ? query.not('archived_at', 'is', null) : query.is('archived_at', null)
 
   const { data, error } = await query
 

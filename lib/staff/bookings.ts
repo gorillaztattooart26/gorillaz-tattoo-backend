@@ -17,7 +17,11 @@ export interface StaffBooking {
   downPaymentAmount: number
   currency: string
   createdAt: string
+  archivedAt: string | null
 }
+
+/** Which slice of a table to fetch — mirrors the Archived-view tab added to Bookings/Inquiries/Payments. */
+export type RecordView = 'active' | 'archived'
 
 /**
  * Raw shape of `bookings` joined with `artists` via the FK relationship
@@ -47,6 +51,7 @@ function mapBooking(row: BookingWithArtistRow): StaffBooking {
     downPaymentAmount: row.down_payment_amount,
     currency: row.currency,
     createdAt: row.created_at,
+    archivedAt: row.archived_at,
   }
 }
 
@@ -74,6 +79,7 @@ export async function getBookings(): Promise<StaffBooking[]> {
  */
 export async function getBookingsForStaffArtist(
   artist: { id: string; is_owner: boolean } | null,
+  view: RecordView = 'active',
 ): Promise<StaffBooking[]> {
   if (!artist) return []
 
@@ -84,6 +90,8 @@ export async function getBookingsForStaffArtist(
     query = query.eq('artist_id', artist.id)
   }
 
+  query = view === 'archived' ? query.not('archived_at', 'is', null) : query.is('archived_at', null)
+
   const { data, error } = await query
 
   if (error) {
@@ -91,6 +99,36 @@ export async function getBookingsForStaffArtist(
     return []
   }
   return (data as unknown as BookingWithArtistRow[]).map(mapBooking)
+}
+
+/** Raw storage paths for one booking's reference photos — used by Delete Booking to clean up the `references` bucket after the DB rows are gone. */
+export async function getBookingReferenceImagePaths(bookingId: string): Promise<string[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('booking_reference_images')
+    .select('image_path')
+    .eq('booking_id', bookingId)
+
+  if (error) {
+    console.error('[staff/bookings] getBookingReferenceImagePaths failed:', error)
+    return []
+  }
+  return data.map((row) => row.image_path)
+}
+
+/** Whether a booking has any payment rows — Delete Booking must refuse when true (payments are the historical record, deleting the booking they reference would orphan them). */
+export async function bookingHasPayments(bookingId: string): Promise<boolean> {
+  const supabase = await createClient()
+  const { count, error } = await supabase
+    .from('payments')
+    .select('*', { count: 'exact', head: true })
+    .eq('booking_id', bookingId)
+
+  if (error) {
+    console.error('[staff/bookings] bookingHasPayments failed:', error)
+    return true // fail closed — block deletion if we can't confirm it's safe
+  }
+  return (count ?? 0) > 0
 }
 
 /** Same scoping as getBookingsForStaffArtist — owners see every booking, everyone else only their own, unlinked accounts see nothing. Powers the Bookings tab's "N total" header. */

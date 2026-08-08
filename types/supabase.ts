@@ -31,6 +31,8 @@ export interface Database {
           height: string | null
           weight: string | null
           message: string
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           updated_at: string
         }
@@ -47,6 +49,8 @@ export interface Database {
           height?: string | null
           weight?: string | null
           message: string
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -63,10 +67,20 @@ export interface Database {
           height?: string | null
           weight?: string | null
           message?: string
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'inquiries_archived_by_fkey'
+            columns: ['archived_by']
+            isOneToOne: false
+            referencedRelation: 'artists'
+            referencedColumns: ['id']
+          },
+        ]
       }
       inquiry_images: {
         Row: {
@@ -294,6 +308,8 @@ export interface Database {
           down_payment_percent: number
           down_payment_amount: number
           remaining_balance: number
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           updated_at: string
         }
@@ -322,6 +338,8 @@ export interface Database {
           down_payment_percent: number
           down_payment_amount: number
           remaining_balance: number
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -350,6 +368,8 @@ export interface Database {
           down_payment_percent?: number
           down_payment_amount?: number
           remaining_balance?: number
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -357,6 +377,13 @@ export interface Database {
           {
             foreignKeyName: 'bookings_artist_id_fkey'
             columns: ['artist_id']
+            isOneToOne: false
+            referencedRelation: 'artists'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'bookings_archived_by_fkey'
+            columns: ['archived_by']
             isOneToOne: false
             referencedRelation: 'artists'
             referencedColumns: ['id']
@@ -406,6 +433,8 @@ export interface Database {
           amount: number
           currency: string
           paid_at: string | null
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           updated_at: string
         }
@@ -419,6 +448,8 @@ export interface Database {
           amount: number
           currency?: string
           paid_at?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -432,6 +463,8 @@ export interface Database {
           amount?: number
           currency?: string
           paid_at?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -443,6 +476,13 @@ export interface Database {
             referencedRelation: 'bookings'
             referencedColumns: ['id']
           },
+          {
+            foreignKeyName: 'payments_archived_by_fkey'
+            columns: ['archived_by']
+            isOneToOne: false
+            referencedRelation: 'artists'
+            referencedColumns: ['id']
+          },
         ]
       }
     }
@@ -451,6 +491,30 @@ export interface Database {
       get_booking_by_token: {
         Args: { p_token: string }
         Returns: Json
+      }
+      get_test_data_counts: {
+        Args: Record<string, never>
+        Returns: Json
+      }
+      clear_test_data: {
+        Args: Record<string, never>
+        Returns: Json
+      }
+      archive_completed_bookings_older_than: {
+        Args: { p_months: number }
+        Returns: number
+      }
+      delete_archived_inquiries_older_than: {
+        Args: { p_months: number }
+        Returns: Json
+      }
+      delete_archived_bookings_older_than: {
+        Args: { p_months: number }
+        Returns: Json
+      }
+      delete_archived_pending_payments_older_than: {
+        Args: { p_months: number }
+        Returns: number
       }
     }
   }

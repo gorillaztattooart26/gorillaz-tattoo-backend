@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Inquiry } from '@/types/supabase'
+import type { RecordView } from '@/lib/staff/bookings'
 
 const REFERENCES_BUCKET = 'references'
 // Long enough to comfortably view during a staff session without the URL
@@ -21,12 +22,16 @@ export interface StaffInquiry extends Inquiry {
  * a storage path, not a browsable URL — each one needs a signed URL
  * generated per request to actually display.
  */
-export async function getInquiries(): Promise<StaffInquiry[]> {
+export async function getInquiries(view: RecordView = 'active'): Promise<StaffInquiry[]> {
   const supabase = await createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('inquiries')
     .select('*, inquiry_images(image_path)')
     .order('created_at', { ascending: false })
+
+  query = view === 'archived' ? query.not('archived_at', 'is', null) : query.is('archived_at', null)
+
+  const { data, error } = await query
 
   if (error || !data) {
     console.error('[staff/inquiries] getInquiries failed:', error)
@@ -111,4 +116,16 @@ export async function getInquiryCount(): Promise<number> {
     return 0
   }
   return count ?? 0
+}
+
+/** Raw storage paths for one inquiry's reference photos — used by Delete Inquiry to clean up the `references` bucket after the DB rows are gone. */
+export async function getInquiryImagePaths(inquiryId: string): Promise<string[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('inquiry_images').select('image_path').eq('inquiry_id', inquiryId)
+
+  if (error) {
+    console.error('[staff/inquiries] getInquiryImagePaths failed:', error)
+    return []
+  }
+  return data.map((row) => row.image_path)
 }

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import { CreditCard } from 'lucide-react'
 import { StaffPageHeader } from '@/components/staff/StaffPageHeader'
-import { StatusBadge } from '@/components/staff/StatusBadge'
 import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
+import { ArchiveViewTabs } from '@/components/staff/ArchiveViewTabs'
+import { PaymentsDataTable } from '@/components/staff/PaymentsDataTable'
 import { getPaymentsForStaffArtist } from '@/lib/staff/payments'
 import { getCurrentStaffArtist } from '@/lib/staff/artists'
-import { formatCurrency, formatDate } from '@/lib/staff/format'
 
 export const metadata: Metadata = {
   title: 'Payments | Staff',
@@ -17,7 +17,11 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function StaffPaymentsPage() {
+export default async function StaffPaymentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>
+}) {
   const artist = await getCurrentStaffArtist()
 
   if (!artist) {
@@ -30,7 +34,15 @@ export default async function StaffPaymentsPage() {
     )
   }
 
-  const payments = await getPaymentsForStaffArtist(artist)
+  const { view: viewParam } = await searchParams
+  const view = viewParam === 'archived' && artist.is_owner ? 'archived' : 'active'
+
+  const [activePayments, archivedPayments] = await Promise.all([
+    getPaymentsForStaffArtist(artist, 'active'),
+    artist.is_owner ? getPaymentsForStaffArtist(artist, 'archived') : Promise.resolve([]),
+  ])
+
+  const payments = view === 'archived' ? archivedPayments : activePayments
 
   return (
     <div>
@@ -38,51 +50,24 @@ export default async function StaffPaymentsPage() {
         title="Payments"
         description={
           artist.is_owner
-            ? `${payments.length} total — every artist's payments`
-            : `${payments.length} total — payments for bookings assigned to you`
+            ? `${activePayments.length} total — every artist's payments`
+            : `${activePayments.length} total — payments for bookings assigned to you`
         }
       />
 
       <div className="px-4 py-6 md:px-8">
-        <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--foreground)]/40">
-                <th scope="col" className="px-5 py-3 font-medium">Booking</th>
-                <th scope="col" className="px-5 py-3 font-medium">Customer</th>
-                <th scope="col" className="px-5 py-3 font-medium">Amount</th>
-                <th scope="col" className="px-5 py-3 font-medium">Status</th>
-                <th scope="col" className="px-5 py-3 font-medium">Method</th>
-                <th scope="col" className="px-5 py-3 font-medium">Paid</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--foreground)]/5">
-              {payments.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-[var(--foreground)]/40">
-                    No payments yet.
-                  </td>
-                </tr>
-              )}
-              {payments.map((payment) => (
-                <tr key={payment.id}>
-                  <td className="px-5 py-4 font-medium text-[var(--foreground)]">{payment.bookingRef}</td>
-                  <td className="px-5 py-4 text-[var(--foreground)]/70">{payment.customerName}</td>
-                  <td className="px-5 py-4 text-[var(--foreground)]/70">
-                    {formatCurrency(payment.amount, payment.currency)}
-                  </td>
-                  <td className="px-5 py-4">
-                    <StatusBadge status={payment.status} />
-                  </td>
-                  <td className="px-5 py-4 capitalize text-[var(--foreground)]/70">{payment.method ?? '—'}</td>
-                  <td className="px-5 py-4 text-[var(--foreground)]/40">
-                    {payment.paidAt ? formatDate(payment.paidAt) : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {artist.is_owner && (
+          <div className="mb-4">
+            <ArchiveViewTabs
+              basePath="/staff/payments"
+              view={view}
+              activeCount={activePayments.length}
+              archivedCount={archivedPayments.length}
+            />
+          </div>
+        )}
+
+        <PaymentsDataTable payments={payments} isOwner={artist.is_owner} view={view} />
       </div>
     </div>
   )

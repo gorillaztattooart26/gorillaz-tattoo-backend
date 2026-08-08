@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { getCurrentStaffArtist } from '@/lib/staff/artists'
+import { requireOwner } from '@/lib/staff/permissions'
 
 const BUCKET = 'homepage-media'
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024 // 10MB
@@ -10,24 +10,6 @@ const MAX_VIDEO_BYTES = 200 * 1024 * 1024 // 200MB
 
 export interface HomepageMediaActionResult {
   error?: string
-}
-
-const NOT_OWNER_ERROR = 'Only the studio owner can update homepage media.'
-
-/**
- * Hero video, About photo, and Studio Portfolio slideshow are shared,
- * site-wide homepage content — every exported action below must gate on
- * this before touching Storage or the DB, since these are Server Actions
- * and can be invoked directly regardless of what the Gallery page UI
- * shows/hides. Mirrors the `!artist.is_owner` guard style already used in
- * app/staff/(protected)/bookings/actions.ts.
- */
-async function requireOwner(): Promise<{ ok: true } | { ok: false; error: string }> {
-  const artist = await getCurrentStaffArtist()
-  if (!artist || !artist.is_owner) {
-    return { ok: false, error: NOT_OWNER_ERROR }
-  }
-  return { ok: true }
 }
 
 function storagePathFromPublicUrl(url: string): string | null {
@@ -43,7 +25,7 @@ function storagePathFromPublicUrl(url: string): string | null {
  * the new one.
  */
 export async function uploadHeroVideoAction(formData: FormData): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const file = formData.get('video')
@@ -95,7 +77,7 @@ export async function uploadHeroVideoAction(formData: FormData): Promise<Homepag
 
 /** Removes the current hero video, reverting the homepage to its static fallback. */
 export async function deleteHeroVideoAction(): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const supabase = await createClient()
@@ -138,7 +120,7 @@ export async function deleteHeroVideoAction(): Promise<HomepageMediaActionResult
  * the new one.
  */
 export async function uploadAboutImageAction(formData: FormData): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const alt = String(formData.get('alt') ?? '').trim()
@@ -195,7 +177,7 @@ export async function uploadAboutImageAction(formData: FormData): Promise<Homepa
 
 /** Removes the current "About the studio" photo, reverting the homepage to its static fallback. */
 export async function deleteAboutImageAction(): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const supabase = await createClient()
@@ -233,7 +215,7 @@ export async function deleteAboutImageAction(): Promise<HomepageMediaActionResul
 
 /** Uploads a photo and assigns it to one of the 8 fixed "Studio Portfolio" slots, replacing whatever was in that slot. */
 export async function uploadPortfolioSlotImageAction(formData: FormData): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const slot = Number(formData.get('slot'))
@@ -308,7 +290,7 @@ export async function assignExistingPortfolioSlotImageAction(
   imageUrl: string,
   alt: string,
 ): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   if (!Number.isInteger(slot) || slot < 0 || slot > 7) {
@@ -350,7 +332,7 @@ export async function assignExistingPortfolioSlotImageAction(
 
 /** Clears a "Studio Portfolio" slot, reverting it to its static fallback photo. */
 export async function deletePortfolioSlotImageAction(slot: number): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   if (!Number.isInteger(slot) || slot < 0 || slot > 7) {
@@ -399,7 +381,7 @@ export async function deletePortfolioSlotImageAction(slot: number): Promise<Home
 export async function reorderPortfolioSlotsAction(
   entries: { slot: number; imageUrl: string; alt: string }[],
 ): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const slots = entries.map((e) => e.slot)
@@ -457,7 +439,7 @@ export async function reorderPortfolioSlotsAction(
  * has no fixed length — new slides just go on the end. Owner-only.
  */
 export async function uploadSlideshowImageAction(formData: FormData): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const alt = String(formData.get('alt') ?? '').trim()
@@ -517,7 +499,7 @@ export async function replaceSlideshowImageAction(
   id: string,
   formData: FormData,
 ): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const alt = String(formData.get('alt') ?? '').trim()
@@ -584,7 +566,7 @@ export async function replaceSlideshowImageAction(
 
 /** Removes a slide entirely, shifting nothing else — reorder afterward if a gap needs closing. Owner-only. */
 export async function deleteSlideshowImageAction(id: string): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   const supabase = await createClient()
@@ -626,7 +608,7 @@ export async function deleteSlideshowImageAction(id: string): Promise<HomepageMe
  * touches Storage or image_url/alt. Owner-only.
  */
 export async function reorderSlideshowImagesAction(orderedIds: string[]): Promise<HomepageMediaActionResult> {
-  const authCheck = await requireOwner()
+  const authCheck = await requireOwner('Only the studio owner can update homepage media.')
   if (!authCheck.ok) return { error: authCheck.error }
 
   if (orderedIds.length === 0) return {}

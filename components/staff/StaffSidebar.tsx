@@ -12,6 +12,7 @@ import {
   Image as ImageIcon,
   Users,
   Settings,
+  ShieldCheck,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -29,8 +30,12 @@ const NAV_LINKS = [
   { label: 'Settings', href: '/staff/settings', icon: Settings },
 ]
 
+/** Owner-only — appended after Settings rather than mixed into NAV_LINKS since it's the only link gated by role. */
+const OWNER_NAV_LINK = { label: 'System', href: '/staff/system', icon: ShieldCheck }
+
 interface StaffSidebarProps {
   userEmail: string
+  isOwner: boolean
 }
 
 /**
@@ -44,7 +49,7 @@ interface StaffSidebarProps {
  * two of each label render before the cut line, since the icon + gap
  * don't fill the full collapsed width.
  */
-export function StaffSidebar({ userEmail }: StaffSidebarProps) {
+export function StaffSidebar({ userEmail, isOwner }: StaffSidebarProps) {
   const pathname = usePathname()
   const [pinned, setPinned] = useState(false)
   const asideRef = useRef<HTMLElement>(null)
@@ -96,7 +101,7 @@ export function StaffSidebar({ userEmail }: StaffSidebarProps) {
       </div>
 
       <nav className="mt-6 flex flex-1 flex-col gap-1 px-2">
-        {NAV_LINKS.map((link) => {
+        {(isOwner ? [...NAV_LINKS, OWNER_NAV_LINK] : NAV_LINKS).map((link) => {
           const isActive = pathname === link.href
           const Icon = link.icon
           return (
