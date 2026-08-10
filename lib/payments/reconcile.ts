@@ -169,11 +169,20 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       .eq('id', pendingPayment.id)
       .select('id')
 
+    // Only a booking still `awaiting_down_payment` may be confirmed by a
+    // paid webhook — this is a conditional update (not a plain `.eq('id', ...)`),
+    // so a booking that has since moved to `cancelled` (or `completed`) is
+    // left untouched here: a late/replayed webhook can never resurrect it
+    // into `appointment_confirmed`. The payment row itself is still marked
+    // paid above regardless, since cancellation intentionally never touches
+    // `payments` (see cancelBookingAction in app/staff/(protected)/bookings/actions.ts) —
+    // only the booking-side transition and its emails are guarded.
     console.log('[payments] updating booking:', booking.id)
     const { error: updateBookingError, data: updatedBookings } = await supabaseAdmin
       .from('bookings')
       .update({ status: 'appointment_confirmed' })
       .eq('id', booking.id)
+      .eq('status', 'awaiting_down_payment')
       .select('id')
 
     if (updatePaymentError || updateBookingError) {
@@ -184,17 +193,26 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       )
       return { status: 500, body: { error: 'Failed to record payment.' } }
     }
-    if (!updatedPayments?.length || !updatedBookings?.length) {
+    if (!updatedPayments?.length) {
       console.error(
-        '[payments] update affected zero rows — payment rows:',
-        updatedPayments?.length ?? 0,
-        'booking rows:',
-        updatedBookings?.length ?? 0,
-        'paymentId:',
+        '[payments] payment update affected zero rows — paymentId:',
         pendingPayment.id,
         'bookingId:',
         booking.id,
       )
+    }
+
+    if (!updatedBookings?.length) {
+      // Not an error: the booking was not `awaiting_down_payment` (e.g. it
+      // was cancelled after this payment attempt started), so the guard
+      // correctly refused to confirm it. Skip the confirmation emails —
+      // they must only fire when this reconciliation actually moved the
+      // booking into `appointment_confirmed`.
+      console.log(
+        '[payments] booking not in awaiting_down_payment status; skipping confirmation and emails:',
+        booking.id,
+      )
+      return { status: 200, body: { received: true } }
     }
 
     console.log('[payments] sending email to:', booking.customer_email)
