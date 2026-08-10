@@ -24,10 +24,8 @@ export const siteConfig = {
   // address already put on every booking's appointment details, so it's
   // treated as confirmed. Hours sourced from the customer-facing booking
   // portal footer (components/booking/BookingFooter.tsx), shown to every
-  // customer today. Phone is still genuinely unconfirmed — the only
-  // number in the codebase (components/booking/EmergencyContact.tsx,
-  // "+63 917 000 0000") is an obvious placeholder, not a real line, so it
-  // stays null rather than publishing a fake number in SEO structured
+  // customer today. Phone is still genuinely unconfirmed, so it stays
+  // null rather than publishing a placeholder number in SEO structured
   // data.
   address: {
     '@type': 'PostalAddress',

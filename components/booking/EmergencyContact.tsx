@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { siteConfig } from '@/lib/site-config'
 
 const CONTACT_LINKS = [
-  { label: 'Studio Phone', value: '+63 917 000 0000', href: 'tel:+639170000000' },
   { label: 'Facebook', value: 'facebook.com/gorillaztattooart', href: siteConfig.social.facebook },
   { label: 'Instagram', value: 'instagram.com/gorillaztattooart', href: siteConfig.social.instagram },
   { label: 'Messenger', value: 'm.me/gorillaztattooart', href: siteConfig.social.facebook },
