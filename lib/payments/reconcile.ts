@@ -136,6 +136,8 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
     return { status: 200, body: { received: true } }
   }
 
+  console.log('[payments] metadata found, booking_token:', event.bookingToken)
+
   const supabaseAdmin = getSupabaseAdmin()
 
   const { data: booking, error: bookingError } = await supabaseAdmin
@@ -148,6 +150,7 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
     console.error('[payments] booking not found for token:', event.bookingToken, bookingError)
     return { status: 200, body: { received: true } }
   }
+  console.log('[payments] booking lookup success:', booking.id)
 
   const artistName = (booking.artists as unknown as { name: string } | null)?.name ?? 'Unknown artist'
 
@@ -156,17 +159,22 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
   if (!pendingPayment) {
     return { status: 200, body: { received: true } }
   }
+  console.log('[payments] payment lookup success:', pendingPayment.id)
 
   if (event.type === 'payment.paid') {
-    const { error: updatePaymentError } = await supabaseAdmin
+    console.log('[payments] updating payment:', pendingPayment.id)
+    const { error: updatePaymentError, data: updatedPayments } = await supabaseAdmin
       .from('payments')
       .update({ status: 'paid', method: event.paymentMethod, paid_at: new Date().toISOString() })
       .eq('id', pendingPayment.id)
+      .select('id')
 
-    const { error: updateBookingError } = await supabaseAdmin
+    console.log('[payments] updating booking:', booking.id)
+    const { error: updateBookingError, data: updatedBookings } = await supabaseAdmin
       .from('bookings')
       .update({ status: 'appointment_confirmed' })
       .eq('id', booking.id)
+      .select('id')
 
     if (updatePaymentError || updateBookingError) {
       console.error(
@@ -176,7 +184,20 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       )
       return { status: 500, body: { error: 'Failed to record payment.' } }
     }
+    if (!updatedPayments?.length || !updatedBookings?.length) {
+      console.error(
+        '[payments] update affected zero rows — payment rows:',
+        updatedPayments?.length ?? 0,
+        'booking rows:',
+        updatedBookings?.length ?? 0,
+        'paymentId:',
+        pendingPayment.id,
+        'bookingId:',
+        booking.id,
+      )
+    }
 
+    console.log('[payments] sending email to:', booking.customer_email)
     const baseUrl = await getBaseUrl()
     await sendPaymentReceiptEmail({
       to: booking.customer_email,
@@ -193,6 +214,7 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       amount: pendingPayment.amount,
       currency: pendingPayment.currency,
     })
+    console.log('[payments] finished, booking confirmed:', booking.id)
   } else {
     const { error: updatePaymentError } = await supabaseAdmin
       .from('payments')
