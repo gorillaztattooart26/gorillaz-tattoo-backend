@@ -308,6 +308,12 @@ export interface Database {
           down_payment_percent: number
           down_payment_amount: number
           remaining_balance: number
+          waiver_accepted: boolean
+          waiver_accepted_at: string | null
+          waiver_version: string | null
+          waiver_hash: string | null
+          waiver_ip: string | null
+          waiver_user_agent: string | null
           archived_at: string | null
           archived_by: string | null
           created_at: string
@@ -338,6 +344,12 @@ export interface Database {
           down_payment_percent: number
           down_payment_amount: number
           remaining_balance: number
+          waiver_accepted?: boolean
+          waiver_accepted_at?: string | null
+          waiver_version?: string | null
+          waiver_hash?: string | null
+          waiver_ip?: string | null
+          waiver_user_agent?: string | null
           archived_at?: string | null
           archived_by?: string | null
           created_at?: string
@@ -368,6 +380,12 @@ export interface Database {
           down_payment_percent?: number
           down_payment_amount?: number
           remaining_balance?: number
+          waiver_accepted?: boolean
+          waiver_accepted_at?: string | null
+          waiver_version?: string | null
+          waiver_hash?: string | null
+          waiver_ip?: string | null
+          waiver_user_agent?: string | null
           archived_at?: string | null
           archived_by?: string | null
           created_at?: string

@@ -59,6 +59,17 @@ export interface Payment {
   paidAt: string | null
 }
 
+/**
+ * Public-safe view of a booking's waiver acceptance — deliberately omits
+ * `waiver_ip` / `waiver_user_agent`, which are staff/owner-only (see
+ * lib/booking.ts's getBookingByToken, the only place this is constructed).
+ */
+export interface WaiverAcceptance {
+  accepted: boolean
+  version: string | null
+  acceptedAt: string | null
+}
+
 export type TimelineStepStatus = 'complete' | 'current' | 'upcoming'
 
 export interface TimelineStep {
@@ -80,6 +91,7 @@ export interface Booking {
   tattoo: Tattoo
   appointment: Appointment
   invoice: Invoice
+  waiver: WaiverAcceptance
   payment: Payment | null
   timeline: TimelineStep[]
   createdAt: string

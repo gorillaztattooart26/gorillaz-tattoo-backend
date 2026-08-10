@@ -6,15 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createCheckoutSessionAction } from '@/components/booking/payment-actions'
 import { RESERVATION_POLICY_SHORT } from '@/lib/policy'
 import type { Booking } from '@/types/booking-portal'
+import type { WaiverValue } from '@/components/booking/WaiverCard'
 
 const PAYMENT_METHODS = ['GCash', 'Maya', 'Visa', 'Mastercard']
 
 interface PaymentCardProps {
   booking: Pick<Booking, 'token' | 'bookingId'>
+  waiver: WaiverValue
   disabled: boolean
 }
 
-export function PaymentCard({ booking, disabled }: PaymentCardProps) {
+export function PaymentCard({ booking, waiver, disabled }: PaymentCardProps) {
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [payError, setPayError] = useState<string | null>(null)
 
@@ -22,7 +24,7 @@ export function PaymentCard({ booking, disabled }: PaymentCardProps) {
     setPayError(null)
     setIsRedirecting(true)
 
-    const result = await createCheckoutSessionAction(booking.token)
+    const result = await createCheckoutSessionAction(booking.token, waiver)
 
     if (!result.checkoutUrl) {
       setPayError(result.error ?? 'Something went wrong. Please try again.')

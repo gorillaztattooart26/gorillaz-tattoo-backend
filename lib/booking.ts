@@ -1,6 +1,20 @@
+import { createHash } from 'node:crypto'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { WAIVER_VERSION, WAIVER_TEXT } from '@/lib/policy'
 import type { Booking, BookingStatus, TimelineStep } from '@/types/booking-portal'
 import type { Artist } from '@/types/artist'
+
+/**
+ * SHA-256 of the canonical WAIVER_TEXT (lib/policy.ts) — deliberately not
+ * a hash of rendered HTML/JSX, so it stays deterministic across styling
+ * or markup changes and only moves when the actual waiver wording (and
+ * WAIVER_VERSION alongside it) changes. Server-only (node:crypto) and
+ * never accepts input — the server is the only party that computes this,
+ * never the client.
+ */
+export function computeWaiverHash(): string {
+  return createHash('sha256').update(WAIVER_TEXT, 'utf8').digest('hex')
+}
 
 function buildTimeline(status: BookingStatus, appointmentDate: string): TimelineStep[] {
   const today = new Date().toISOString().slice(0, 10)
@@ -70,6 +84,9 @@ interface BookingRpcRow {
   down_payment_percent: number
   down_payment_amount: number
   remaining_balance: number
+  waiver_accepted: boolean
+  waiver_accepted_at: string | null
+  waiver_version: string | null
   created_at: string
 }
 
@@ -177,6 +194,11 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
       downPaymentAmount: b.down_payment_amount,
       remainingBalance: b.remaining_balance,
     },
+    waiver: {
+      accepted: b.waiver_accepted,
+      version: b.waiver_version,
+      acceptedAt: b.waiver_accepted_at,
+    },
     payment: null,
     timeline: buildTimeline(b.status, b.appointment_date),
     createdAt: b.created_at,
@@ -203,6 +225,8 @@ export interface BookingRecord {
   downPaymentAmount: number
   currency: string
   customer: { name: string; email: string; mobile: string }
+  /** Whether waiver acceptance is already recorded for this booking — lets the checkout action skip re-validating/re-recording on a payment retry. */
+  waiverAccepted: boolean
 }
 
 /**
@@ -234,7 +258,52 @@ export async function getBookingRecordByToken(token: string): Promise<BookingRec
       email: b.customer_email,
       mobile: b.customer_mobile,
     },
+    waiverAccepted: b.waiver_accepted,
   }
+}
+
+export interface WaiverAcceptanceInput {
+  ip: string | null
+  userAgent: string | null
+}
+
+/**
+ * Records waiver acceptance on a booking, server-side, before any
+ * PayMongo checkout session is created (see createCheckoutSessionAction).
+ * Idempotent via `.eq('waiver_accepted', false)` — a retried payment
+ * attempt (booking already has an accepted waiver) is a no-op rather than
+ * overwriting the original acceptance timestamp/IP with a later one.
+ *
+ * Uses the service-role client because `anon` has no UPDATE grant on
+ * `bookings` (migration 20260805025944 revoked it, and no RLS UPDATE
+ * policy exists for `anon` either). Safe despite bypassing RLS: `bookingId`
+ * here is always the internal UUID already resolved by
+ * `getBookingRecordByToken()`, itself gated by the unguessable booking
+ * token — this call is scoped to exactly one row the caller has already
+ * proven it may act on, not an open table write.
+ */
+export async function recordWaiverAcceptance(
+  bookingId: string,
+  input: WaiverAcceptanceInput,
+): Promise<boolean> {
+  const { error } = await getSupabaseAdmin()
+    .from('bookings')
+    .update({
+      waiver_accepted: true,
+      waiver_accepted_at: new Date().toISOString(),
+      waiver_version: WAIVER_VERSION,
+      waiver_hash: computeWaiverHash(),
+      waiver_ip: input.ip,
+      waiver_user_agent: input.userAgent,
+    })
+    .eq('id', bookingId)
+    .eq('waiver_accepted', false)
+
+  if (error) {
+    console.error('[bookings] recordWaiverAcceptance failed:', error)
+    return false
+  }
+  return true
 }
 
 export interface LatestPaymentAttempt {

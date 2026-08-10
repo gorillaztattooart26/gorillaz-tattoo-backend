@@ -1,9 +1,10 @@
 'use server'
 
 import { supabase } from '@/lib/supabase'
-import { getBookingRecordByToken } from '@/lib/booking'
-import { getBaseUrl } from '@/lib/url'
+import { getBookingRecordByToken, recordWaiverAcceptance } from '@/lib/booking'
+import { getBaseUrl, getRequestMeta } from '@/lib/url'
 import { getActivePaymentProvider } from '@/lib/payments/service'
+import type { WaiverValue } from '@/components/booking/WaiverCard'
 
 export interface CreateCheckoutSessionActionResult {
   checkoutUrl?: string
@@ -15,9 +16,17 @@ export interface CreateCheckoutSessionActionResult {
  * booking and its down payment amount from the DB by token rather than
  * trusting anything passed from the client — a tampered client-supplied
  * amount should never be able to influence what's actually charged.
+ *
+ * `waiver` gets the same treatment: it's only ever read when the booking
+ * hasn't already recorded acceptance, and even then both booleans must
+ * independently be `true` or the request is rejected — before any waiver
+ * record or PayMongo checkout session is created. A client that disables
+ * the Pay button but still calls this action directly with
+ * `agreedToTerms: false` (or omits `waiver` entirely) cannot proceed.
  */
 export async function createCheckoutSessionAction(
   token: string,
+  waiver?: WaiverValue,
 ): Promise<CreateCheckoutSessionActionResult> {
   const booking = await getBookingRecordByToken(token)
 
@@ -27,6 +36,17 @@ export async function createCheckoutSessionAction(
 
   if (booking.status !== 'awaiting_down_payment') {
     return { error: 'This booking is not awaiting a down payment.' }
+  }
+
+  if (!booking.waiverAccepted) {
+    if (waiver?.agreedToTerms !== true || waiver?.consentToTattoo !== true) {
+      return { error: 'Please agree to both waiver items before continuing.' }
+    }
+
+    const recorded = await recordWaiverAcceptance(booking.id, await getRequestMeta())
+    if (!recorded) {
+      return { error: 'Something went wrong recording your waiver. Please try again.' }
+    }
   }
 
   const baseUrl = await getBaseUrl()

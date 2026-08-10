@@ -9,8 +9,12 @@ import type { Booking } from '@/types/booking-portal'
 
 const INITIAL_WAIVER: WaiverValue = { agreedToTerms: false, consentToTattoo: false }
 
+function formatAcceptedAt(iso: string): string {
+  return new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+}
+
 interface WaiverAndPaymentProps {
-  booking: Pick<Booking, 'token' | 'bookingId' | 'invoice' | 'status'>
+  booking: Pick<Booking, 'token' | 'bookingId' | 'invoice' | 'status' | 'waiver'>
 }
 
 /** Owns the waiver checkbox state so PaymentCard's button can be disabled until both are checked. */
@@ -32,6 +36,25 @@ export function WaiverAndPayment({ booking }: WaiverAndPaymentProps) {
               ? `This booking has been cancelled. ${RESERVATION_POLICY_TERMS[0]} Per studio policy, your reservation payment has been forfeited. Contact the studio if you believe this is a mistake.`
               : 'Your down payment has been received and your appointment slot is reserved. See the timeline below for what happens next.'}
           </p>
+
+          {booking.waiver.accepted && (
+            <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-t border-[var(--foreground)]/10 pt-4 text-xs text-[var(--foreground)]/50">
+              <dt>Accepted Waiver</dt>
+              <dd className="text-right">Yes</dd>
+              {booking.waiver.version && (
+                <>
+                  <dt>Version</dt>
+                  <dd className="text-right">{booking.waiver.version}</dd>
+                </>
+              )}
+              {booking.waiver.acceptedAt && (
+                <>
+                  <dt>Acceptance Date</dt>
+                  <dd className="text-right">{formatAcceptedAt(booking.waiver.acceptedAt)}</dd>
+                </>
+              )}
+            </dl>
+          )}
         </CardContent>
       </Card>
     )
@@ -40,7 +63,7 @@ export function WaiverAndPayment({ booking }: WaiverAndPaymentProps) {
   return (
     <div className="flex flex-col gap-6">
       <WaiverCard value={waiver} onChange={setWaiver} />
-      <PaymentCard booking={booking} disabled={!canPay} />
+      <PaymentCard booking={booking} waiver={waiver} disabled={!canPay} />
     </div>
   )
 }
