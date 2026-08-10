@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   ARTIST_OPTIONS,
   CONTACT_METHOD_OPTIONS,
@@ -8,6 +8,7 @@ import {
   STYLE_OPTIONS,
 } from '@/components/booking/options'
 import { submitInquiryAction } from '@/components/booking/actions'
+import { INQUIRY_HONEYPOT_FIELD } from '@/components/booking/schema'
 import { CtaPill } from '@/components/common/CtaPill'
 import { FieldGroup, SelectField, fieldClasses } from '@/components/common/FormField'
 import { ArtistWorkModal } from '@/components/portfolio/ArtistWorkModal'
@@ -42,6 +43,9 @@ export function InquireForm({ galleryItems }: { galleryItems: GalleryItem[] }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isWorkModalOpen, setIsWorkModalOpen] = useState(false)
+  // Honeypot — invisible to real visitors, so it stays empty for them; a
+  // populated value signals an automated submission (see actions.ts).
+  const honeypotRef = useRef<HTMLInputElement>(null)
 
   const hasChosenArtist = form.artist !== ARTIST_OPTIONS[0]
   const selectedArtistItems = useMemo(() => {
@@ -69,6 +73,7 @@ export function InquireForm({ galleryItems }: { galleryItems: GalleryItem[] }) {
     if (referenceFiles) {
       Array.from(referenceFiles).forEach((file) => formData.append('referenceImages', file))
     }
+    formData.append(INQUIRY_HONEYPOT_FIELD, honeypotRef.current?.value ?? '')
 
     const result = await submitInquiryAction(formData)
     // On success the action redirects and this component unmounts, so
@@ -82,6 +87,22 @@ export function InquireForm({ galleryItems }: { galleryItems: GalleryItem[] }) {
   return (
     <>
     <form onSubmit={handleSubmit} aria-label="Tattoo inquiry form" className="reveal flex flex-col gap-6 md:gap-8">
+      {/* Honeypot — visually hidden off-screen (not display:none, which
+          some bots detect and skip), never focusable/announced. Real
+          visitors never see or fill this; the actual security check
+          happens server-side in actions.ts regardless. */}
+      <div className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden opacity-0" aria-hidden="true">
+        <label htmlFor={INQUIRY_HONEYPOT_FIELD}>Leave this field blank</label>
+        <input
+          ref={honeypotRef}
+          type="text"
+          id={INQUIRY_HONEYPOT_FIELD}
+          name={INQUIRY_HONEYPOT_FIELD}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         <FieldGroup label="01 — Who you are">
           <input

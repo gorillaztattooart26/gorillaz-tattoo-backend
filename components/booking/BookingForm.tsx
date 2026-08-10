@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { CtaPill } from '@/components/common/CtaPill'
 import { FieldGroup, SelectField, fieldClasses } from '@/components/common/FormField'
 import {
@@ -10,6 +10,7 @@ import {
   STYLE_OPTIONS,
 } from '@/components/booking/options'
 import { submitInquiryAction } from '@/components/booking/actions'
+import { INQUIRY_HONEYPOT_FIELD } from '@/components/booking/schema'
 import type { BookingFormValues } from '@/types/booking'
 import { cn } from '@/utils/cn'
 
@@ -39,6 +40,9 @@ export function BookingForm() {
   const [referenceFiles, setReferenceFiles] = useState<FileList | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  // Honeypot — invisible to real visitors, so it stays empty for them; a
+  // populated value signals an automated submission (see actions.ts).
+  const honeypotRef = useRef<HTMLInputElement>(null)
 
   const update =
     (key: keyof BookingFormValues) =>
@@ -59,6 +63,7 @@ export function BookingForm() {
     if (referenceFiles) {
       Array.from(referenceFiles).forEach((file) => formData.append('referenceImages', file))
     }
+    formData.append(INQUIRY_HONEYPOT_FIELD, honeypotRef.current?.value ?? '')
 
     const result = await submitInquiryAction(formData)
     // On success the action redirects and this component unmounts, so
@@ -75,6 +80,22 @@ export function BookingForm() {
       aria-label="Tattoo inquiry form"
       className="reveal lg:col-span-2 flex flex-col gap-4"
     >
+      {/* Honeypot — visually hidden off-screen (not display:none, which
+          some bots detect and skip), never focusable/announced. Real
+          visitors never see or fill this; the actual security check
+          happens server-side in actions.ts regardless. */}
+      <div className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden opacity-0" aria-hidden="true">
+        <label htmlFor={`${INQUIRY_HONEYPOT_FIELD}-booking`}>Leave this field blank</label>
+        <input
+          ref={honeypotRef}
+          type="text"
+          id={`${INQUIRY_HONEYPOT_FIELD}-booking`}
+          name={INQUIRY_HONEYPOT_FIELD}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="01 — Who you are">
           <input

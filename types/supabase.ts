@@ -534,6 +534,10 @@ export interface Database {
         Args: { p_months: number }
         Returns: number
       }
+      check_and_increment_rate_limit: {
+        Args: { p_key: string; p_window_seconds: number; p_max_attempts: number }
+        Returns: boolean
+      }
     }
   }
 }
