@@ -8,6 +8,8 @@ import { RecordArchiveControls } from '@/components/staff/RecordArchiveControls'
 import { BulkActionBar } from '@/components/staff/BulkActionBar'
 import { useRowSelection } from '@/hooks/useRowSelection'
 import { formatCurrency, formatDate } from '@/lib/staff/format'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 import type { StaffBooking } from '@/lib/staff/bookings'
 import {
   archiveBookingAction,
@@ -25,6 +27,30 @@ interface BookingsDataTableProps {
   view: 'active' | 'archived'
 }
 
+/** Mirrors formatAcceptedAt in components/booking/WaiverAndPayment.tsx — same date/time convention shown to the customer. */
+function formatWaiverAcceptedAt(iso: string): string {
+  return new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+}
+
+/** Reuses StatusBadge's pill styling (emerald = confirmed, amber = needs action) since waiver status isn't a booking `status` value. */
+function WaiverStatusBadge({ accepted, acceptedAt }: { accepted: boolean; acceptedAt: string | null }) {
+  if (accepted) {
+    return (
+      <div className="flex flex-col items-start gap-1">
+        <Badge className={cn('rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide', 'bg-emerald-500/15 text-emerald-300')}>
+          Waiver Signed
+        </Badge>
+        {acceptedAt && <span className="text-xs text-[var(--foreground)]/40">{formatWaiverAcceptedAt(acceptedAt)}</span>}
+      </div>
+    )
+  }
+  return (
+    <Badge className={cn('rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide', 'bg-amber-500/15 text-amber-300')}>
+      Waiver Pending
+    </Badge>
+  )
+}
+
 /**
  * Table body for the Bookings tab — extracted from page.tsx into a Client
  * Component so the bulk-select checkboxes and per-row Archive/Restore/
@@ -37,7 +63,7 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
   const ids = bookings.map((b) => b.id)
   const selection = useRowSelection(ids)
 
-  const columnCount = isOwner ? 9 : 8
+  const columnCount = isOwner ? 10 : 9
 
   return (
     <div>
@@ -69,6 +95,7 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
               <th scope="col" className="px-5 py-3 font-medium">Customer</th>
               <th scope="col" className="px-5 py-3 font-medium">Artist</th>
               <th scope="col" className="px-5 py-3 font-medium">Status</th>
+              <th scope="col" className="px-5 py-3 font-medium">Waiver</th>
               <th scope="col" className="px-5 py-3 font-medium">Appointment</th>
               <th scope="col" className="px-5 py-3 font-medium">Price</th>
               <th scope="col" className="px-5 py-3 font-medium">Down Payment</th>
@@ -102,6 +129,9 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
                 <td className="px-5 py-4 capitalize text-[var(--foreground)]/70">{booking.artistName}</td>
                 <td className="px-5 py-4">
                   <StatusBadge status={booking.status} />
+                </td>
+                <td className="px-5 py-4">
+                  <WaiverStatusBadge accepted={booking.waiverAccepted} acceptedAt={booking.waiverAcceptedAt} />
                 </td>
                 <td className="px-5 py-4 text-[var(--foreground)]/70">
                   {formatDate(booking.appointmentDate)}

@@ -18,6 +18,8 @@ export interface StaffBooking {
   currency: string
   createdAt: string
   archivedAt: string | null
+  waiverAccepted: boolean
+  waiverAcceptedAt: string | null
 }
 
 /** Which slice of a table to fetch — mirrors the Archived-view tab added to Bookings/Inquiries/Payments. */
@@ -52,6 +54,8 @@ function mapBooking(row: BookingWithArtistRow): StaffBooking {
     currency: row.currency,
     createdAt: row.created_at,
     archivedAt: row.archived_at,
+    waiverAccepted: row.waiver_accepted,
+    waiverAcceptedAt: row.waiver_accepted_at,
   }
 }
 
