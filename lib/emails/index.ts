@@ -28,8 +28,8 @@ export async function sendBookingConfirmationEmail(params: {
   appointmentDate: string
   appointmentTime: string
 }): Promise<void> {
-  const { subject, html } = bookingConfirmationTemplate(params)
-  await sendEmail({ to: params.to, subject, html })
+  const { subject, html, text } = bookingConfirmationTemplate(params)
+  await sendEmail({ to: params.to, subject, html, text })
 }
 
 export async function sendPaymentReceiptEmail(params: {

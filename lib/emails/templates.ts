@@ -3,6 +3,8 @@ import { RESERVATION_POLICY_TERMS } from '@/lib/policy'
 export interface EmailContent {
   subject: string
   html: string
+  /** Optional plain-text alternative — see lib/emails/send.ts. */
+  text?: string
 }
 
 const ACCENT = '#fabb42'
@@ -93,6 +95,19 @@ export function bookingConfirmationTemplate(params: {
       ${button('View Your Booking', params.bookingUrl)}
       <p style="margin-top:24px;color:#71717a;font-size:13px;">Booking reference: ${escapeHtml(params.bookingId)}</p>
     `),
+    text: [
+      `Hi ${params.customerName},`,
+      '',
+      `Your consultation has been approved and a booking has been created for you with ${params.artistName}, tentatively scheduled for ${params.appointmentDate} at ${params.appointmentTime}.`,
+      '',
+      'To confirm your appointment, review your booking details and complete the required down payment using the link below.',
+      '',
+      `View your booking: ${params.bookingUrl}`,
+      '',
+      `Booking reference: ${params.bookingId}`,
+      '',
+      "Gorillaz Tattoo Art — this is an automated message, please don't reply directly to this email.",
+    ].join('\n'),
   }
 }
 
