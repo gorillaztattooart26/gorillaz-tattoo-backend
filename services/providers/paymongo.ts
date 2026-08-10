@@ -22,7 +22,7 @@ interface PaymongoWebhookEvent {
       type?: string
       data?: {
         attributes?: {
-          metadata?: { booking_token?: string }
+          metadata?: { booking_token?: string; payment_attempt_id?: string }
           source?: { type?: string } | null
         }
       }
@@ -78,6 +78,7 @@ export class PayMongoProvider implements PaymentProvider {
             },
             metadata: {
               booking_token: params.bookingToken,
+              payment_attempt_id: params.paymentAttemptId,
             },
           },
         },
@@ -147,12 +148,19 @@ export class PayMongoProvider implements PaymentProvider {
 
   /**
    * Reduces PayMongo's webhook payload to the normalized shape reconciliation
-   * logic needs. Reconciliation is via `metadata.booking_token`, set on the
-   * checkout session at creation time — PayMongo's webhook event for a
-   * Checkout-Session-originated payment carries the underlying Payment
-   * resource (a `pay_...` id, distinct from the `cs_...` checkout session id
+   * logic needs. `metadata.booking_token` identifies which booking the event
+   * belongs to — PayMongo's webhook event for a Checkout-Session-originated
+   * payment carries the underlying Payment resource (a `pay_...` id,
+   * distinct from the `cs_...` checkout session id
    * `payments.checkout_session_id` was seeded with), not the checkout
    * session itself, so matching on the session id directly isn't possible.
+   *
+   * `metadata.payment_attempt_id` identifies which *attempt* on that
+   * booking: PayMongo copies a checkout session's metadata onto the
+   * resulting Payment resource unchanged, so the id createCheckoutSession
+   * embedded (params.paymentAttemptId) round-trips back here exactly,
+   * letting reconciliation match the one payment row that generated this
+   * event instead of guessing among a booking's pending payments.
    */
   parseWebhookEvent(rawBody: string): NormalizedPaymentEvent {
     const event: PaymongoWebhookEvent = JSON.parse(rawBody)
@@ -167,6 +175,7 @@ export class PayMongoProvider implements PaymentProvider {
     return {
       type,
       bookingToken: payment?.attributes?.metadata?.booking_token ?? null,
+      paymentAttemptId: payment?.attributes?.metadata?.payment_attempt_id ?? null,
       paymentMethod: payment?.attributes?.source?.type ?? null,
       providerEventId: event?.data?.id ?? null,
     }

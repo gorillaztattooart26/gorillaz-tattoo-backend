@@ -1,4 +1,6 @@
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { NormalizedPaymentEvent } from '@/types/payment'
+import type { Database } from '@/types/supabase'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getBaseUrl } from '@/lib/url'
 import { sendPaymentReceiptEmail, sendStaffPaymentReceivedNotification } from '@/lib/emails'
@@ -6,6 +8,105 @@ import { sendPaymentReceiptEmail, sendStaffPaymentReceivedNotification } from '@
 export interface ReconcileResult {
   status: number
   body: Record<string, unknown>
+}
+
+interface PendingPayment {
+  id: string
+  amount: number
+  currency: string
+}
+
+/**
+ * Resolves the exact `payments` row a webhook event belongs to.
+ *
+ * Previous behavior: always picked whichever pending payment for the
+ * booking had the newest `created_at` (`ORDER BY created_at DESC LIMIT 1`).
+ * That's only correct when a booking has at most one pending payment at a
+ * time — false the moment a customer double-clicks Pay, abandons a
+ * checkout and retries from the Payment Failed page, or otherwise ends up
+ * with two payment attempts pending at once. In that case the webhook for
+ * attempt A could be reconciled against attempt B's row, marking the wrong
+ * attempt paid (or failed).
+ *
+ * New behavior: every checkout session is created with a server-generated
+ * `paymentAttemptId` embedded in the provider's metadata (see
+ * components/booking/payment-actions.ts) and used as that attempt's
+ * `payments.id` primary key. The webhook event for that attempt carries
+ * the same id back (`event.paymentAttemptId`), so this matches on an exact
+ * primary key instead of guessing — the row is the one the provider is
+ * literally telling us it's reconciling, not the one we assume is "most
+ * recent". `.eq('status', 'pending')` is also kept as an idempotency guard
+ * against duplicate webhook deliveries: once a row leaves `pending`, a
+ * replayed event for it no longer matches and becomes a no-op.
+ *
+ * Falls back to the old lookup only for attempts started before
+ * `paymentAttemptId` existed (in-flight checkout sessions at deploy time),
+ * and only when it's genuinely unambiguous — exactly one pending payment
+ * for the booking. If more than one pending payment exists and the event
+ * carries no attempt id, this refuses to guess and logs for manual
+ * reconciliation instead of risking a wrong match.
+ */
+async function findPendingPayment(
+  supabaseAdmin: SupabaseClient<Database>,
+  bookingId: string,
+  paymentAttemptId: string | null,
+): Promise<PendingPayment | null> {
+  if (paymentAttemptId) {
+    const { data, error } = await supabaseAdmin
+      .from('payments')
+      .select('id, amount, currency')
+      .eq('id', paymentAttemptId)
+      .eq('booking_id', bookingId)
+      .eq('status', 'pending')
+      .maybeSingle()
+
+    if (error) {
+      console.error(
+        '[payments] pending payment lookup by attempt id failed:',
+        bookingId,
+        paymentAttemptId,
+        error,
+      )
+      return null
+    }
+    if (!data) {
+      console.error(
+        '[payments] no pending payment row for attempt id:',
+        paymentAttemptId,
+        'booking:',
+        bookingId,
+      )
+      return null
+    }
+    return data
+  }
+
+  // Legacy fallback: event predates paymentAttemptId (e.g. a checkout
+  // session created before this field was added). Only safe to proceed
+  // when there is exactly one pending payment to attribute the event to.
+  const { data, error } = await supabaseAdmin
+    .from('payments')
+    .select('id, amount, currency')
+    .eq('booking_id', bookingId)
+    .eq('status', 'pending')
+
+  if (error) {
+    console.error('[payments] pending payments lookup failed:', bookingId, error)
+    return null
+  }
+  if (!data || data.length === 0) {
+    console.error('[payments] no pending payment row for booking:', bookingId)
+    return null
+  }
+  if (data.length > 1) {
+    console.error(
+      '[payments] multiple pending payments for booking and event carries no attempt id; refusing to guess:',
+      bookingId,
+      data.map((row) => row.id),
+    )
+    return null
+  }
+  return data[0]
 }
 
 /**
@@ -50,21 +151,9 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
 
   const artistName = (booking.artists as unknown as { name: string } | null)?.name ?? 'Unknown artist'
 
-  const { data: pendingPayment, error: paymentLookupError } = await supabaseAdmin
-    .from('payments')
-    .select('id, amount, currency')
-    .eq('booking_id', booking.id)
-    .eq('status', 'pending')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  const pendingPayment = await findPendingPayment(supabaseAdmin, booking.id, event.paymentAttemptId)
 
-  if (paymentLookupError || !pendingPayment) {
-    console.error(
-      '[payments] no pending payment row for booking:',
-      booking.id,
-      paymentLookupError,
-    )
+  if (!pendingPayment) {
     return { status: 200, body: { received: true } }
   }
 

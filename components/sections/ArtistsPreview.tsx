@@ -224,45 +224,55 @@ export function ArtistsPreview({ artists }: ArtistsPreviewProps) {
   )
 
   // Layered over the photo instead of sitting in the bio card, since this
-  // design's photo is full-bleed rather than a bounded card.
-  const socialLinks = (
+  // design's photo is full-bleed rather than a bounded card. Each icon is
+  // independently optional — an artist's instagram/facebook URL can be
+  // empty (lib/artists.ts defaults a missing DB value to ''), and an empty
+  // href would render a dead/broken-looking icon rather than just omitting
+  // it.
+  const hasInstagram = Boolean(artist.instagram)
+  const hasFacebook = Boolean(artist.facebook)
+  const socialLinks = (hasInstagram || hasFacebook) && (
     <div className="flex items-center gap-2.5">
-      <motion.a
-        key={`ig-${index}`}
-        href={artist.instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${artist.name} on instagram`}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white/80 backdrop-blur transition-colors hover:border-white/50 hover:text-white"
-        initial={reduceMotion ? false : 'hidden'}
-        animate={inView ? 'visible' : 'hidden'}
-        variants={socialIconVariants}
-        transition={{
-          duration: reduceMotion ? 0 : SOCIAL_DURATION,
-          delay: reduceMotion ? 0 : SOCIAL_BASE_DELAY,
-          ease: EASE_OUT,
-        }}
-      >
-        <InstagramIcon />
-      </motion.a>
-      <motion.a
-        key={`fb-${index}`}
-        href={artist.facebook}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${artist.name} on facebook`}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white/80 backdrop-blur transition-colors hover:border-white/50 hover:text-white"
-        initial={reduceMotion ? false : 'hidden'}
-        animate={inView ? 'visible' : 'hidden'}
-        variants={socialIconVariants}
-        transition={{
-          duration: reduceMotion ? 0 : SOCIAL_DURATION,
-          delay: reduceMotion ? 0 : SOCIAL_BASE_DELAY + SOCIAL_STAGGER,
-          ease: EASE_OUT,
-        }}
-      >
-        <FacebookIcon />
-      </motion.a>
+      {hasInstagram && (
+        <motion.a
+          key={`ig-${index}`}
+          href={artist.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${artist.name} on instagram`}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white/80 backdrop-blur transition-colors hover:border-white/50 hover:text-white"
+          initial={reduceMotion ? false : 'hidden'}
+          animate={inView ? 'visible' : 'hidden'}
+          variants={socialIconVariants}
+          transition={{
+            duration: reduceMotion ? 0 : SOCIAL_DURATION,
+            delay: reduceMotion ? 0 : SOCIAL_BASE_DELAY,
+            ease: EASE_OUT,
+          }}
+        >
+          <InstagramIcon />
+        </motion.a>
+      )}
+      {hasFacebook && (
+        <motion.a
+          key={`fb-${index}`}
+          href={artist.facebook}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${artist.name} on facebook`}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white/80 backdrop-blur transition-colors hover:border-white/50 hover:text-white"
+          initial={reduceMotion ? false : 'hidden'}
+          animate={inView ? 'visible' : 'hidden'}
+          variants={socialIconVariants}
+          transition={{
+            duration: reduceMotion ? 0 : SOCIAL_DURATION,
+            delay: reduceMotion ? 0 : SOCIAL_BASE_DELAY + SOCIAL_STAGGER,
+            ease: EASE_OUT,
+          }}
+        >
+          <FacebookIcon />
+        </motion.a>
+      )}
     </div>
   )
 

@@ -8,6 +8,7 @@ import { createBookingSchema, type CreateBookingValues } from '@/app/staff/creat
 import { getBaseUrl } from '@/lib/url'
 import { sendBookingConfirmationEmail } from '@/lib/emails'
 import { checkBookingConflict } from '@/lib/staff/booking-availability'
+import { getCurrentStaffArtist } from '@/lib/staff/artists'
 import type { Database } from '@/types/supabase'
 
 const DEFAULT_REFERENCE_IMAGES = [
@@ -119,8 +120,22 @@ async function copyInquiryReferenceImages(
  * Reference images fall back to a couple of sample photos when there's
  * no source inquiry (or it had none of its own) — real upload UI still
  * isn't wired to storage for a from-scratch booking.
+ *
+ * Explicitly checks for a logged-in staff account before doing anything
+ * else — this is the one write in the staff area that previously relied
+ * entirely on the /staff/create-booking middleware gate and the
+ * `bookings` INSERT RLS policy (authenticated-only, see migration
+ * 20260808150000) rather than also checking in code, unlike every other
+ * privileged Server Action in the app (see e.g. updateArtistProfileAction,
+ * createGalleryItemAction). Same `getCurrentStaffArtist()` helper those
+ * use, not a new check.
  */
 export async function createBookingAction(values: CreateBookingValues): Promise<CreateBookingActionResult> {
+  const staffArtist = await getCurrentStaffArtist()
+  if (!staffArtist) {
+    return { error: "Your account isn't linked to an artist yet — ask the studio owner to link it." }
+  }
+
   const parsed = createBookingSchema.parse(values)
 
   const { data: artist, error: artistError } = await supabase

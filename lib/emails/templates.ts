@@ -8,6 +8,23 @@ export interface EmailContent {
 const ACCENT = '#fabb42'
 
 /**
+ * Every template below builds its HTML with plain string interpolation
+ * (no JSX, so no automatic escaping) — every value that ultimately comes
+ * from a customer or staff-entered field (name, message, artist name,
+ * etc.) must be passed through this before being placed in the markup,
+ * whether in text content or an attribute like `href`. Only the static
+ * markup/labels the templates themselves author are exempt.
+ */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+/**
  * Shared wrapper for every outgoing email. Deliberately plain, light-mode,
  * inline-styled HTML rather than trying to reuse the site's dark theme —
  * most email clients strip <style> blocks and render dark backgrounds
@@ -38,9 +55,10 @@ function emailShell(bodyHtml: string): string {
   `
 }
 
+/** `label` is always a code-authored literal from a call site below, not user input — only `url` needs escaping. */
 function button(label: string, url: string): string {
   return `
-    <a href="${url}" style="display:inline-block;margin-top:24px;padding:14px 28px;background-color:${ACCENT};color:#000000;font-weight:700;font-size:14px;text-decoration:none;border-radius:999px;">
+    <a href="${escapeHtml(url)}" style="display:inline-block;margin-top:24px;padding:14px 28px;background-color:${ACCENT};color:#000000;font-weight:700;font-size:14px;text-decoration:none;border-radius:999px;">
       ${label}
     </a>
   `
@@ -50,7 +68,7 @@ export function inquiryConfirmationTemplate(params: { fullName: string }): Email
   return {
     subject: 'We received your inquiry — Gorillaz Tattoo Art',
     html: emailShell(`
-      <p>Hi ${params.fullName},</p>
+      <p>Hi ${escapeHtml(params.fullName)},</p>
       <p>Thanks for reaching out to Gorillaz Tattoo Art. We've received your inquiry and one of our artists will review it and get back to you soon.</p>
       <p>If your idea needs a consultation, we'll reach out using the contact method you selected to set that up.</p>
       <p>Talk soon,<br />Gorillaz Tattoo Art</p>
@@ -69,11 +87,11 @@ export function bookingConfirmationTemplate(params: {
   return {
     subject: `Your booking is set — ${params.bookingId}`,
     html: emailShell(`
-      <p>Hi ${params.customerName},</p>
-      <p>Your consultation has been approved and a booking has been created for you with <strong>${params.artistName}</strong>, tentatively scheduled for <strong>${params.appointmentDate} at ${params.appointmentTime}</strong>.</p>
+      <p>Hi ${escapeHtml(params.customerName)},</p>
+      <p>Your consultation has been approved and a booking has been created for you with <strong>${escapeHtml(params.artistName)}</strong>, tentatively scheduled for <strong>${escapeHtml(params.appointmentDate)} at ${escapeHtml(params.appointmentTime)}</strong>.</p>
       <p>To confirm your appointment, review your booking details and complete the required down payment using the link below.</p>
       ${button('View Your Booking', params.bookingUrl)}
-      <p style="margin-top:24px;color:#71717a;font-size:13px;">Booking reference: ${params.bookingId}</p>
+      <p style="margin-top:24px;color:#71717a;font-size:13px;">Booking reference: ${escapeHtml(params.bookingId)}</p>
     `),
   }
 }
@@ -94,8 +112,8 @@ export function paymentReceiptTemplate(params: {
   return {
     subject: `Payment received — booking ${params.bookingId} confirmed`,
     html: emailShell(`
-      <p>Hi ${params.customerName},</p>
-      <p>We've received your down payment of <strong>${formattedAmount}</strong> for booking <strong>${params.bookingId}</strong>. Your appointment slot is now confirmed.</p>
+      <p>Hi ${escapeHtml(params.customerName)},</p>
+      <p>We've received your down payment of <strong>${formattedAmount}</strong> for booking <strong>${escapeHtml(params.bookingId)}</strong>. Your appointment slot is now confirmed.</p>
       <p>The remaining balance will be paid at the studio after your tattoo session.</p>
       ${button('View Your Booking', params.bookingUrl)}
     `),
@@ -116,15 +134,15 @@ export function staffNewInquiryTemplate(params: {
     html: emailShell(`
       <p>A new inquiry just came in through the website.</p>
       <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
-        <tr><td style="padding:6px 0;color:#71717a;">Name</td><td style="padding:6px 0;">${params.fullName}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Email</td><td style="padding:6px 0;">${params.email}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Phone</td><td style="padding:6px 0;">${params.phone}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Preferred artist</td><td style="padding:6px 0;">${params.preferredArtist}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Style</td><td style="padding:6px 0;">${params.style}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Placement</td><td style="padding:6px 0;">${params.placement}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Name</td><td style="padding:6px 0;">${escapeHtml(params.fullName)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Email</td><td style="padding:6px 0;">${escapeHtml(params.email)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Phone</td><td style="padding:6px 0;">${escapeHtml(params.phone)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Preferred artist</td><td style="padding:6px 0;">${escapeHtml(params.preferredArtist)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Style</td><td style="padding:6px 0;">${escapeHtml(params.style)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Placement</td><td style="padding:6px 0;">${escapeHtml(params.placement)}</td></tr>
       </table>
       <p style="margin-top:16px;color:#71717a;">Idea:</p>
-      <p>${params.message}</p>
+      <p>${escapeHtml(params.message)}</p>
     `),
   }
 }
@@ -145,10 +163,10 @@ export function staffPaymentReceivedTemplate(params: {
   return {
     subject: `Payment received — ${params.bookingId}`,
     html: emailShell(`
-      <p>${params.customerName} just paid the down payment for booking <strong>${params.bookingId}</strong> with <strong>${params.artistName}</strong>.</p>
+      <p>${escapeHtml(params.customerName)} just paid the down payment for booking <strong>${escapeHtml(params.bookingId)}</strong> with <strong>${escapeHtml(params.artistName)}</strong>.</p>
       <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
         <tr><td style="padding:6px 0;color:#71717a;">Amount</td><td style="padding:6px 0;">${formattedAmount}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Artist</td><td style="padding:6px 0;">${params.artistName}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Artist</td><td style="padding:6px 0;">${escapeHtml(params.artistName)}</td></tr>
       </table>
       <p style="margin-top:16px;color:#71717a;">The appointment is now confirmed.</p>
     `),
@@ -166,10 +184,10 @@ export function staffBookingCancelledTemplate(params: {
   return {
     subject: `Booking cancelled — ${params.bookingId}`,
     html: emailShell(`
-      <p>Booking <strong>${params.bookingId}</strong> for <strong>${params.customerName}</strong> with <strong>${params.artistName}</strong> was just cancelled.</p>
+      <p>Booking <strong>${escapeHtml(params.bookingId)}</strong> for <strong>${escapeHtml(params.customerName)}</strong> with <strong>${escapeHtml(params.artistName)}</strong> was just cancelled.</p>
       <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
-        <tr><td style="padding:6px 0;color:#71717a;">Was scheduled for</td><td style="padding:6px 0;">${params.appointmentDate} at ${params.appointmentTime}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Cancelled by</td><td style="padding:6px 0;">${params.cancelledBy}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Was scheduled for</td><td style="padding:6px 0;">${escapeHtml(params.appointmentDate)} at ${escapeHtml(params.appointmentTime)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Cancelled by</td><td style="padding:6px 0;">${escapeHtml(params.cancelledBy)}</td></tr>
       </table>
     `),
   }
@@ -188,11 +206,11 @@ export function staffBookingRescheduledTemplate(params: {
   return {
     subject: `Booking rescheduled — ${params.bookingId}`,
     html: emailShell(`
-      <p>Booking <strong>${params.bookingId}</strong> for <strong>${params.customerName}</strong> with <strong>${params.artistName}</strong> was just rescheduled.</p>
+      <p>Booking <strong>${escapeHtml(params.bookingId)}</strong> for <strong>${escapeHtml(params.customerName)}</strong> with <strong>${escapeHtml(params.artistName)}</strong> was just rescheduled.</p>
       <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
-        <tr><td style="padding:6px 0;color:#71717a;">Was</td><td style="padding:6px 0;">${params.oldDate} at ${params.oldTime}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Now</td><td style="padding:6px 0;">${params.newDate} at ${params.newTime}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Rescheduled by</td><td style="padding:6px 0;">${params.rescheduledBy}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Was</td><td style="padding:6px 0;">${escapeHtml(params.oldDate)} at ${escapeHtml(params.oldTime)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Now</td><td style="padding:6px 0;">${escapeHtml(params.newDate)} at ${escapeHtml(params.newTime)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Rescheduled by</td><td style="padding:6px 0;">${escapeHtml(params.rescheduledBy)}</td></tr>
       </table>
     `),
   }
@@ -208,8 +226,8 @@ export function customerBookingCancelledTemplate(params: {
   return {
     subject: `Your booking has been cancelled — ${params.bookingId}`,
     html: emailShell(`
-      <p>Hi ${params.customerName},</p>
-      <p>Your booking <strong>${params.bookingId}</strong> with <strong>${params.artistName}</strong>, previously scheduled for <strong>${params.appointmentDate} at ${params.appointmentTime}</strong>, has been cancelled.</p>
+      <p>Hi ${escapeHtml(params.customerName)},</p>
+      <p>Your booking <strong>${escapeHtml(params.bookingId)}</strong> with <strong>${escapeHtml(params.artistName)}</strong>, previously scheduled for <strong>${escapeHtml(params.appointmentDate)} at ${escapeHtml(params.appointmentTime)}</strong>, has been cancelled.</p>
       <p style="margin-top:16px;color:#71717a;font-size:13px;">${RESERVATION_POLICY_TERMS[0]} Per studio policy, your reservation payment has been forfeited.</p>
       <p style="margin-top:16px;">If you believe this is a mistake, or you'd like to book a new appointment, please contact the studio.</p>
     `),
@@ -229,11 +247,11 @@ export function customerBookingRescheduledTemplate(params: {
   return {
     subject: `Your booking has been rescheduled — ${params.bookingId}`,
     html: emailShell(`
-      <p>Hi ${params.customerName},</p>
-      <p>Your booking <strong>${params.bookingId}</strong> with <strong>${params.artistName}</strong> has been rescheduled.</p>
+      <p>Hi ${escapeHtml(params.customerName)},</p>
+      <p>Your booking <strong>${escapeHtml(params.bookingId)}</strong> with <strong>${escapeHtml(params.artistName)}</strong> has been rescheduled.</p>
       <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
-        <tr><td style="padding:6px 0;color:#71717a;">Was</td><td style="padding:6px 0;">${params.oldDate} at ${params.oldTime}</td></tr>
-        <tr><td style="padding:6px 0;color:#71717a;">Now</td><td style="padding:6px 0;">${params.newDate} at ${params.newTime}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Was</td><td style="padding:6px 0;">${escapeHtml(params.oldDate)} at ${escapeHtml(params.oldTime)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Now</td><td style="padding:6px 0;">${escapeHtml(params.newDate)} at ${escapeHtml(params.newTime)}</td></tr>
       </table>
       <p style="margin-top:16px;color:#71717a;font-size:13px;">${RESERVATION_POLICY_TERMS[2]}</p>
       ${button('View Your Booking', params.bookingUrl)}

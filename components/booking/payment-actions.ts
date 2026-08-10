@@ -52,11 +52,20 @@ export async function createCheckoutSessionAction(
   const baseUrl = await getBaseUrl()
   const provider = getActivePaymentProvider()
 
+  // Generated up front (not left to the DB default) so it can be embedded
+  // in the checkout session's metadata below — the provider echoes it back
+  // on the resulting webhook event, letting reconciliation match this exact
+  // attempt instead of guessing among a booking's pending payments if more
+  // than one exists (retries, abandoned checkouts, double-clicks). See
+  // lib/payments/reconcile.ts.
+  const paymentAttemptId = crypto.randomUUID()
+
   let session
   try {
     session = await provider.createCheckoutSession({
       bookingToken: token,
       bookingId: booking.bookingId,
+      paymentAttemptId,
       amount: booking.downPaymentAmount,
       currency: booking.currency,
       description: `Down payment for booking ${booking.bookingId}`,
@@ -77,6 +86,7 @@ export async function createCheckoutSessionAction(
   }
 
   const { error: insertError } = await supabase.from('payments').insert({
+    id: paymentAttemptId,
     booking_id: booking.id,
     checkout_session_id: session.id,
     provider: provider.name,

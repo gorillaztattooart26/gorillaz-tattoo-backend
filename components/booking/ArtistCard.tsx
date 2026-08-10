@@ -27,15 +27,17 @@ export function ArtistCard({ artist }: { artist: Artist }) {
             {artist.specialty} · {artist.years} experience
           </p>
           <p className="mt-4 text-sm leading-relaxed text-[var(--foreground)]/70">{artist.bio}</p>
-          <a
-            href={artist.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--foreground)]/20 px-4 py-2 text-xs font-semibold text-[var(--foreground)]/80 transition-colors hover:border-[var(--foreground)]/40 hover:text-[var(--foreground)]"
-          >
-            <InstagramIcon className="h-4 w-4" />
-            Instagram
-          </a>
+          {artist.instagram && (
+            <a
+              href={artist.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--foreground)]/20 px-4 py-2 text-xs font-semibold text-[var(--foreground)]/80 transition-colors hover:border-[var(--foreground)]/40 hover:text-[var(--foreground)]"
+            >
+              <InstagramIcon className="h-4 w-4" />
+              Instagram
+            </a>
+          )}
         </div>
       </CardContent>
     </Card>
