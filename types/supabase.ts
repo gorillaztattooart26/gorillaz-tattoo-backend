@@ -503,6 +503,44 @@ export interface Database {
           },
         ]
       }
+      artist_availability_blocks: {
+        Row: {
+          id: string
+          artist_id: string
+          starts_at: string
+          ends_at: string
+          reason: string
+          created_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          artist_id: string
+          starts_at: string
+          ends_at: string
+          reason: string
+          created_at?: string
+          created_by: string
+        }
+        Update: {
+          id?: string
+          artist_id?: string
+          starts_at?: string
+          ends_at?: string
+          reason?: string
+          created_at?: string
+          created_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'artist_availability_blocks_artist_id_fkey'
+            columns: ['artist_id']
+            isOneToOne: false
+            referencedRelation: 'artists'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -551,3 +589,5 @@ export type BookingRow = Database['public']['Tables']['bookings']['Row']
 export type BookingReferenceImageRow = Database['public']['Tables']['booking_reference_images']['Row']
 export type PaymentRow = Database['public']['Tables']['payments']['Row']
 export type PaymentInsert = Database['public']['Tables']['payments']['Insert']
+export type ArtistAvailabilityBlockRow = Database['public']['Tables']['artist_availability_blocks']['Row']
+export type ArtistAvailabilityBlockInsert = Database['public']['Tables']['artist_availability_blocks']['Insert']
