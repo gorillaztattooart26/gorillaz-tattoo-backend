@@ -59,7 +59,7 @@ export async function getBookings(): Promise<StaffBooking[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('bookings')
-    .select('*, artists(name)')
+    .select('*, artists!bookings_artist_id_fkey(name)')
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -84,7 +84,7 @@ export async function getBookingsForStaffArtist(
   if (!artist) return []
 
   const supabase = await createClient()
-  let query = supabase.from('bookings').select('*, artists(name)').order('created_at', { ascending: false })
+  let query = supabase.from('bookings').select('*, artists!bookings_artist_id_fkey(name)').order('created_at', { ascending: false })
 
   if (!artist.is_owner) {
     query = query.eq('artist_id', artist.id)
@@ -141,7 +141,7 @@ export async function getRecentBookingsForStaffArtist(
   const supabase = await createClient()
   let query = supabase
     .from('bookings')
-    .select('*, artists(name)')
+    .select('*, artists!bookings_artist_id_fkey(name)')
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -162,7 +162,7 @@ export async function getRecentBookings(limit = 5): Promise<StaffBooking[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('bookings')
-    .select('*, artists(name)')
+    .select('*, artists!bookings_artist_id_fkey(name)')
     .order('created_at', { ascending: false })
     .limit(limit)
 

@@ -39,7 +39,7 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
 
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from('bookings')
-    .select('id, token, booking_id, customer_name, customer_email, artists(name)')
+    .select('id, token, booking_id, customer_name, customer_email, artists!bookings_artist_id_fkey(name)')
     .eq('token', event.bookingToken)
     .maybeSingle()
 

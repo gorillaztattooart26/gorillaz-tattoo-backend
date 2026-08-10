@@ -66,7 +66,7 @@ async function authorizeBookingAction(
   const { data: booking, error } = await supabase
     .from('bookings')
     .select(
-      'id, token, booking_id, status, customer_name, customer_email, artist_id, appointment_date, appointment_time, estimated_session_hours, artists(name)',
+      'id, token, booking_id, status, customer_name, customer_email, artist_id, appointment_date, appointment_time, estimated_session_hours, artists!bookings_artist_id_fkey(name)',
     )
     .eq('id', bookingId)
     .maybeSingle()
