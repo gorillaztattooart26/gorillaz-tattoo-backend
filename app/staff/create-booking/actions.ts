@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { createBookingSchema, type CreateBookingValues } from '@/app/staff/create-booking/schema'
 import { getBaseUrl } from '@/lib/url'
 import { sendBookingConfirmationEmail } from '@/lib/emails'
@@ -106,9 +107,9 @@ async function copyInquiryReferenceImages(
  * server-side (never trust client input), looks up the artist row, then
  * inserts the booking.
  *
- * The booking and reference-image inserts run on the staff session client
- * (`sessionSupabase`, `authenticated` role) — this action only ever runs
- * behind /staff/create-booking's auth gate, so the write should carry the
+ * The booking insert runs on the staff session client (`sessionSupabase`,
+ * `authenticated` role) — this action only ever runs behind
+ * /staff/create-booking's auth gate, so the write should carry the
  * caller's real role rather than the anon key. `bookings` has no SELECT
  * policy for `authenticated` beyond what the Bookings tab already relies
  * on, and Postgres RLS requires the SELECT policy to also pass for
@@ -116,6 +117,12 @@ async function copyInquiryReferenceImages(
  * are generated here rather than read back via `.select()` — same pattern
  * as the inquiry form's `inquiryId` in components/booking/actions.ts,
  * which has the equivalent constraint under `anon`.
+ *
+ * The reference-image insert below runs on the service-role client
+ * instead, narrowly scoped to the single booking `id` generated in this
+ * same call — see the comment at that insert and lib/supabase-admin.ts
+ * for why (this flow can create a booking for any artist, not just the
+ * caller's own, and RLS on booking_reference_images is scoped per-artist).
  *
  * Reference images fall back to a couple of sample photos when there's
  * no source inquiry (or it had none of its own) — real upload UI still
@@ -209,8 +216,17 @@ export async function createBookingAction(values: CreateBookingValues): Promise<
     : []
   const referenceImages = carriedOverImages.length > 0 ? carriedOverImages : DEFAULT_REFERENCE_IMAGES
 
+  // `booking_reference_images` INSERT is RLS-scoped to the caller's own
+  // artist (see supabase/migrations/20260810150000), but this action lets
+  // staff create a booking for ANY artist — the shared front-desk flow
+  // documented above. The service-role client is used here, narrowly, only
+  // for the rows tied to `id`, the booking this exact invocation just
+  // created a few lines above (never a client-supplied or pre-existing
+  // booking id) — see lib/supabase-admin.ts for why this specific case is
+  // a documented, bounded exception rather than a general RLS bypass.
+  const adminSupabase = getSupabaseAdmin()
   for (const image of referenceImages) {
-    const { error: imageInsertError } = await sessionSupabase.from('booking_reference_images').insert({
+    const { error: imageInsertError } = await adminSupabase.from('booking_reference_images').insert({
       booking_id: id,
       image_path: image.path,
       alt_text: image.alt,
