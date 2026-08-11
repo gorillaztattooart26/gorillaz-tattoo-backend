@@ -169,6 +169,24 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       .eq('id', pendingPayment.id)
       .select('id')
 
+    // Stage 6C: the booking must never be confirmed unless the payment row
+    // was actually, verifiably marked `paid` first — checked and returned
+    // on immediately below, before the booking UPDATE is even reached, so
+    // that UPDATE is physically unreachable after either failure mode.
+    if (updatePaymentError) {
+      console.error('[payments] failed to update payment:', updatePaymentError)
+      return { status: 500, body: { error: 'Failed to record payment.' } }
+    }
+    if (!updatedPayments?.length) {
+      console.error(
+        '[payments] payment update affected zero rows — paymentId:',
+        pendingPayment.id,
+        'bookingId:',
+        booking.id,
+      )
+      return { status: 500, body: { error: 'Failed to record payment.' } }
+    }
+
     // Only a booking still `awaiting_down_payment` AND not archived may be
     // confirmed by a paid webhook — this is a conditional update (not a
     // plain `.eq('id', ...)`), so a booking that has since moved to
@@ -181,11 +199,9 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
     // against the row's current committed state at execution time, so it's
     // correct regardless of whether the archive happened before this
     // checkout was created, after it, or concurrently with this exact
-    // webhook. The payment row itself is still marked paid above
-    // regardless (cancellation/archival intentionally never touch
-    // `payments` — see cancelBookingAction in
-    // app/staff/(protected)/bookings/actions.ts and Stage 6A's report) —
-    // only the booking-side transition and its emails are guarded.
+    // webhook. The payment row is now already confirmed `paid` above
+    // (Stage 6C) — only the booking-side transition and its emails are
+    // guarded from here on.
     console.log('[payments] updating booking:', booking.id)
     const { error: updateBookingError, data: updatedBookings } = await supabaseAdmin
       .from('bookings')
@@ -195,21 +211,9 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       .is('archived_at', null)
       .select('id')
 
-    if (updatePaymentError || updateBookingError) {
-      console.error(
-        '[payments] failed to update payment/booking:',
-        updatePaymentError,
-        updateBookingError,
-      )
+    if (updateBookingError) {
+      console.error('[payments] failed to update booking:', updateBookingError)
       return { status: 500, body: { error: 'Failed to record payment.' } }
-    }
-    if (!updatedPayments?.length) {
-      console.error(
-        '[payments] payment update affected zero rows — paymentId:',
-        pendingPayment.id,
-        'bookingId:',
-        booking.id,
-      )
     }
 
     if (!updatedBookings?.length) {
