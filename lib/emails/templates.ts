@@ -249,6 +249,111 @@ export function customerBookingCancelledTemplate(params: {
   }
 }
 
+export function paymentDueReminderTemplate(params: {
+  customerName: string
+  bookingId: string
+  artistName: string
+  appointmentDate: string
+  appointmentTime: string
+  bookingUrl: string
+}): EmailContent {
+  return {
+    subject: `Reminder: your down payment is still due — ${params.bookingId}`,
+    html: emailShell(`
+      <p>Hi ${escapeHtml(params.customerName)},</p>
+      <p>This is a reminder that your down payment for booking <strong>${escapeHtml(params.bookingId)}</strong> with <strong>${escapeHtml(params.artistName)}</strong>, scheduled for <strong>${escapeHtml(params.appointmentDate)} at ${escapeHtml(params.appointmentTime)}</strong>, hasn't been received yet.</p>
+      <p>Please complete your down payment to keep your appointment confirmed.</p>
+      ${button('Complete Your Payment', params.bookingUrl)}
+      <p style="margin-top:24px;color:#71717a;font-size:13px;">Booking reference: ${escapeHtml(params.bookingId)}</p>
+    `),
+    text: [
+      `Hi ${params.customerName},`,
+      '',
+      `This is a reminder that your down payment for booking ${params.bookingId} with ${params.artistName}, scheduled for ${params.appointmentDate} at ${params.appointmentTime}, hasn't been received yet.`,
+      '',
+      'Please complete your down payment to keep your appointment confirmed.',
+      '',
+      `Complete your payment: ${params.bookingUrl}`,
+      '',
+      `Booking reference: ${params.bookingId}`,
+      '',
+      "Gorillaz Tattoo Art — this is an automated message, please don't reply directly to this email.",
+    ].join('\n'),
+  }
+}
+
+export function appointment24hReminderTemplate(params: {
+  customerName: string
+  bookingId: string
+  artistName: string
+  appointmentDate: string
+  appointmentTime: string
+}): EmailContent {
+  return {
+    subject: `Your appointment is coming up — ${params.bookingId}`,
+    html: emailShell(`
+      <p>Hi ${escapeHtml(params.customerName)},</p>
+      <p>This is a reminder that your appointment with <strong>${escapeHtml(params.artistName)}</strong> is coming up within the next 24 hours.</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#71717a;">Date</td><td style="padding:6px 0;">${escapeHtml(params.appointmentDate)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Time</td><td style="padding:6px 0;">${escapeHtml(params.appointmentTime)}</td></tr>
+      </table>
+      <p style="margin-top:16px;">We look forward to seeing you. If you need to reschedule or have any questions, please contact the studio.</p>
+      <p style="margin-top:24px;color:#71717a;font-size:13px;">Booking reference: ${escapeHtml(params.bookingId)}</p>
+    `),
+    text: [
+      `Hi ${params.customerName},`,
+      '',
+      `This is a reminder that your appointment with ${params.artistName} is coming up within the next 24 hours.`,
+      '',
+      `Date: ${params.appointmentDate}`,
+      `Time: ${params.appointmentTime}`,
+      '',
+      'We look forward to seeing you. If you need to reschedule or have any questions, please contact the studio.',
+      '',
+      `Booking reference: ${params.bookingId}`,
+      '',
+      "Gorillaz Tattoo Art — this is an automated message, please don't reply directly to this email.",
+    ].join('\n'),
+  }
+}
+
+export function appointment2hReminderTemplate(params: {
+  customerName: string
+  bookingId: string
+  artistName: string
+  appointmentDate: string
+  appointmentTime: string
+}): EmailContent {
+  return {
+    subject: `Your appointment is in 2 hours — ${params.bookingId}`,
+    html: emailShell(`
+      <p>Hi ${escapeHtml(params.customerName)},</p>
+      <p>This is a reminder that your appointment with <strong>${escapeHtml(params.artistName)}</strong> is coming up in about 2 hours.</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#71717a;">Date</td><td style="padding:6px 0;">${escapeHtml(params.appointmentDate)}</td></tr>
+        <tr><td style="padding:6px 0;color:#71717a;">Time</td><td style="padding:6px 0;">${escapeHtml(params.appointmentTime)}</td></tr>
+      </table>
+      <p style="margin-top:16px;">See you soon. If you're running late or need to reach the studio, please contact us as soon as possible.</p>
+      <p style="margin-top:24px;color:#71717a;font-size:13px;">Booking reference: ${escapeHtml(params.bookingId)}</p>
+    `),
+    text: [
+      `Hi ${params.customerName},`,
+      '',
+      `This is a reminder that your appointment with ${params.artistName} is coming up in about 2 hours.`,
+      '',
+      `Date: ${params.appointmentDate}`,
+      `Time: ${params.appointmentTime}`,
+      '',
+      "See you soon. If you're running late or need to reach the studio, please contact us as soon as possible.",
+      '',
+      `Booking reference: ${params.bookingId}`,
+      '',
+      "Gorillaz Tattoo Art — this is an automated message, please don't reply directly to this email.",
+    ].join('\n'),
+  }
+}
+
 export function customerBookingRescheduledTemplate(params: {
   customerName: string
   bookingId: string
