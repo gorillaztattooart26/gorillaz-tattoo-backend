@@ -8,7 +8,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { createBookingSchema, type CreateBookingValues } from '@/app/staff/create-booking/schema'
 import { getBaseUrl } from '@/lib/url'
 import { sendBookingConfirmationEmail } from '@/lib/emails'
-import { checkBookingConflict } from '@/lib/staff/booking-availability'
+import { checkArtistConflict } from '@/lib/staff/booking-availability'
+import { manilaDateTimeToUtcInterval } from '@/lib/staff/timezone'
 import { getCurrentStaffArtist } from '@/lib/staff/artists'
 import type { Database } from '@/types/supabase'
 
@@ -155,22 +156,34 @@ export async function createBookingAction(values: CreateBookingValues): Promise<
     throw new Error(`Unknown artist: ${parsed.artistSlug}`)
   }
 
-  // Best-effort double-booking guard — uses the staff session client
-  // (authenticated already has SELECT on bookings, proven by the
-  // Bookings tab) rather than the anon client above, which has no read
-  // access to this table at all. Any read failure here just skips the
-  // check rather than blocking booking creation.
+  // Best-effort double-booking + availability-block guard — uses the
+  // staff session client (authenticated already has EXECUTE on the
+  // check_artist_booking_conflict RPC) rather than the anon client above,
+  // which has no read access to bookings/availability at all. Goes
+  // through the RPC rather than a direct table query specifically so
+  // this also works when staff create a booking for an artist other than
+  // themselves (the front-desk flow this action already supports below)
+  // — see checkArtistConflict's doc comment for why a direct query can't
+  // do that under RLS. Any read failure here just skips the check rather
+  // than blocking booking creation, matching the prior convention.
   const sessionSupabase = await createClient()
-  const conflict = await checkBookingConflict(sessionSupabase, {
+  const { startsAt, endsAt } = manilaDateTimeToUtcInterval(
+    parsed.appointmentDate,
+    parsed.appointmentTime,
+    parsed.estimatedSessionHours,
+  )
+  const conflict = await checkArtistConflict(sessionSupabase, {
     artistId: artist.id,
-    date: parsed.appointmentDate,
-    time: parsed.appointmentTime,
-    durationHours: parsed.estimatedSessionHours,
+    startsAt,
+    endsAt,
   })
 
   if (conflict.hasConflict) {
     return {
-      error: `${artist.name} already has a booking (${conflict.conflictingBookingRef}) that overlaps this time slot. Pick a different time or check the Bookings tab.`,
+      error:
+        conflict.conflictType === 'availability_block'
+          ? `${artist.name} is marked unavailable during this time. Pick a different time or check the Availability tab.`
+          : `${artist.name} already has a booking that overlaps this time slot. Pick a different time or check the Bookings tab.`,
     }
   }
 

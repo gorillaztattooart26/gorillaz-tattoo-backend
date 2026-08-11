@@ -90,3 +90,66 @@ export async function checkBookingConflict(
 
   return { hasConflict: false }
 }
+
+export interface ArtistConflictCheckParams {
+  artistId: string
+  startsAt: Date
+  endsAt: Date
+  /** Exclude this booking's own row from the booking-vs-booking half of the check — pass the booking being rescheduled so it doesn't conflict with itself. */
+  excludeBookingId?: string
+}
+
+export interface ArtistConflictResult {
+  hasConflict: boolean
+  conflictType?: 'booking' | 'availability_block'
+}
+
+/**
+ * Unified booking-vs-booking + booking-vs-availability-block conflict
+ * check for one artist and one absolute UTC interval, via the
+ * `check_artist_booking_conflict` SECURITY DEFINER RPC (Stage 2E-A
+ * investigation, migration 20260811010000).
+ *
+ * Why this exists alongside `checkBookingConflict` rather than replacing
+ * it: `bookings` and `artist_availability_blocks` both scope SELECT to
+ * `is_current_user_owner() OR artist_id = current_staff_artist_id()`, but
+ * booking creation is intentionally unrestricted — any linked staff
+ * account may create a booking for any artist (the shared front-desk
+ * flow; see the bookings INSERT policy's own comment,
+ * 20260810140000_scope_staff_rls_policies_by_ownership.sql). That means
+ * `checkBookingConflict`, called under a non-owner's session for an
+ * artist other than themselves, silently sees zero rows for that artist
+ * (confirmed empirically in the Stage 2E-A investigation) and reports no
+ * conflict regardless of the target artist's real schedule. The RPC
+ * bypasses that RLS gap deliberately and narrowly — it doesn't broaden
+ * what either table's policies allow, it just answers this one question
+ * with the caller's own authenticated session (never service-role).
+ *
+ * `startsAt`/`endsAt` must already be absolute UTC instants — build them
+ * with `manilaDateTimeToUtcInterval` (lib/staff/timezone.ts), the same
+ * Stage 2D helper the availability-block feature already uses. This
+ * function does no Manila conversion itself.
+ *
+ * Fails open on an RPC error (logs, then reports no conflict) — same
+ * convention `checkBookingConflict` already uses, so a transient read
+ * failure never blocks booking creation outright.
+ */
+export async function checkArtistConflict(
+  supabase: SupabaseClient<Database>,
+  params: ArtistConflictCheckParams,
+): Promise<ArtistConflictResult> {
+  const { data, error } = await supabase.rpc('check_artist_booking_conflict', {
+    p_artist_id: params.artistId,
+    p_starts_at: params.startsAt.toISOString(),
+    p_ends_at: params.endsAt.toISOString(),
+    p_exclude_booking_id: params.excludeBookingId ?? null,
+  })
+
+  if (error) {
+    console.error('[staff/booking-availability] checkArtistConflict RPC failed:', error)
+    return { hasConflict: false }
+  }
+
+  const result = data as unknown as { conflict: boolean; conflict_type?: 'booking' | 'availability_block' }
+  return { hasConflict: result.conflict, conflictType: result.conflict_type }
+}

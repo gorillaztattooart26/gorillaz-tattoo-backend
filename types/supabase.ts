@@ -544,6 +544,10 @@ export interface Database {
     }
     Views: Record<string, never>
     Functions: {
+      check_artist_booking_conflict: {
+        Args: { p_artist_id: string; p_starts_at: string; p_ends_at: string; p_exclude_booking_id?: string | null }
+        Returns: Json
+      }
       get_booking_by_token: {
         Args: { p_token: string }
         Returns: Json

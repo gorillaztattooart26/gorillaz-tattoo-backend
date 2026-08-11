@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentStaffArtist } from '@/lib/staff/artists'
-import { checkBookingConflict } from '@/lib/staff/booking-availability'
+import { checkArtistConflict } from '@/lib/staff/booking-availability'
+import { manilaDateTimeToUtcInterval } from '@/lib/staff/timezone'
 import { requireOwner } from '@/lib/staff/permissions'
 import { bookingHasPayments, getBookingReferenceImagePaths } from '@/lib/staff/bookings'
 import { deleteReferenceImages } from '@/lib/staff/storage'
@@ -172,17 +173,20 @@ export async function rescheduleBookingAction(
   if (!auth.ok) return { error: auth.error }
   const { supabase, booking, staffLabel } = auth
 
-  const conflict = await checkBookingConflict(supabase, {
+  const { startsAt, endsAt } = manilaDateTimeToUtcInterval(newDate, newTime, booking.estimated_session_hours)
+  const conflict = await checkArtistConflict(supabase, {
     artistId: booking.artist_id,
-    date: newDate,
-    time: newTime,
-    durationHours: booking.estimated_session_hours,
+    startsAt,
+    endsAt,
     excludeBookingId: booking.id,
   })
 
   if (conflict.hasConflict) {
     return {
-      error: `This artist already has a booking (${conflict.conflictingBookingRef}) that overlaps the new time. Pick a different slot.`,
+      error:
+        conflict.conflictType === 'availability_block'
+          ? 'This artist is marked unavailable during the new time. Pick a different slot.'
+          : 'This artist already has a booking that overlaps the new time. Pick a different slot.',
     }
   }
 
