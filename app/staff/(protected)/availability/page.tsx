@@ -3,8 +3,9 @@ import { CalendarOff } from 'lucide-react'
 import { StaffPageHeader } from '@/components/staff/StaffPageHeader'
 import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
 import { AvailabilityDataTable } from '@/components/staff/AvailabilityDataTable'
+import { AvailabilityBlockDialog } from '@/components/staff/AvailabilityBlockDialog'
 import { getAvailabilityBlocksForStaffArtist } from '@/lib/staff/availability'
-import { getCurrentStaffArtist } from '@/lib/staff/artists'
+import { getCurrentStaffArtist, getAllArtistsForStaff } from '@/lib/staff/artists'
 
 export const metadata: Metadata = {
   title: 'Availability | Staff',
@@ -17,10 +18,9 @@ export const metadata: Metadata = {
 }
 
 /**
- * Stage 2A — read-only. Staff can see existing availability blocks; there
- * is no create/edit/delete UI yet (that's Stage 2B/2C), so unlike
- * app/staff/(protected)/bookings/page.tsx this page needs no Server
- * Actions, no archive/view toggle, and no baseUrl.
+ * Stage 2A added the read-only list; Stage 2B adds "Block Time" (create
+ * only — edit/delete are still Stage 2C). No archive/view toggle and no
+ * baseUrl are needed here, unlike app/staff/(protected)/bookings/page.tsx.
  */
 export default async function StaffAvailabilityPage() {
   const artist = await getCurrentStaffArtist()
@@ -35,7 +35,12 @@ export default async function StaffAvailabilityPage() {
     )
   }
 
-  const blocks = await getAvailabilityBlocksForStaffArtist(artist)
+  // Only the owner's form needs the full artist list (the artist selector) —
+  // a non-owner's dialog never renders or submits an artist field at all.
+  const [blocks, artists] = await Promise.all([
+    getAvailabilityBlocksForStaffArtist(artist),
+    artist.is_owner ? getAllArtistsForStaff() : Promise.resolve([]),
+  ])
 
   return (
     <div>
@@ -46,6 +51,7 @@ export default async function StaffAvailabilityPage() {
             ? `${blocks.length} total — every artist's blocked periods`
             : `${blocks.length} total — periods you're marked unavailable`
         }
+        action={<AvailabilityBlockDialog isOwner={artist.is_owner} artists={artists} />}
       />
 
       <div className="px-4 py-6 md:px-8">

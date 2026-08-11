@@ -29,3 +29,29 @@ export async function getCurrentStaffArtist(): Promise<StaffArtist | null> {
   }
   return data
 }
+
+export interface StaffArtistOption {
+  id: string
+  name: string
+}
+
+/**
+ * Every artist, id+name only — powers the owner's artist selector when
+ * creating an availability block on someone else's behalf (Stage 2B).
+ * `artists` SELECT is already open to any authenticated staff account
+ * (`"Staff can read artists" ... USING (true)`, base schema), so this
+ * grants no new access — it's just the id-bearing shape the picker
+ * needs, which the public site's lib/artists.ts:getArtists() doesn't
+ * return (that one is shaped for the anon marketing page and has no
+ * `id`, only `slug`).
+ */
+export async function getAllArtistsForStaff(): Promise<StaffArtistOption[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('artists').select('id, name').order('display_order')
+
+  if (error) {
+    console.error('[staff/artists] getAllArtistsForStaff failed:', error)
+    return []
+  }
+  return data
+}
