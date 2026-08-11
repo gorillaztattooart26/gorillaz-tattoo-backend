@@ -1,5 +1,6 @@
 'use server'
 
+import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentStaffArtist } from '@/lib/staff/artists'
@@ -10,6 +11,12 @@ export interface AvailabilityBlockActionResult {
   error?: string
   id?: string
 }
+
+export interface DeleteAvailabilityBlockActionResult {
+  error?: string
+}
+
+const blockIdSchema = z.string().uuid()
 
 /**
  * Creates one `artist_availability_blocks` row.
@@ -101,4 +108,61 @@ export async function createAvailabilityBlockAction(
 
   revalidatePath('/staff/availability')
   return { id: inserted?.id }
+}
+
+/**
+ * Deletes one `artist_availability_blocks` row by id.
+ *
+ * Authorization is intentionally NOT duplicated here — Stage 1's RLS
+ * DELETE policy (`is_current_user_owner() OR artist_id =
+ * current_staff_artist_id()`) is the sole authorization boundary. This
+ * action does not fetch the row first to check ownership (that would be
+ * a second, redundant authority alongside RLS, and — per the Stage 2C
+ * investigation — the gallery delete action's equivalent pre-check is
+ * actually *stricter* than its own RLS policy and would incorrectly
+ * block the owner from deleting another artist's row if copied here).
+ *
+ * `.delete().eq('id', blockId).select('id').maybeSingle()` is a single
+ * statement: RLS filters which row (if any) the delete is allowed to
+ * touch, and chaining `.select('id')` lets us tell "deleted" apart from
+ * "matched nothing" without a separate SELECT. A non-owner's attempt on
+ * another artist's block and a genuinely nonexistent id are
+ * indistinguishable at this point — both come back as `data: null`, no
+ * error — and that ambiguity is preserved deliberately: resolving it
+ * would require an unscoped existence lookup that could leak whether a
+ * given id belongs to another artist.
+ */
+export async function deleteAvailabilityBlockAction(blockId: string): Promise<DeleteAvailabilityBlockActionResult> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'You must be signed in to do this.' }
+  }
+
+  const parsedId = blockIdSchema.safeParse(blockId)
+  if (!parsedId.success) {
+    return { error: 'That availability block could not be found.' }
+  }
+
+  const { data, error } = await supabase
+    .from('artist_availability_blocks')
+    .delete()
+    .eq('id', parsedId.data)
+    .select('id')
+    .maybeSingle()
+
+  if (error) {
+    console.error('[staff/availability] deleteAvailabilityBlockAction failed:', error)
+    return { error: 'Something went wrong deleting this availability block. Please try again.' }
+  }
+
+  if (!data) {
+    return { error: 'That availability block could not be found.' }
+  }
+
+  revalidatePath('/staff/availability')
+  return {}
 }

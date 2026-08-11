@@ -1,4 +1,5 @@
 import type { StaffAvailabilityBlock } from '@/lib/staff/availability'
+import { AvailabilityBlockDeleteButton } from '@/components/staff/AvailabilityBlockDeleteButton'
 
 const MANILA_TIME_ZONE = 'Asia/Manila'
 
@@ -64,13 +65,13 @@ interface AvailabilityDataTableProps {
 }
 
 /**
- * Read-only table for the Availability tab (Stage 2A) — no bulk-select,
- * no row actions, so unlike BookingsDataTable/PaymentsDataTable this has
- * no interactive state and stays a plain Server Component rather than
- * `'use client'`. Create/delete land in later stages.
+ * Table for the Availability tab. Stage 2A made this read-only; Stage 2C
+ * adds a per-row delete control. The table itself stays a plain Server
+ * Component — only AvailabilityBlockDeleteButton is a Client Component,
+ * so the interactive surface stays as small as possible.
  */
 export function AvailabilityDataTable({ blocks, isOwner }: AvailabilityDataTableProps) {
-  const columnCount = isOwner ? 3 : 2
+  const columnCount = (isOwner ? 3 : 2) + 1
 
   return (
     <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
@@ -80,6 +81,7 @@ export function AvailabilityDataTable({ blocks, isOwner }: AvailabilityDataTable
             {isOwner && <th scope="col" className="px-5 py-3 font-medium">Artist</th>}
             <th scope="col" className="px-5 py-3 font-medium">Date / Time</th>
             <th scope="col" className="px-5 py-3 font-medium">Reason</th>
+            <th scope="col" className="px-5 py-3 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-[var(--foreground)]/5">
@@ -102,6 +104,9 @@ export function AvailabilityDataTable({ blocks, isOwner }: AvailabilityDataTable
                   <p className="mt-0.5 text-xs text-[var(--foreground)]/50">{timeLine}</p>
                 </td>
                 <td className="px-5 py-4 text-[var(--foreground)]/70">{block.reason}</td>
+                <td className="px-5 py-4">
+                  <AvailabilityBlockDeleteButton blockId={block.id} />
+                </td>
               </tr>
             )
           })}
