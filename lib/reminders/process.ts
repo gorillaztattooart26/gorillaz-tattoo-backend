@@ -71,6 +71,7 @@ interface CandidateBookingRow {
 interface ExistingReminderRow {
   booking_id: string
   reminder_type: string
+  status: string
 }
 
 /** One row this invocation's claim step actually inserted — handed to Stage 3E's delivery step so it can attempt those rows immediately without re-querying for "freshly claimed" rows (see lib/reminders/deliver.ts). */
@@ -160,7 +161,7 @@ export async function processRemindersOnce(
 
   const bookingIds = rows.map((row) => row.id)
   const { data: existing, error: existingError } = await reminderDeliveriesTable(supabaseAdmin)
-    .select('booking_id, reminder_type')
+    .select('booking_id, reminder_type, status')
     .in('booking_id', bookingIds)
 
   if (existingError) {
@@ -168,9 +169,12 @@ export async function processRemindersOnce(
     throw new Error('Failed to load existing reminder deliveries.')
   }
 
-  const alreadyClaimed = new Set(
-    ((existing ?? []) as ExistingReminderRow[]).map((row) => `${row.booking_id}:${row.reminder_type}`),
-  )
+  const existingRows = (existing ?? []) as ExistingReminderRow[]
+
+  const alreadyClaimed = new Set(existingRows.map((row) => `${row.booking_id}:${row.reminder_type}`))
+
+  /** `reminder_deliveries.status` per existing (booking, type) pair — lets the 24h/2h suppression below distinguish a still-in-flight (`pending`) or successful (`sent`) 2h reminder from one that's conclusively unsendable (`failed`), rather than treating "a row exists" as "a reminder went out". */
+  const existingStatusByKey = new Map(existingRows.map((row) => [`${row.booking_id}:${row.reminder_type}`, row.status]))
 
   const attemptedAt = now.toISOString()
   const toClaim: { booking_id: string; reminder_type: ReminderType; status: 'pending'; attempted_at: string }[] = []
@@ -187,8 +191,31 @@ export async function processRemindersOnce(
           ? ['appointment_24h', 'appointment_2h']
           : []
 
+    // Late-confirmation suppression: appointment_2h's window is a strict
+    // subset of appointment_24h's (0-2h vs 0-24h), so a booking that first
+    // becomes claimable after already crossing the 2h mark would otherwise
+    // have both claimed together in the same pass. While appointment_2h is
+    // still in flight (`pending`) or has already gone out (`sent`),
+    // appointment_24h must not claim — including on a later pass, after
+    // appointment_2h's own row exists, which is why this checks
+    // `existingStatusByKey` (persisted) rather than only current
+    // eligibility. But a `failed` appointment_2h is conclusively
+    // unsendable and never retried (see fetchStalePendingRows in
+    // lib/reminders/deliver.ts, which only re-attempts `pending` rows) —
+    // suppressing appointment_24h forever in that case would leave the
+    // booking with no reminder at all, so `failed` explicitly does NOT
+    // suppress: appointment_24h becomes the fallback reminder instead.
+    const twentyFourHourPreviouslyClaimed = alreadyClaimed.has(`${booking.id}:appointment_24h`)
+    const twoHourStatus = existingStatusByKey.get(`${booking.id}:appointment_2h`)
+    const twoHourBlocksTwentyFourHour =
+      twoHourStatus === 'sent' ||
+      twoHourStatus === 'pending' ||
+      (twoHourStatus === undefined && isReminderEligible(appointmentStartUtc, now, 'appointment_2h'))
+    const suppressTwentyFourHour = !twentyFourHourPreviouslyClaimed && twoHourBlocksTwentyFourHour
+
     for (const reminderType of candidateTypes) {
       if (alreadyClaimed.has(`${booking.id}:${reminderType}`)) continue
+      if (reminderType === 'appointment_24h' && suppressTwentyFourHour) continue
       if (!isReminderEligible(appointmentStartUtc, now, reminderType)) continue
 
       toClaim.push({

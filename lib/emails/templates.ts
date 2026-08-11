@@ -326,10 +326,10 @@ export function appointment2hReminderTemplate(params: {
   appointmentTime: string
 }): EmailContent {
   return {
-    subject: `Your appointment is in 2 hours — ${params.bookingId}`,
+    subject: `Your appointment is coming up — ${params.bookingId}`,
     html: emailShell(`
       <p>Hi ${escapeHtml(params.customerName)},</p>
-      <p>This is a reminder that your appointment with <strong>${escapeHtml(params.artistName)}</strong> is coming up in about 2 hours.</p>
+      <p>This is a reminder that your appointment with <strong>${escapeHtml(params.artistName)}</strong> is coming up in less than 2 hours.</p>
       <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;">
         <tr><td style="padding:6px 0;color:#71717a;">Date</td><td style="padding:6px 0;">${escapeHtml(params.appointmentDate)}</td></tr>
         <tr><td style="padding:6px 0;color:#71717a;">Time</td><td style="padding:6px 0;">${escapeHtml(params.appointmentTime)}</td></tr>
@@ -340,7 +340,7 @@ export function appointment2hReminderTemplate(params: {
     text: [
       `Hi ${params.customerName},`,
       '',
-      `This is a reminder that your appointment with ${params.artistName} is coming up in about 2 hours.`,
+      `This is a reminder that your appointment with ${params.artistName} is coming up in less than 2 hours.`,
       '',
       `Date: ${params.appointmentDate}`,
       `Time: ${params.appointmentTime}`,
