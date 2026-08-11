@@ -88,6 +88,8 @@ interface BookingRpcRow {
   waiver_accepted_at: string | null
   waiver_version: string | null
   created_at: string
+  /** Already present in `bookings` (Stage 6 archive feature) and already returned by `get_booking_by_token`'s `to_jsonb(b)` — just not previously read into these row shapes. */
+  archived_at: string | null
 }
 
 interface ArtistRpcRow {
@@ -160,6 +162,7 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
     token: b.token,
     bookingId: b.booking_id,
     status: b.status,
+    isArchived: b.archived_at !== null,
     customer: {
       name: b.customer_name,
       email: b.customer_email,
@@ -222,6 +225,8 @@ export interface BookingRecord {
   id: string
   bookingId: string
   status: BookingStatus
+  /** Whether staff have archived this booking — an archived booking must never be allowed to start or complete checkout, regardless of `status`. See createCheckoutSessionAction. */
+  isArchived: boolean
   downPaymentAmount: number
   currency: string
   customer: { name: string; email: string; mobile: string }
@@ -251,6 +256,7 @@ export async function getBookingRecordByToken(token: string): Promise<BookingRec
     id: b.id,
     bookingId: b.booking_id,
     status: b.status,
+    isArchived: b.archived_at !== null,
     downPaymentAmount: b.down_payment_amount,
     currency: b.currency,
     customer: {

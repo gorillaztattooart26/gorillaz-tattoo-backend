@@ -169,13 +169,22 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       .eq('id', pendingPayment.id)
       .select('id')
 
-    // Only a booking still `awaiting_down_payment` may be confirmed by a
-    // paid webhook — this is a conditional update (not a plain `.eq('id', ...)`),
-    // so a booking that has since moved to `cancelled` (or `completed`) is
-    // left untouched here: a late/replayed webhook can never resurrect it
-    // into `appointment_confirmed`. The payment row itself is still marked
-    // paid above regardless, since cancellation intentionally never touches
-    // `payments` (see cancelBookingAction in app/staff/(protected)/bookings/actions.ts) —
+    // Only a booking still `awaiting_down_payment` AND not archived may be
+    // confirmed by a paid webhook — this is a conditional update (not a
+    // plain `.eq('id', ...)`), so a booking that has since moved to
+    // `cancelled`/`completed`, or been archived by staff (Stage 6A — an
+    // archived booking must never be resurrected into
+    // `appointment_confirmed`, regardless of when in the checkout/webhook
+    // sequence the archive happened), is left untouched here: a
+    // late/replayed webhook can never confirm it. This single atomic UPDATE
+    // is the actual race guard — Postgres evaluates the WHERE clause
+    // against the row's current committed state at execution time, so it's
+    // correct regardless of whether the archive happened before this
+    // checkout was created, after it, or concurrently with this exact
+    // webhook. The payment row itself is still marked paid above
+    // regardless (cancellation/archival intentionally never touch
+    // `payments` — see cancelBookingAction in
+    // app/staff/(protected)/bookings/actions.ts and Stage 6A's report) —
     // only the booking-side transition and its emails are guarded.
     console.log('[payments] updating booking:', booking.id)
     const { error: updateBookingError, data: updatedBookings } = await supabaseAdmin
@@ -183,6 +192,7 @@ export async function reconcilePaymentEvent(event: NormalizedPaymentEvent): Prom
       .update({ status: 'appointment_confirmed' })
       .eq('id', booking.id)
       .eq('status', 'awaiting_down_payment')
+      .is('archived_at', null)
       .select('id')
 
     if (updatePaymentError || updateBookingError) {

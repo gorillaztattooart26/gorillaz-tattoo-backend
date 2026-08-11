@@ -38,6 +38,16 @@ export async function createCheckoutSessionAction(
     return { error: 'This booking is not awaiting a down payment.' }
   }
 
+  // `isArchived` comes from the server-side record re-derived above by
+  // token, never from client input. An archived booking must never start
+  // (or resume) checkout — see lib/payments/reconcile.ts for the matching
+  // webhook-side guard that protects a checkout already in flight when the
+  // archive happens. Deliberately the same generic wording as the status
+  // check above: nothing here reveals that "archived" is the reason.
+  if (booking.isArchived) {
+    return { error: 'This booking is not available for payment.' }
+  }
+
   if (!booking.waiverAccepted) {
     if (waiver?.agreedToTerms !== true || waiver?.consentToTattoo !== true) {
       return { error: 'Please agree to both waiver items before continuing.' }

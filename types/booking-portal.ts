@@ -86,6 +86,8 @@ export interface Booking {
   /** Human-friendly reference shown to the customer — NOT used for routing/lookup. */
   bookingId: string
   status: BookingStatus
+  /** Whether staff have archived this booking — a booking can be archived at any status. Deliberately a boolean, not the raw `archived_at` timestamp: the customer-facing portal only ever needs to know whether payment is still possible, never when/by whom it was archived. */
+  isArchived: boolean
   customer: Customer
   artist: Artist
   tattoo: Tattoo
