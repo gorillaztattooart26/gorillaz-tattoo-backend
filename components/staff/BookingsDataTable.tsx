@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/staff/StatusBadge'
 import { CopyBookingLink } from '@/components/staff/CopyBookingLink'
 import { BookingActionsMenu } from '@/components/staff/BookingActionsMenu'
 import { RecordArchiveControls } from '@/components/staff/RecordArchiveControls'
+import { RowActionsMenu } from '@/components/staff/RowActionsMenu'
 import { BulkActionBar } from '@/components/staff/BulkActionBar'
 import { useRowSelection } from '@/hooks/useRowSelection'
 import { formatCurrency, formatDate } from '@/lib/staff/format'
@@ -63,7 +64,7 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
   const ids = bookings.map((b) => b.id)
   const selection = useRowSelection(ids)
 
-  const columnCount = isOwner ? 10 : 9
+  const columnCount = isOwner ? 9 : 8
 
   return (
     <div>
@@ -79,8 +80,8 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
         />
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
-        <table className="w-full text-left text-sm">
+      <div className="relative overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
+        <table className="w-full min-w-[860px] text-left text-sm">
           <thead>
             <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--foreground)]/40">
               {isOwner && (
@@ -92,15 +93,14 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
                   />
                 </th>
               )}
-              <th scope="col" className="px-5 py-3 font-medium">Customer</th>
-              <th scope="col" className="px-5 py-3 font-medium">Artist</th>
-              <th scope="col" className="px-5 py-3 font-medium">Status</th>
-              <th scope="col" className="px-5 py-3 font-medium">Waiver</th>
-              <th scope="col" className="px-5 py-3 font-medium">Appointment</th>
-              <th scope="col" className="px-5 py-3 font-medium">Price</th>
-              <th scope="col" className="px-5 py-3 font-medium">Down Payment</th>
-              <th scope="col" className="px-5 py-3 font-medium">Booking Link</th>
-              <th scope="col" className="px-5 py-3 font-medium">Actions</th>
+              <th scope="col" className="min-w-[170px] px-5 py-3 font-medium">Customer</th>
+              <th scope="col" className="min-w-[110px] px-5 py-3 font-medium">Artist</th>
+              <th scope="col" className="min-w-[130px] px-5 py-3 font-medium">Status</th>
+              <th scope="col" className="min-w-[140px] px-5 py-3 font-medium">Waiver</th>
+              <th scope="col" className="min-w-[130px] px-5 py-3 font-medium">Appointment</th>
+              <th scope="col" className="min-w-[100px] px-5 py-3 font-medium">Price</th>
+              <th scope="col" className="min-w-[110px] px-5 py-3 font-medium">Down Payment</th>
+              <th scope="col" className="min-w-[110px] px-5 py-3 font-medium">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--foreground)]/5">
@@ -114,7 +114,7 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
             {bookings.map((booking) => (
               <tr key={booking.id}>
                 {isOwner && (
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-4 align-top">
                     <Checkbox
                       checked={selection.isSelected(booking.id)}
                       onCheckedChange={() => selection.toggle(booking.id)}
@@ -122,32 +122,30 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
                     />
                   </td>
                 )}
-                <td className="px-5 py-4">
-                  <p className="font-medium text-[var(--foreground)]">{booking.customerName}</p>
-                  <p className="text-xs text-[var(--foreground)]/40">{booking.bookingId}</p>
+                <td className="px-5 py-4 align-top">
+                  <p className="break-words font-medium leading-relaxed text-[var(--foreground)]">{booking.customerName}</p>
+                  <p className="mt-0.5 break-words text-xs leading-relaxed text-[var(--foreground)]/40">{booking.bookingId}</p>
                 </td>
-                <td className="px-5 py-4 capitalize text-[var(--foreground)]/70">{booking.artistName}</td>
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 align-top capitalize leading-relaxed text-[var(--foreground)]/70">{booking.artistName}</td>
+                <td className="px-5 py-4 align-top">
                   <StatusBadge status={booking.status} />
                 </td>
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 align-top">
                   <WaiverStatusBadge accepted={booking.waiverAccepted} acceptedAt={booking.waiverAcceptedAt} />
                 </td>
-                <td className="px-5 py-4 text-[var(--foreground)]/70">
+                <td className="px-5 py-4 align-top leading-relaxed text-[var(--foreground)]/70">
                   {formatDate(booking.appointmentDate)}
                   <span className="ml-1 text-xs text-[var(--foreground)]/40">{booking.appointmentTime}</span>
                 </td>
-                <td className="px-5 py-4 text-[var(--foreground)]/70">
+                <td className="px-5 py-4 align-top leading-relaxed text-[var(--foreground)]/70">
                   {formatCurrency(booking.estimatedPrice, booking.currency)}
                 </td>
-                <td className="px-5 py-4 text-[var(--foreground)]/70">
+                <td className="px-5 py-4 align-top leading-relaxed text-[var(--foreground)]/70">
                   {formatCurrency(booking.downPaymentAmount, booking.currency)}
                 </td>
-                <td className="px-5 py-4">
-                  <CopyBookingLink url={`${baseUrl}/booking/${booking.token}`} />
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex flex-col items-start gap-3">
+                <td className="px-5 py-4 align-top">
+                  <RowActionsMenu label={`Actions for ${booking.bookingId}`}>
+                    <CopyBookingLink url={`${baseUrl}/booking/${booking.token}`} />
                     {view === 'active' && <BookingActionsMenu booking={booking} />}
                     {isOwner && (
                       <RecordArchiveControls
@@ -158,13 +156,16 @@ export function BookingsDataTable({ bookings, baseUrl, isOwner, view }: Bookings
                         onDelete={() => deleteBookingAction(booking.id)}
                       />
                     )}
-                  </div>
+                  </RowActionsMenu>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <p className="mt-2 flex items-center gap-1.5 text-xs text-[var(--foreground)]/30 md:hidden">
+        <span aria-hidden>↔</span> Scroll sideways to see every column
+      </p>
     </div>
   )
 }

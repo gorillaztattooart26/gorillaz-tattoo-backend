@@ -6,8 +6,9 @@ import { HeroVideoManager } from '@/components/staff/HeroVideoManager'
 import { AboutImageManager } from '@/components/staff/AboutImageManager'
 import { PortfolioImagesManager } from '@/components/staff/PortfolioImagesManager'
 import { SlideshowManager } from '@/components/staff/SlideshowManager'
+import { GalleryOrderManager } from '@/components/staff/GalleryOrderManager'
 import { PlaceholderSection } from '@/components/staff/PlaceholderSection'
-import { getStaffGalleryItems } from '@/lib/staff/gallery'
+import { getStaffGalleryItems, getAllGalleryItemsForOwner } from '@/lib/staff/gallery'
 import { getCurrentStaffArtist } from '@/lib/staff/artists'
 import {
   getExistingSiteImages,
@@ -53,7 +54,10 @@ export default async function StaffGalleryPage() {
     )
   }
 
-  const items = await getStaffGalleryItems(artist.name)
+  const [items, allItemsForOrdering] = await Promise.all([
+    getStaffGalleryItems(artist.name),
+    artist.is_owner ? getAllGalleryItemsForOwner() : Promise.resolve([]),
+  ])
 
   return (
     <div>
@@ -70,6 +74,7 @@ export default async function StaffGalleryPage() {
             </div>
             <PortfolioImagesManager slots={portfolioSlots} existingImages={existingImages} />
             <SlideshowManager slides={slideshowImages} />
+            <GalleryOrderManager items={allItemsForOrdering} />
           </>
         ) : (
           <HomepageMediaOwnerNotice />

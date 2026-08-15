@@ -63,7 +63,7 @@ export function InquiryDetailButton({ inquiry }: InquiryDetailButtonProps) {
         ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(true)}
-        className="whitespace-nowrap rounded-full border border-[var(--foreground)]/25 px-3 py-1.5 text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:border-[var(--foreground)]/50 hover:text-[var(--foreground)]"
+        className="flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/5"
       >
         view full inquiry
       </button>

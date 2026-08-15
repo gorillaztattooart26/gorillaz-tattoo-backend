@@ -16,11 +16,6 @@ export interface Customer {
   preferredContactMethod: PreferredContactMethod
 }
 
-export interface ReferenceImage {
-  src: string
-  alt: string
-}
-
 export interface Tattoo {
   description: string
   style: string
@@ -28,7 +23,6 @@ export interface Tattoo {
   estimatedSize: string
   estimatedSessionHours: number
   estimatedSessionCount: number
-  referenceImages: ReferenceImage[]
 }
 
 export interface Appointment {

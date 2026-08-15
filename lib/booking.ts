@@ -156,7 +156,7 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
   }
 
   const result = data as unknown as BookingRpcResult
-  const { booking: b, artist, reference_images: referenceImages } = result
+  const { booking: b, artist } = result
 
   return {
     token: b.token,
@@ -177,10 +177,6 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
       estimatedSize: b.estimated_size,
       estimatedSessionHours: b.estimated_session_hours,
       estimatedSessionCount: b.estimated_session_count,
-      referenceImages: referenceImages.map((image) => ({
-        src: image.image_path,
-        alt: image.alt_text ?? 'Reference image on file for this booking',
-      })),
     },
     appointment: {
       studioAddress: b.studio_address,

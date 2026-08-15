@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { HOME_SECTIONS, ROUTES } from '@/lib/routes'
 import { CtaPill } from '@/components/common/CtaPill'
+import { PortfolioLightbox } from '@/components/portfolio/PortfolioLightbox'
 import { cn } from '@/utils/cn'
 import { artistNameKey } from '@/utils/artistName'
 import type { GalleryItem } from '@/types/gallery'
@@ -15,10 +16,10 @@ interface PortfolioGalleryProps {
 }
 
 /**
- * Single masonry tile. Pieces with more than one reference photo (e.g. a
+ * Single grid tile. Pieces with more than one reference photo (e.g. a
  * healed shot alongside the fresh one) get an in-tile carousel.
  */
-function PortfolioTile({ item }: { item: GalleryItem }) {
+function PortfolioTile({ item, onOpen }: { item: GalleryItem; onOpen: (imageIndex: number) => void }) {
   const [index, setIndex] = useState(0)
   const hasMultiple = item.images.length > 1
 
@@ -33,14 +34,25 @@ function PortfolioTile({ item }: { item: GalleryItem }) {
   }
 
   return (
-    <div className="group relative mb-2.5 break-inside-avoid overflow-hidden bg-[var(--gz-ink-900)] md:mb-3.5">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(index)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onOpen(index)
+        }
+      }}
+      aria-label={`View ${item.piece} full screen`}
+      className="group relative block aspect-[4/5] w-full cursor-pointer overflow-hidden bg-[var(--gz-ink-900)]"
+    >
       <Image
         src={item.images[index]}
         alt={item.alt}
-        width={0}
-        height={0}
+        fill
         sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-        className="block h-auto w-full transition-transform duration-[780ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
+        className="h-full w-full object-cover transition-transform duration-[780ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
         style={{ filter: 'contrast(1.03) saturate(1.02)' }}
       />
 
@@ -134,6 +146,28 @@ export function PortfolioGallery({ items }: PortfolioGalleryProps) {
       ),
     [items, category, artist],
   )
+
+  // Flat list of every photo across every currently-filtered piece, and
+  // where each piece's photos start within that flat list — lets the
+  // lightbox browse every image in the current filter regardless of which
+  // tile/photo was clicked to open it, independent of each tile's own
+  // small hover carousel.
+  const flatImages = useMemo(
+    () =>
+      filtered.flatMap((item) =>
+        item.images.map((src) => ({ src, alt: item.alt, category: item.category, artistName: item.artistName })),
+      ),
+    [filtered],
+  )
+  const tileStartIndex = useMemo(() => {
+    let acc = 0
+    return filtered.map((item) => {
+      const start = acc
+      acc += item.images.length
+      return start
+    })
+  }, [filtered])
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   // Pads the scrollable rail so "All" (the first pill) sits centered in the
   // viewport at rest, and the last pill can also reach center — mirrors the
@@ -284,12 +318,18 @@ export function PortfolioGallery({ items }: PortfolioGalleryProps) {
             </button>
           </div>
         ) : (
-          <div className="columns-1 gap-2.5 md:columns-2 md:gap-3.5 lg:columns-3">
-            {filtered.map((item) => (
-              <PortfolioTile key={item.piece} item={item} />
+          <div className="grid grid-cols-1 items-start gap-2.5 md:grid-cols-2 md:gap-3.5 lg:grid-cols-3">
+            {filtered.map((item, itemIndex) => (
+              <PortfolioTile
+                key={item.piece}
+                item={item}
+                onOpen={(imageIndex) => setLightboxIndex(tileStartIndex[itemIndex] + imageIndex)}
+              />
             ))}
           </div>
         )}
+
+        <PortfolioLightbox images={flatImages} index={lightboxIndex} onIndexChange={setLightboxIndex} />
 
         <div className="reveal mt-3 flex flex-col items-center gap-5 border-t border-[var(--gz-border-subtle)] pt-9 md:mt-7 md:gap-6 md:pt-16">
           <p className="m-0 max-w-[22ch] text-center text-[28px] font-normal uppercase leading-[0.94] text-[var(--gz-paper-050)] [font-family:var(--font-gz-display)] md:text-[48px] lg:text-[64px]">

@@ -44,11 +44,9 @@ function formatPHP(amount: number): string {
 export function CreateBookingForm({
   artists,
   prefill,
-  referenceImages = [],
 }: {
   artists: Artist[]
   prefill?: BookingPrefill
-  referenceImages?: string[]
 }) {
   const router = useRouter()
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -180,31 +178,6 @@ export function CreateBookingForm({
             />
           </FormField>
           {prefill?.sourceInquiryId ? <input type="hidden" {...register('sourceInquiryId')} /> : null}
-
-          {referenceImages.length > 0 ? (
-            <div className="sm:col-span-2">
-              <p className="text-xs text-[var(--foreground)]/40">
-                {referenceImages.length} reference {referenceImages.length === 1 ? 'photo' : 'photos'} from this
-                inquiry will be attached to the booking automatically.
-              </p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {referenceImages.map((url) => (
-                  // eslint-disable-next-line @next/next/no-img-element -- short-lived signed preview URL, not worth Next/Image's remote-pattern config for a staff-only convenience thumbnail
-                  <img
-                    key={url}
-                    src={url}
-                    alt="Reference photo from this inquiry"
-                    className="h-16 w-16 rounded-lg border border-[var(--border)] object-cover"
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className="text-xs text-[var(--foreground)]/40 sm:col-span-2">
-              Reference image upload isn&apos;t wired to storage yet — newly
-              created bookings use sample images until that&apos;s connected.
-            </p>
-          )}
         </CardContent>
       </Card>
 

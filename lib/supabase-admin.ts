@@ -41,6 +41,19 @@ let cachedClient: SupabaseClient<Database> | null = null
  * the call site with the same one-booking-id scoping, not a shared
  * "bypass RLS for X" function.
  *
+ * Third narrow, deliberate exception: app/staff/(protected)/gallery/
+ * actions.ts's createGalleryItemAction uses this client to check submitted
+ * photos' SHA-256 hashes against `gallery_image_hashes` and to register new
+ * hashes after a successful upload. That Server Action is browser-reachable
+ * by any linked staff account, but `gallery_image_hashes` has zero
+ * authenticated grants by design (migration 20260815150000) — Park must not
+ * be able to read other artists' hashes or delete/fabricate a hash row to
+ * bypass duplicate protection for his own uploads. Every hash value this
+ * client ever writes there is one the server itself computed from the
+ * bytes of a file that same request just uploaded, never a client-supplied
+ * hash, and every hash row it inserts is scoped to the one gallery_items id
+ * that same invocation just created — not a general-purpose bypass.
+ *
  * Deliberately a separate module from lib/supabase.ts (the anon client used
  * everywhere else) so the two can never be confused at the import site.
  *

@@ -131,14 +131,14 @@ export function BookingActionsMenu({ booking }: BookingActionsMenuProps) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-1.5">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="flex w-full flex-col items-stretch gap-1.5">
+      <div className="flex flex-col gap-1">
         <button
           ref={rescheduleTriggerRef}
           type="button"
           onClick={onOpenReschedule}
           disabled={isPending}
-          className="flex items-center gap-1.5 rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/5 disabled:opacity-60"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/5 disabled:opacity-60"
         >
           <CalendarClock className="h-3.5 w-3.5" />
           reschedule
@@ -147,7 +147,7 @@ export function BookingActionsMenu({ booking }: BookingActionsMenuProps) {
           type="button"
           onClick={onComplete}
           disabled={isPending}
-          className="flex items-center gap-1.5 rounded-full border border-emerald-500/40 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/10 disabled:opacity-60"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/10 disabled:opacity-60"
         >
           <CheckCircle2 className="h-3.5 w-3.5" />
           complete
@@ -156,7 +156,7 @@ export function BookingActionsMenu({ booking }: BookingActionsMenuProps) {
           type="button"
           onClick={onCancel}
           disabled={isPending}
-          className="flex items-center gap-1.5 rounded-full border border-red-500/40 px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
         >
           <XCircle className="h-3.5 w-3.5" />
           cancel

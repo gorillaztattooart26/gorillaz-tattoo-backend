@@ -3,6 +3,7 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { StatusBadge } from '@/components/staff/StatusBadge'
 import { RecordArchiveControls } from '@/components/staff/RecordArchiveControls'
+import { RowActionsMenu } from '@/components/staff/RowActionsMenu'
 import { BulkActionBar } from '@/components/staff/BulkActionBar'
 import { useRowSelection } from '@/hooks/useRowSelection'
 import { formatCurrency, formatDate } from '@/lib/staff/format'
@@ -98,13 +99,15 @@ export function PaymentsDataTable({ payments, isOwner, view }: PaymentsDataTable
                 </td>
                 {isOwner && (
                   <td className="px-5 py-4">
-                    <RecordArchiveControls
-                      view={view}
-                      itemLabel={`this payment for ${payment.bookingRef}`}
-                      onArchive={() => archivePaymentAction(payment.id)}
-                      onRestore={() => restorePaymentAction(payment.id)}
-                      onDelete={() => deletePaymentAction(payment.id)}
-                    />
+                    <RowActionsMenu label={`Actions for the payment for ${payment.bookingRef}`}>
+                      <RecordArchiveControls
+                        view={view}
+                        itemLabel={`this payment for ${payment.bookingRef}`}
+                        onArchive={() => archivePaymentAction(payment.id)}
+                        onRestore={() => restorePaymentAction(payment.id)}
+                        onDelete={() => deletePaymentAction(payment.id)}
+                      />
+                    </RowActionsMenu>
                   </td>
                 )}
               </tr>

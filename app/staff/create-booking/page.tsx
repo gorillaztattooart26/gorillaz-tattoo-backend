@@ -43,7 +43,7 @@ export default async function CreateBookingPage({
         </p>
       </div>
 
-      <CreateBookingForm artists={artists} prefill={prefill} referenceImages={inquiry?.images ?? []} />
+      <CreateBookingForm artists={artists} prefill={prefill} />
     </div>
   )
 }

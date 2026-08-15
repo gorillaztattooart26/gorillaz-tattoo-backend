@@ -21,7 +21,7 @@ export function CopyBookingLink({ url }: CopyBookingLinkProps) {
     <button
       type="button"
       onClick={onCopy}
-      className="flex items-center gap-1.5 rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/5"
+      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/5"
     >
       {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
       {copied ? 'copied' : 'copy link'}

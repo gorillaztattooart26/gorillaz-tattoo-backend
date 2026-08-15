@@ -33,8 +33,8 @@ export function RecordArchiveControls({ view, itemLabel, onArchive, onRestore, o
   }
 
   return (
-    <div className="flex flex-col items-start gap-1.5">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="flex w-full flex-col items-stretch gap-1.5">
+      <div className="flex flex-col gap-1">
         {view === 'active' && onArchive && (
           <button
             type="button"
@@ -43,7 +43,7 @@ export function RecordArchiveControls({ view, itemLabel, onArchive, onRestore, o
               if (!confirm(`Archive ${itemLabel}? It'll be hidden from the default view but can be restored.`)) return
               void run(onArchive, 'Archived.')
             }}
-            className="flex items-center gap-1.5 rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/5 disabled:opacity-60"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--foreground)]/5 disabled:opacity-60"
           >
             <Archive className="h-3.5 w-3.5" />
             archive
@@ -54,7 +54,7 @@ export function RecordArchiveControls({ view, itemLabel, onArchive, onRestore, o
             type="button"
             disabled={isPending}
             onClick={() => void run(onRestore, 'Restored.')}
-            className="flex items-center gap-1.5 rounded-full border border-emerald-500/40 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/10 disabled:opacity-60"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/10 disabled:opacity-60"
           >
             <ArchiveRestore className="h-3.5 w-3.5" />
             restore
@@ -67,7 +67,7 @@ export function RecordArchiveControls({ view, itemLabel, onArchive, onRestore, o
             if (!confirm(`Permanently delete ${itemLabel}? This can't be undone.`)) return
             void run(onDelete, 'Deleted.')
           }}
-          className="flex items-center gap-1.5 rounded-full border border-red-500/50 px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
+          className="flex w-full items-center gap-2 rounded-lg border-t border-[var(--border)]/60 px-3 py-2 text-left text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
         >
           <Trash2 className="h-3.5 w-3.5" />
           delete

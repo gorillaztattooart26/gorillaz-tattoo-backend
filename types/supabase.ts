@@ -192,6 +192,30 @@ export interface Database {
         }
         Relationships: []
       }
+      gallery_image_hashes: {
+        Row: {
+          id: string
+          gallery_item_id: string
+          image_url: string
+          file_hash: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          gallery_item_id: string
+          image_url: string
+          file_hash: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          gallery_item_id?: string
+          image_url?: string
+          file_hash?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       homepage_hero: {
         Row: {
           id: string

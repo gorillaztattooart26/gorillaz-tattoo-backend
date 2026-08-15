@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Checkbox } from '@/components/ui/checkbox'
 import { InquiryDetailButton } from '@/components/staff/InquiryDetailButton'
 import { RecordArchiveControls } from '@/components/staff/RecordArchiveControls'
+import { RowActionsMenu } from '@/components/staff/RowActionsMenu'
 import { BulkActionBar } from '@/components/staff/BulkActionBar'
 import { useRowSelection } from '@/hooks/useRowSelection'
 import { formatDate } from '@/lib/staff/format'
@@ -45,8 +46,8 @@ export function InquiriesDataTable({ inquiries, isOwner, view }: InquiriesDataTa
         />
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
-        <table className="w-full text-left text-sm">
+      <div className="relative overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]/60 md:rounded-2xl">
+        <table className="w-full min-w-[1120px] text-left text-sm">
           <thead>
             <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-[var(--foreground)]/40">
               {isOwner && (
@@ -58,20 +59,18 @@ export function InquiriesDataTable({ inquiries, isOwner, view }: InquiriesDataTa
                   />
                 </th>
               )}
-              <th scope="col" className="px-5 py-3 font-medium">
-                <span className="sr-only">Actions</span>
-              </th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Name</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Contact</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Artist</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Style</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Placement</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Size</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Height</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Weight</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Description</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Reference</th>
-              <th scope="col" className="whitespace-nowrap px-5 py-3 font-medium">Submitted</th>
+              <th scope="col" className="min-w-[110px] px-5 py-3 font-medium">Actions</th>
+              <th scope="col" className="min-w-[150px] px-5 py-3 font-medium">Name</th>
+              <th scope="col" className="min-w-[190px] px-5 py-3 font-medium">Contact</th>
+              <th scope="col" className="min-w-[120px] px-5 py-3 font-medium">Artist</th>
+              <th scope="col" className="min-w-[110px] px-5 py-3 font-medium">Style</th>
+              <th scope="col" className="min-w-[110px] px-5 py-3 font-medium">Placement</th>
+              <th scope="col" className="min-w-[90px] px-5 py-3 font-medium">Size</th>
+              <th scope="col" className="min-w-[80px] px-5 py-3 font-medium">Height</th>
+              <th scope="col" className="min-w-[80px] px-5 py-3 font-medium">Weight</th>
+              <th scope="col" className="min-w-[240px] px-5 py-3 font-medium">Description</th>
+              <th scope="col" className="min-w-[130px] px-5 py-3 font-medium">Reference</th>
+              <th scope="col" className="min-w-[110px] px-5 py-3 font-medium">Submitted</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--foreground)]/5">
@@ -85,7 +84,7 @@ export function InquiriesDataTable({ inquiries, isOwner, view }: InquiriesDataTa
             {inquiries.map((inquiry) => (
               <tr key={inquiry.id}>
                 {isOwner && (
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-4 align-top">
                     <Checkbox
                       checked={selection.isSelected(inquiry.id)}
                       onCheckedChange={() => selection.toggle(inquiry.id)}
@@ -93,13 +92,13 @@ export function InquiriesDataTable({ inquiries, isOwner, view }: InquiriesDataTa
                     />
                   </td>
                 )}
-                <td className="px-5 py-4">
-                  <div className="flex flex-col items-start gap-1.5">
+                <td className="px-5 py-4 align-top">
+                  <RowActionsMenu label={`Actions for the inquiry from ${inquiry.full_name}`}>
                     <InquiryDetailButton inquiry={inquiry} />
                     {view === 'active' && (
                       <Link
                         href={`/staff/create-booking?fromInquiry=${inquiry.id}`}
-                        className="whitespace-nowrap rounded-full border border-[var(--primary)]/40 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10"
+                        className="flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10"
                       >
                         convert to booking
                       </Link>
@@ -113,29 +112,29 @@ export function InquiriesDataTable({ inquiries, isOwner, view }: InquiriesDataTa
                         onDelete={() => deleteInquiryAction(inquiry.id)}
                       />
                     )}
-                  </div>
+                  </RowActionsMenu>
                 </td>
-                <td className="whitespace-nowrap px-5 py-4 font-medium text-[var(--foreground)]">{inquiry.full_name}</td>
-                <td className="whitespace-nowrap px-5 py-4 text-[var(--foreground)]/70">
-                  <p>{inquiry.email}</p>
-                  <p className="text-xs text-[var(--foreground)]/40">{inquiry.phone}</p>
+                <td className="px-5 py-4 align-top break-words font-medium leading-relaxed text-[var(--foreground)]">{inquiry.full_name}</td>
+                <td className="px-5 py-4 align-top break-words leading-relaxed text-[var(--foreground)]/70">
+                  <p className="break-all">{inquiry.email}</p>
+                  <p className="mt-0.5 text-xs text-[var(--foreground)]/40">{inquiry.phone}</p>
                 </td>
-                <td className="whitespace-nowrap px-5 py-4 capitalize text-[var(--foreground)]/70">{inquiry.preferred_artist}</td>
-                <td className="whitespace-nowrap px-5 py-4 capitalize text-[var(--foreground)]/70">{inquiry.tattoo_type}</td>
-                <td className="whitespace-nowrap px-5 py-4 text-[var(--foreground)]/70">{inquiry.placement}</td>
-                <td className="whitespace-nowrap px-5 py-4 text-[var(--foreground)]/70">{inquiry.size}</td>
-                <td className="whitespace-nowrap px-5 py-4 text-[var(--foreground)]/70">{inquiry.height || '—'}</td>
-                <td className="whitespace-nowrap px-5 py-4 text-[var(--foreground)]/70">{inquiry.weight || '—'}</td>
-                <td className="px-5 py-4 text-[var(--foreground)]/70">
-                  <p className="w-64 whitespace-pre-wrap break-words rounded-lg border border-[var(--border)] bg-[var(--background)]/20 px-3 py-2 leading-relaxed">
+                <td className="px-5 py-4 align-top break-words capitalize leading-relaxed text-[var(--foreground)]/70">{inquiry.preferred_artist}</td>
+                <td className="px-5 py-4 align-top break-words capitalize leading-relaxed text-[var(--foreground)]/70">{inquiry.tattoo_type}</td>
+                <td className="px-5 py-4 align-top break-words leading-relaxed text-[var(--foreground)]/70">{inquiry.placement}</td>
+                <td className="px-5 py-4 align-top break-words leading-relaxed text-[var(--foreground)]/70">{inquiry.size}</td>
+                <td className="px-5 py-4 align-top leading-relaxed text-[var(--foreground)]/70">{inquiry.height || '—'}</td>
+                <td className="px-5 py-4 align-top leading-relaxed text-[var(--foreground)]/70">{inquiry.weight || '—'}</td>
+                <td className="px-5 py-4 align-top text-[var(--foreground)]/70">
+                  <p className="w-64 max-w-full whitespace-pre-wrap break-words rounded-lg border border-[var(--border)] bg-[var(--background)]/20 px-3 py-2 leading-relaxed">
                     {inquiry.message}
                   </p>
                 </td>
-                <td className="whitespace-nowrap px-5 py-4">
+                <td className="px-5 py-4 align-top">
                   {inquiry.images.length === 0 ? (
                     <span className="text-xs text-[var(--foreground)]/30">none</span>
                   ) : (
-                    <div className="flex gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {inquiry.images.map((url, index) => (
                         <a
                           key={url}
@@ -156,12 +155,15 @@ export function InquiriesDataTable({ inquiries, isOwner, view }: InquiriesDataTa
                     </div>
                   )}
                 </td>
-                <td className="whitespace-nowrap px-5 py-4 text-[var(--foreground)]/40">{formatDate(inquiry.created_at)}</td>
+                <td className="whitespace-nowrap px-5 py-4 align-top text-[var(--foreground)]/40">{formatDate(inquiry.created_at)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <p className="mt-2 flex items-center gap-1.5 text-xs text-[var(--foreground)]/30 md:hidden">
+        <span aria-hidden>↔</span> Scroll sideways to see every column
+      </p>
     </div>
   )
 }
